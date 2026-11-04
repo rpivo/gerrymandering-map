@@ -4,6 +4,7 @@ Commands:
     boundaries  Build the map in effect for 2026: the Census 2024 districts with the
                 redrawn states swapped in, validated, written to data/build/.
     audit       Validate data/sources/states.csv and list states with new 2026 maps.
+    calibrate   Re-derive the map generalization settings from Census files.
 """
 
 import argparse
@@ -15,7 +16,9 @@ from shapely.geometry.base import BaseGeometry
 
 from gerry.blocks import assemble_districts, read_block_assignment, read_blocks
 from gerry.boundaries import load_districts, load_state_outlines
+from gerry.calibrate import calibrate
 from gerry.fetch import CENSUS_CD119, CENSUS_STATES, fetch
+from gerry.generalize import absorb_fragments, simplify_to_census
 from gerry.replacement import (
     check_audit_match,
     clip_to_land,
@@ -53,7 +56,8 @@ def _load_replacement(
     """Fetch, normalize and clip one state's current map. Returns rows and problems."""
     plan, field = _read_plan(state_map, raw, manifest)
     rows = normalize_state_map(plan, state_map.state, field)
-    rows = clip_to_land(rows, land)
+    # Same footing as Census districts: land only, no clipping slivers, Census-level detail.
+    rows = simplify_to_census(absorb_fragments(clip_to_land(rows, land)))
     rows["map_source"] = state_map.source.id
     gap = coverage_gap(rows, land)
     if gap <= MAX_COVERAGE_GAP:
@@ -115,6 +119,7 @@ def audit(repo_root: Path) -> int:
 COMMANDS = {
     "boundaries": (boundaries, "Build and validate the 2026 district map."),
     "audit": (audit, "Validate the state map audit and list changed states."),
+    "calibrate": (calibrate, "Re-derive the settings in gerry.generalize from Census files."),
 }
 
 

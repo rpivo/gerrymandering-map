@@ -95,8 +95,26 @@ def test_boundaries_swaps_in_registered_state_maps(fake_pipeline, monkeypatch, t
     written = output(tmp_path)
     maine = written[written["state"] == "ME"].sort_values("district_id")
     assert list(maine["map_source"]) == ["me-test-2026"] * 2
-    assert maine.geometry.iloc[0].equals(box(0, 0, 1, 1))  # clipped to land
+    assert maine.geometry.iloc[0].hausdorff_distance(box(0, 0, 1, 1)) < 1e-9  # clipped to land
     assert len(written) == 435
+
+
+def test_boundaries_generalizes_only_swapped_in_states(fake_pipeline, monkeypatch, tmp_path):
+    steps = []
+
+    def record(name):
+        def step(districts, *args, **kwargs):
+            steps.append((name, sorted(set(districts["state"]))))
+            return districts
+
+        return step
+
+    monkeypatch.setattr(cli, "absorb_fragments", record("absorb"))
+    monkeypatch.setattr(cli, "simplify_to_census", record("simplify"))
+    monkeypatch.setattr(cli, "STATE_MAPS", {"ME": StateMap("ME", ME_SOURCE, "CD")})
+    write_audit(tmp_path, audit_rows(changed=("ME",)))
+    assert run(tmp_path) == 0
+    assert steps == [("absorb", ["ME"]), ("simplify", ["ME"])]
 
 
 def test_boundaries_names_pending_states_it_could_not_swap(
@@ -143,7 +161,7 @@ def test_boundaries_builds_a_state_from_blocks(fake_pipeline, monkeypatch, tmp_p
     fetched = [source_id for source_id, _, _ in fake_pipeline["fetched"]]
     assert "census-blocks-test-23" in fetched
     maine = output(tmp_path).query("state == 'ME'").sort_values("district_id")
-    assert maine.geometry.iloc[0].equals(box(0, 0, 1, 1))
+    assert maine.geometry.iloc[0].hausdorff_distance(box(0, 0, 1, 1)) < 1e-9
     assert list(maine["map_source"]) == ["me-test-2026"] * 2
 
 
