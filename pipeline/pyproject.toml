@@ -3,7 +3,13 @@ name = "gerry"
 version = "0.1.0"
 description = "Data pipeline for gerrymandering-map: district boundaries, compactness scores, JSON export."
 requires-python = ">=3.13,<3.14"
-dependencies = []
+dependencies = [
+    "geopandas>=1.2.0",
+    "httpx>=0.28.1",
+    "pyogrio>=0.13.0",
+    "pyproj>=3.8.0",
+    "shapely>=2.2.0",
+]
 
 [dependency-groups]
 dev = [
@@ -21,5 +27,11 @@ packages = ["src/gerry"]
 [tool.pytest.ini_options]
 testpaths = ["tests", "../tools/tests"]
 addopts = "--strict-markers"
+# Library warnings often flag behaviour changes (for example geopandas missing vs empty).
+filterwarnings = ["error"]
 
 # Ruff is configured repo-wide in ../ruff.toml.
+
+[tool.uv]
+# Only resolve package versions published at least two weeks ago (matches site/pnpm-workspace.yaml).
+exclude-newer = "2 weeks"

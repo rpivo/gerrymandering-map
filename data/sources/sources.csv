@@ -1,0 +1,2 @@
+id,url,publisher,license,description,downloaded,sha256
+census-cd119-cb-2025-500k,https://www2.census.gov/geo/tiger/GENZ2025/shp/cb_2025_us_cd119_500k.zip,U.S. Census Bureau,Public domain (U.S. Government work),"Cartographic boundary file, 119th Congress districts, 2025 edition, 1:500,000, clipped to the shoreline",2026-11-04,8e804518d333d67e24e25c61767c6a7c78fd0a0852179e8cc19c36fd66011010
