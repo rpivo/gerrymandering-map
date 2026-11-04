@@ -125,7 +125,9 @@ def scores(repo_root: Path) -> int:
     if not built.exists():
         print(f"{built.relative_to(repo_root)} not found. Run make boundaries first.")
         return 1
-    table = score_districts(gpd.read_file(built))
+    data = repo_root / "data"
+    land = load_state_outlines(fetch(CENSUS_STATES, data / "raw", data / "sources" / "sources.csv"))
+    table = score_districts(gpd.read_file(built), land)
     write_districts_json(table, repo_root / "site" / "src" / "data" / "districts.json")
     table.to_csv(built.parent / "scores.csv", index=False)
     ranked = table[~table["at_large"]].sort_values("rank_national")

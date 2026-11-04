@@ -10,6 +10,7 @@ metrics on one scale; their raw values sit in very different ranges.
 
 import geopandas as gpd
 import pandas as pd
+from shapely.geometry.base import BaseGeometry
 
 from gerry.metrics import compactness
 
@@ -39,12 +40,16 @@ def _with_ranks(scores: pd.DataFrame) -> pd.DataFrame:
     return scores
 
 
-def score_districts(districts: gpd.GeoDataFrame) -> pd.DataFrame:
+def score_districts(
+    districts: gpd.GeoDataFrame, land: dict[str, BaseGeometry] | None = None
+) -> pd.DataFrame:
     """Score every district.
 
     Args:
         districts: One row per district with `district_id`, `state`, `number` (null for
             at-large) and `geometry`. Any other columns, such as `map_source`, are kept.
+        land: Each state's land outline (in the districts' CRS), keyed by state. With it,
+            Reock and convex hull are measured against land (see gerry.metrics).
 
     Returns:
         One row per district, sorted by `district_id`, without geometry: the raw
@@ -53,7 +58,10 @@ def score_districts(districts: gpd.GeoDataFrame) -> pd.DataFrame:
         score or ranks.
     """
     metrics = pd.DataFrame(
-        [compactness(geometry, districts.crs) for geometry in districts.geometry],
+        [
+            compactness(geometry, districts.crs, (land or {}).get(state))
+            for geometry, state in zip(districts.geometry, districts["state"], strict=True)
+        ],
         index=districts.index,
     )
     scores = pd.concat([pd.DataFrame(districts.drop(columns="geometry")), metrics], axis=1)

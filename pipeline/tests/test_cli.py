@@ -217,7 +217,18 @@ def test_default_repo_root_is_the_repository():
     assert (cli.REPO_ROOT / "CLAUDE.md").exists()
 
 
-def test_scores_writes_site_json_and_csv(valid_districts, tmp_path, capsys):
+def test_scores_writes_site_json_and_csv(valid_districts, monkeypatch, tmp_path, capsys):
+    fetched = []
+    monkeypatch.setattr(cli, "fetch", lambda source, *a: fetched.append(source.id) or Path("/f"))
+    outlines = {s: g.buffer(0.01) for s, g in valid_districts.dissolve("state").geometry.items()}
+    monkeypatch.setattr(cli, "load_state_outlines", lambda path: outlines)
+    real_score, seen = cli.score_districts, {}
+
+    def spy(districts, land=None):
+        seen["land"] = land
+        return real_score(districts, land)
+
+    monkeypatch.setattr(cli, "score_districts", spy)
     build = tmp_path / "data" / "build"
     build.mkdir(parents=True)
     valid_districts.assign(map_source="census-cd119-cb-2025-500k").to_file(build / "districts.gpkg")
@@ -231,6 +242,8 @@ def test_scores_writes_site_json_and_csv(valid_districts, tmp_path, capsys):
     out = capsys.readouterr().out
     assert "Scored 435 districts (429 ranked, 6 at-large)." in out
     assert "Most irregular:" in out
+    assert fetched == ["census-states-cb-2025-500k"]
+    assert seen["land"] is outlines
 
 
 def test_scores_needs_the_built_map_first(tmp_path, capsys):
