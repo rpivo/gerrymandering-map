@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import geopandas as gpd
@@ -214,3 +215,24 @@ def test_audit_fails_on_problems(tmp_path, capsys):
 
 def test_default_repo_root_is_the_repository():
     assert (cli.REPO_ROOT / "CLAUDE.md").exists()
+
+
+def test_scores_writes_site_json_and_csv(valid_districts, tmp_path, capsys):
+    build = tmp_path / "data" / "build"
+    build.mkdir(parents=True)
+    valid_districts.assign(map_source="census-cd119-cb-2025-500k").to_file(build / "districts.gpkg")
+    assert cli.main(["scores", "--repo-root", str(tmp_path)]) == 0
+    data = json.loads((tmp_path / "site" / "src" / "data" / "districts.json").read_text())
+    assert data["count"] == 435
+    scored = [d for d in data["districts"] if not d["at_large"]]
+    assert len(scored) == 429
+    assert sorted(d["rank_national"] for d in scored) == list(range(1, 430))
+    assert len(pd.read_csv(build / "scores.csv")) == 435
+    out = capsys.readouterr().out
+    assert "Scored 435 districts (429 ranked, 6 at-large)." in out
+    assert "Most irregular:" in out
+
+
+def test_scores_needs_the_built_map_first(tmp_path, capsys):
+    assert cli.main(["scores", "--repo-root", str(tmp_path)]) == 1
+    assert "make boundaries" in capsys.readouterr().out

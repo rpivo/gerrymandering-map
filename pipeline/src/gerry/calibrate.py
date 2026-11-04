@@ -12,7 +12,6 @@ state file, then comparing with the 1:500,000 versions, shows:
 Run it with `python -m gerry calibrate`. It downloads about 11 MB of TIGER files.
 """
 
-import math
 from collections.abc import Iterable
 from pathlib import Path
 
@@ -25,6 +24,7 @@ from shapely.geometry.base import BaseGeometry
 from gerry.boundaries import load_districts, load_state_outlines, normalize_districts
 from gerry.fetch import CENSUS_CD119, CENSUS_STATES, Source, fetch
 from gerry.generalize import MIN_SHARED_M, absorb_fragments, local_crs, simplify_to_census
+from gerry.metrics import polsby_popper
 from gerry.replacement import clip_to_land
 from gerry.states import STATES_BY_USPS
 
@@ -52,11 +52,6 @@ def load_tiger_districts(path: Path) -> gpd.GeoDataFrame:
     raw = gpd.read_file(location)
     district_column = next(c for c in raw.columns if c.startswith("CD") and c.endswith("FP"))
     return normalize_districts(raw[raw[district_column] != "ZZ"])
-
-
-def polsby_popper(geometry: BaseGeometry) -> float:
-    """Return 4 pi area / perimeter squared: 1 for a circle, lower for less compact shapes."""
-    return 4 * math.pi * geometry.area / geometry.length**2
 
 
 def _projected_by_state(districts: gpd.GeoDataFrame) -> dict[str, gpd.GeoDataFrame]:

@@ -2,7 +2,7 @@
 UV := uv run --project pipeline
 PY_PATHS := pipeline tools
 
-.PHONY: setup lint format test check-functions check pr-size site-dev site-check boundaries audit calibrate
+.PHONY: setup lint format test check-functions check pr-size site-dev site-check boundaries audit calibrate scores data
 
 setup:
 	uv sync --project pipeline
@@ -36,6 +36,13 @@ check: lint test check-functions site-check
 # Download (once, then cached) and validate the Census district boundaries.
 boundaries:
 	$(UV) python -m gerry boundaries
+
+# Score the built map; write site/src/data/districts.json and data/build/scores.csv.
+scores:
+	$(UV) python -m gerry scores
+
+# Build the map and score it.
+data: boundaries scores
 
 # Validate data/sources/states.csv and list states whose 2026 map differs from 2024.
 audit:
