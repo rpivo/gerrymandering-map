@@ -42,7 +42,7 @@ Run these from the repo root.
 | `make boundaries` | Builds the 2026 district map into `data/build/districts.gpkg`: the Census districts with each redrawn state's official map swapped in, then checks it (435 districts, each state's count, valid shapes, no overlaps, full land coverage). Downloads are cached in `data/raw/` |
 | `make audit` | Checks `data/sources/states.csv` and lists the states whose 2026 map differs from the Census boundaries |
 | `make calibrate` | Re-derives the settings that bring state files to the Census level of detail, from Census files for 12 unchanged states |
-| `make scores` | Scores the built map: Polsby-Popper, Reock and convex hull for every district, percentiles among the 429 districts with lines, a 0 to 100 irregularity score and ranks. Writes `site/src/data/districts.json` (committed) and `data/build/scores.csv` |
+| `make scores` | Scores the built map: Polsby-Popper, Reock and convex hull for every district, percentiles among the 429 districts with lines, a 0 to 100 irregularity score and ranks. Writes the site's data to `site/src/data/` (committed: `districts.json` scores, `shapes.json` SVG outlines and state maps, `states.json` state details) and `data/build/scores.csv` |
 | `make data` | `make boundaries` then `make scores` |
 | `make test` | Runs the Python tests (`pipeline/tests` and `tools/tests`) |
 | `make lint` | Checks Python style and docstrings with ruff, without changing files |

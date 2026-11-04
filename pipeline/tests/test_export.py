@@ -4,7 +4,7 @@ import math
 import pandas as pd
 import pytest
 
-from gerry.export import district_records, write_districts_json
+from gerry.export import district_records, state_records, write_districts_json, write_shapes_json
 
 CENSUS = "census-cd119-cb-2025-500k"
 
@@ -83,3 +83,39 @@ def test_records_reject_a_missing_score_for_a_district_with_lines():
     frame["irregularity"] = pd.array([None, None], dtype="Int64")
     with pytest.raises(ValueError, match="TX-35.*irregularity"):
         district_records(frame)
+
+
+def test_shapes_json_has_card_and_page_outlines_and_state_maps(tmp_path):
+    import geopandas as gpd
+    from shapely.geometry import box
+
+    districts = gpd.GeoDataFrame(
+        {"district_id": ["ME-01", "ME-02", "WY-AL"], "state": ["ME", "ME", "WY"]},
+        geometry=[box(-70, 44, -69, 45), box(-69, 44, -68, 45), box(-110, 41, -104, 45)],
+        crs="EPSG:4269",
+    )
+    path = tmp_path / "shapes.json"
+    write_shapes_json(districts, path)
+    data = json.loads(path.read_text())
+    assert set(data["districts"]) == {"ME-01", "ME-02", "WY-AL"}
+    for outline in data["districts"]["ME-01"].values():
+        assert outline["viewBox"].startswith("0 0 ") and outline["d"].startswith("M")
+    assert set(data["districts"]["ME-01"]) == {"card", "page"}
+    assert set(data["states"]) == {"ME", "WY"}
+    assert set(data["states"]["ME"]["paths"]) == {"ME-01", "ME-02"}
+
+
+def test_state_records_join_names_seats_and_the_audit():
+    from test_state_audit import row
+
+    audit = [
+        row("TX", changed_since_2024="yes", first_used="2026", enacted="2025-08-29"),
+        row("WY"),
+    ]
+    tx, wy = state_records(audit)
+    assert tx["state"] == "TX" and tx["name"] == "Texas" and tx["seats"] == 38
+    assert tx["changed_since_2024"] is True
+    assert tx["map_in_effect_2026"] == "2021 enacted plan"
+    assert tx["source_url"] == "https://example.gov/maps"
+    assert wy["at_large"] is True and wy["changed_since_2024"] is False
+    assert wy["enacted"] is None

@@ -69,7 +69,7 @@ def schwartzberg(geometry: BaseGeometry) -> float:
     return 1 / math.sqrt(polsby_popper(geometry))
 
 
-def _local_projection(geometry: BaseGeometry, crs: CRS | str):
+def local_projection(geometry: BaseGeometry, crs: CRS | str):
     """Return a function projecting shapes from crs into meters centered on geometry."""
     to_lonlat = Transformer.from_crs(crs, "EPSG:4326", always_xy=True)
     lonlat = shapely.transform(geometry, to_lonlat.transform, interleaved=False)
@@ -79,7 +79,7 @@ def _local_projection(geometry: BaseGeometry, crs: CRS | str):
 
 def project_around(geometry: BaseGeometry, crs: CRS | str) -> BaseGeometry:
     """Return a shape in meters, in an equal-area projection centered on the shape itself."""
-    return _local_projection(geometry, crs)(geometry)
+    return local_projection(geometry, crs)(geometry)
 
 
 def compactness(
@@ -92,7 +92,7 @@ def compactness(
         crs: The CRS of geometry and land.
         land: The state's land, for measuring Reock and convex hull against land.
     """
-    project = _local_projection(geometry, crs)
+    project = local_projection(geometry, crs)
     shape = project(geometry)
     local_land = project(land) if land is not None else None
     return {

@@ -232,7 +232,12 @@ def test_scores_writes_site_json_and_csv(valid_districts, monkeypatch, tmp_path,
     build = tmp_path / "data" / "build"
     build.mkdir(parents=True)
     valid_districts.assign(map_source="census-cd119-cb-2025-500k").to_file(build / "districts.gpkg")
+    write_audit(tmp_path, audit_rows())
     assert cli.main(["scores", "--repo-root", str(tmp_path)]) == 0
+    site_data = tmp_path / "site" / "src" / "data"
+    shapes = json.loads((site_data / "shapes.json").read_text())
+    assert len(shapes["districts"]) == 435 and len(shapes["states"]) == 50
+    assert json.loads((site_data / "states.json").read_text())["count"] == 50
     data = json.loads((tmp_path / "site" / "src" / "data" / "districts.json").read_text())
     assert data["count"] == 435
     scored = [d for d in data["districts"] if not d["at_large"]]
