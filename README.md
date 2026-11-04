@@ -70,21 +70,24 @@ For each measure, a district's percentile is where it falls among the 429 distri
 
 ## Deploy
 
-The site is hosted on Cloudflare Pages, connected to this GitHub repo. Every merge to `main` deploys to production, and every PR gets its own preview URL.
+The site is a Cloudflare Worker that serves the Astro build as static files (no Worker script), connected to this GitHub repo with Workers Builds. Every merge to `main` deploys to production, and other branches get preview URLs.
 
-Pages project settings (Workers & Pages, Create, Pages, Connect to Git):
+The Worker's config is `site/wrangler.json`. Build settings in the Cloudflare dashboard (Workers & Pages, Create application, Continue with GitHub):
 
 | Setting | Value |
 |---|---|
+| Project name | `gerrymandering-map` (must match `name` in `wrangler.json`) |
 | Production branch | `main` |
-| Framework preset | Astro |
 | Root directory | `site` |
 | Build command | `pnpm build` |
-| Build output directory | `dist` |
+| Deploy command | `pnpm exec wrangler deploy` |
+| Non-production branch deploy command | `pnpm exec wrangler versions upload` |
 
-Cloudflare reads the Node version from `site/.nvmrc` and the pnpm version from `packageManager` in `site/package.json`. Response headers (security headers, and long-term caching for Astro's fingerprinted assets) are in `site/public/_headers`.
+Wrangler is a pinned dev dependency, so deploys use the locked version. Cloudflare reads the Node version from `site/.nvmrc` and the pnpm version from `packageManager` in `site/package.json`. Response headers (security headers, and long-term caching for Astro's fingerprinted assets) are in `site/public/_headers`, which Workers static assets honor.
 
 The pipeline doesn't run on Cloudflare: the site builds only from the committed data in `site/src/data/`, so a data change ships by committing regenerated files.
+
+To check a deploy locally without uploading: `cd site && pnpm build && pnpm exec wrangler deploy --dry-run`.
 
 ## License
 
