@@ -2,10 +2,11 @@
 UV := uv run --project pipeline
 PY_PATHS := pipeline tools
 
-.PHONY: setup lint format test check-functions check pr-size
+.PHONY: setup lint format test check-functions check pr-size site-dev site-check
 
 setup:
 	uv sync --project pipeline
+	pnpm --dir site install --frozen-lockfile
 
 lint:
 	$(UV) ruff check $(PY_PATHS)
@@ -21,8 +22,15 @@ test:
 check-functions:
 	$(UV) python tools/check_function_length.py $(PY_PATHS)
 
-# Everything CI runs on the pipeline. Must pass before every commit.
-check: lint test check-functions
+# Site: lint (including function length and docstrings), typecheck, tests, build.
+site-check:
+	pnpm --dir site check
+
+site-dev:
+	pnpm --dir site dev
+
+# Everything CI runs. Must pass before every commit.
+check: lint test check-functions site-check
 
 pr-size:
 	$(UV) python tools/check_pr_size.py origin/main

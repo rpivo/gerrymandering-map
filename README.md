@@ -4,13 +4,14 @@ A website that lists every US congressional district, shows its shape, and score
 
 The scores describe shape, not intent. An irregular district isn't proof of a gerrymander, and a compact one isn't proof against it.
 
-**Status:** early setup. The data pipeline is scaffolded. The site and the scoring code come next.
+**Status:** early setup. The data pipeline and the site are scaffolded. The scoring code comes next.
 
 ## Layout
 
 | Path | What's there |
 |---|---|
 | `pipeline/` | Python data pipeline: downloads boundaries, computes scores, exports JSON |
+| `site/` | Astro + TypeScript static site, built from the pipeline's exported JSON |
 | `tools/` | Repo checks run in CI: function length and PR size limits |
 | `.github/workflows/ci.yml` | CI: lint, tests and limit checks on every PR |
 | `.claude/` | Claude Code settings, including a hook that blocks commits when checks fail |
@@ -18,7 +19,9 @@ The scores describe shape, not intent. An irregular district isn't proof of a ge
 
 ## Setup
 
-You need [uv](https://docs.astral.sh/uv/) and GNU Make. uv installs Python 3.13 itself if it's missing.
+You need [uv](https://docs.astral.sh/uv/), Node 24 or newer, [pnpm](https://pnpm.io/) 10, and GNU Make. uv installs Python 3.13 itself if it's missing.
+
+The site only installs package versions that have been published for at least two weeks (`minimumReleaseAge` in `site/pnpm-workspace.yaml`), as a guard against freshly published malicious releases.
 
 ```bash
 make setup
@@ -30,8 +33,10 @@ Run these from the repo root.
 
 | Command | What it does |
 |---|---|
-| `make setup` | Installs the pipeline's Python environment |
-| `make check` | Everything CI runs on the pipeline: lint, tests and the function length check |
+| `make setup` | Installs the pipeline's Python environment and the site's packages |
+| `make check` | Everything CI runs: pipeline lint, tests and function length, plus the full site check |
+| `make site-dev` | Starts the site's dev server at http://localhost:4324 |
+| `make site-check` | Site lint (including function length and docstrings), typecheck, tests and build |
 | `make test` | Runs the Python tests (`pipeline/tests` and `tools/tests`) |
 | `make lint` | Checks Python style and docstrings with ruff, without changing files |
 | `make format` | Fixes Python style and formatting in place |

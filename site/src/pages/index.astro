@@ -1,0 +1,87 @@
+---
+import Base from "../layouts/Base.astro";
+
+const repoUrl = "https://github.com/rpivo/gerrymandering-map";
+---
+
+<Base
+  title="Gerrymandering Map"
+  description="Every US congressional district, its shape, and how irregular that shape is."
+>
+  <main>
+    <p class="eyebrow">Work in progress</p>
+    <h1>Gerrymandering Map</h1>
+    <p class="lede">
+      Every US congressional district, what it looks like, and how irregular its shape is
+      compared with all the others.
+    </p>
+
+    <section aria-labelledby="coming">
+      <h2 id="coming">Coming soon</h2>
+      <ul>
+        <li>Outlines of all 435 districts, searchable by state, district or representative.</li>
+        <li>
+          An irregularity score from 0 to 100 for each one, based on three standard measures
+          of compactness.
+        </li>
+        <li>A plain-language explanation of what the scores can and can't tell you.</li>
+      </ul>
+    </section>
+
+    <p class="note">
+      A score describes a district's shape, not the intent behind it. Coastlines, rivers and
+      the Voting Rights Act can all make a district irregular for good reasons.
+    </p>
+
+    <p><a href={repoUrl}>Follow along on GitHub</a></p>
+  </main>
+</Base>
+
+<style>
+  main {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 4rem 1rem;
+  }
+
+  .eyebrow {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    margin: 0.25rem 0 1rem;
+    font-size: clamp(2rem, 6vw, 3rem);
+    line-height: 1.1;
+  }
+
+  .lede {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+  }
+
+  h2 {
+    margin-top: 2.5rem;
+    font-size: 1.1rem;
+  }
+
+  ul {
+    padding-left: 1.2rem;
+  }
+
+  li + li {
+    margin-top: 0.5rem;
+  }
+
+  .note {
+    margin: 2rem 0;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text-muted);
+  }
+</style>
