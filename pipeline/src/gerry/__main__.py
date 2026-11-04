@@ -18,7 +18,7 @@ from shapely.geometry.base import BaseGeometry
 from gerry.blocks import assemble_districts, read_block_assignment, read_blocks
 from gerry.boundaries import load_districts, load_state_outlines
 from gerry.calibrate import calibrate
-from gerry.export import write_districts_json
+from gerry.export import write_districts_json, write_shapes_json, write_states_json
 from gerry.fetch import CENSUS_CD119, CENSUS_STATES, fetch
 from gerry.generalize import absorb_fragments, simplify_to_census
 from gerry.replacement import (
@@ -120,15 +120,19 @@ def audit(repo_root: Path) -> int:
 
 
 def scores(repo_root: Path) -> int:
-    """Score the built map; write site/src/data/districts.json and data/build/scores.csv."""
+    """Score the built map and write the site's data files and data/build/scores.csv."""
     built = repo_root / "data" / "build" / "districts.gpkg"
     if not built.exists():
         print(f"{built.relative_to(repo_root)} not found. Run make boundaries first.")
         return 1
     data = repo_root / "data"
     land = load_state_outlines(fetch(CENSUS_STATES, data / "raw", data / "sources" / "sources.csv"))
-    table = score_districts(gpd.read_file(built), land)
-    write_districts_json(table, repo_root / "site" / "src" / "data" / "districts.json")
+    districts = gpd.read_file(built)
+    table = score_districts(districts, land)
+    site_data = repo_root / "site" / "src" / "data"
+    write_districts_json(table, site_data / "districts.json")
+    write_shapes_json(districts, site_data / "shapes.json")
+    write_states_json(read_state_audit(data / "sources" / "states.csv"), site_data / "states.json")
     table.to_csv(built.parent / "scores.csv", index=False)
     ranked = table[~table["at_large"]].sort_values("rank_national")
     print(
@@ -136,7 +140,7 @@ def scores(repo_root: Path) -> int:
     )
     top = ", ".join(f"{r.district_id} ({r.irregularity})" for r in ranked.head(10).itertuples())
     print(f"Most irregular: {top}")
-    print("Wrote site/src/data/districts.json and data/build/scores.csv")
+    print("Wrote site/src/data/ (districts, shapes, states) and data/build/scores.csv")
     return 0
 
 
