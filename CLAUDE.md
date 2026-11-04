@@ -29,12 +29,15 @@ These rules apply to every change in this repo. If a request conflicts with one 
 - Keep the validation checks passing: exactly 435 districts, each state's count matching its apportionment, unique IDs, valid geometry.
 - When a state's map is in question (redrawn, in court, or a replacement), record its status and source in `data/sources/states.csv` rather than guessing.
 
-## Metrics and tests
+## Testing (test-driven development)
 
-- Metric functions are pure: geometry in, number out, with no I/O.
+- Write the test first for any new behaviour, in the pipeline or the site. Run it and confirm it fails for the expected reason (not an import error or a typo) before writing the code. Then write the smallest code that makes it pass, then tidy up with the tests still green.
+- When fixing a bug, first write a test that reproduces it and fails, then fix it.
+- Tests must be able to fail. For any check that guards against something (a validation, an absence check, a race or edge case), prove it works by temporarily breaking the code it guards and watching the test fail. Then restore the code. A test that has only ever passed proves nothing.
 - Every new or changed metric needs a known-answer test (a circle, a square, an L shape, a multi-part district).
-- When fixing a bug in a metric or a validation check, first write a test that fails without the fix.
+- Metric functions are pure: geometry in, number out, with no I/O.
 - Any change to the scoring formula must also update the methodology page.
+- In the PR description, say which tests were written first and which guards were checked by breaking the code.
 
 ## Copy and tone
 
