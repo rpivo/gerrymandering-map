@@ -17,6 +17,7 @@ __pycache__/
 node_modules/
 dist/
 .astro/
+.wrangler/
 
 # Personal Claude Code settings
 .claude/settings.local.json
