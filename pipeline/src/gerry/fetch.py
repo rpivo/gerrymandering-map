@@ -29,6 +29,8 @@ class Source:
     publisher: str
     license: str
     description: str
+    # Local file name, for URLs that don't end in one (API download links).
+    filename: str | None = None
 
 
 class SourceChangedError(Exception):
@@ -43,6 +45,18 @@ CENSUS_CD119 = Source(
     description=(
         "Cartographic boundary file, 119th Congress districts, 2025 edition, 1:500,000, "
         "clipped to the shoreline"
+    ),
+)
+
+
+CENSUS_STATES = Source(
+    id="census-states-cb-2025-500k",
+    url="https://www2.census.gov/geo/tiger/GENZ2025/shp/cb_2025_us_state_500k.zip",
+    publisher="U.S. Census Bureau",
+    license="Public domain (U.S. Government work)",
+    description=(
+        "Cartographic boundary file, states, 2025 edition, 1:500,000, clipped to the "
+        "shoreline. Used to clip replacement district maps to land."
     ),
 )
 
@@ -107,7 +121,8 @@ def fetch(
             checksum recorded in the manifest.
         httpx.HTTPStatusError: if the download fails.
     """
-    target = raw_dir / source.id / PurePosixPath(urlparse(source.url).path).name
+    name = source.filename or PurePosixPath(urlparse(source.url).path).name
+    target = raw_dir / source.id / name
     entries = read_manifest(manifest)
     recorded = entries.get(source.id, {}).get("sha256")
     if target.exists():
@@ -126,6 +141,7 @@ def fetch(
     partial.replace(target)
     if not recorded:
         downloaded = (today or date.today()).isoformat()
-        entries[source.id] = {**asdict(source), "downloaded": downloaded, "sha256": actual}
+        details = {k: v for k, v in asdict(source).items() if k in MANIFEST_FIELDS}
+        entries[source.id] = {**details, "downloaded": downloaded, "sha256": actual}
         _write_manifest(manifest, entries)
     return target

@@ -4,6 +4,9 @@ plans/
 # Raw data downloads (sources are recorded in data/sources/)
 data/raw/
 
+# Pipeline output, rebuilt by make boundaries
+data/build/
+
 # Python
 .venv/
 __pycache__/
