@@ -2,7 +2,7 @@
 UV := uv run --project pipeline
 PY_PATHS := pipeline tools
 
-.PHONY: setup lint format test check-functions check pr-size site-dev site-check boundaries audit
+.PHONY: setup lint format test check-functions check pr-size site-dev site-check boundaries audit calibrate
 
 setup:
 	uv sync --project pipeline
@@ -40,6 +40,10 @@ boundaries:
 # Validate data/sources/states.csv and list states whose 2026 map differs from 2024.
 audit:
 	$(UV) python -m gerry audit
+
+# Re-derive the map generalization settings from Census files (downloads about 11 MB).
+calibrate:
+	$(UV) python -m gerry calibrate
 
 pr-size:
 	$(UV) python tools/check_pr_size.py origin/main

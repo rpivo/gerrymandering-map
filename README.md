@@ -41,6 +41,7 @@ Run these from the repo root.
 | `make site-check` | Site lint (including function length and docstrings), typecheck, tests and build |
 | `make boundaries` | Builds the 2026 district map into `data/build/districts.gpkg`: the Census districts with each redrawn state's official map swapped in, then checks it (435 districts, each state's count, valid shapes, no overlaps, full land coverage). Downloads are cached in `data/raw/` |
 | `make audit` | Checks `data/sources/states.csv` and lists the states whose 2026 map differs from the Census boundaries |
+| `make calibrate` | Re-derives the settings that bring state files to the Census level of detail, from Census files for 12 unchanged states |
 | `make test` | Runs the Python tests (`pipeline/tests` and `tools/tests`) |
 | `make lint` | Checks Python style and docstrings with ruff, without changing files |
 | `make format` | Fixes Python style and formatting in place |
@@ -51,7 +52,7 @@ Run these from the repo root.
 
 Raw downloads go in `data/raw/`, which is not committed. Every source is recorded in `data/sources/sources.csv` with its SHA-256 checksum. If a source changes upstream, the pipeline stops rather than quietly using different data.
 
-Current boundaries: the U.S. Census Bureau's 2025 cartographic boundary file for the 119th Congress (1:500,000, clipped to the shoreline). These are the lines used in the 2024 election. Nine states used a different map in the 2026 election (`data/sources/states.csv` records each with a source). For eight of them (Alabama, California, Florida, Louisiana, North Carolina, Tennessee, Texas and Utah) the pipeline downloads the state's official 2026 shapefile and swaps it in. Ohio publishes its map only as a block assignment file, so the pipeline joins it to the Census 2020 block shapes and merges the blocks into districts. Each state's districts are clipped to the Census outline of the state, so every district is measured against land the same way. Missouri and Virginia passed new maps that were not used in 2026.
+Current boundaries: the U.S. Census Bureau's 2025 cartographic boundary file for the 119th Congress (1:500,000, clipped to the shoreline). These are the lines used in the 2024 election. Nine states used a different map in the 2026 election (`data/sources/states.csv` records each with a source). For eight of them (Alabama, California, Florida, Louisiana, North Carolina, Tennessee, Texas and Utah) the pipeline downloads the state's official 2026 shapefile and swaps it in. Ohio publishes its map only as a block assignment file, so the pipeline joins it to the Census 2020 block shapes and merges the blocks into districts. Each state's districts are then put on the same footing as the Census districts: clipped to the Census outline of the state (land only), with clipping slivers merged into their neighbours, and internal borders simplified to the Census file's level of detail. Without that last step, the more detailed state files would score about 2% less compact on average for no real reason. `make calibrate` re-derives both settings from the Census Bureau's own full-detail and generalized versions of the same districts. Missouri and Virginia passed new maps that were not used in 2026.
 
 ## License
 
