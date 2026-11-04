@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import geopandas as gpd
+import pandas as pd
 import pytest
 from shapely.geometry import box
 from test_state_audit import row
@@ -8,11 +9,12 @@ from test_state_audit import row
 from gerry import __main__ as cli
 from gerry.fetch import Source
 from gerry.state_audit import COLUMNS
-from gerry.state_maps import StateMap
+from gerry.state_maps import BlockAssignmentMap, StateMap
 from gerry.states import STATES
 
 ME_LAND = box(0, 0, 2, 1)
 ME_SOURCE = Source("me-test-2026", "https://example.gov/me.zip", "Maine", "PD", "Test")
+ME_BLOCKS = Source("census-blocks-test-23", "https://example.gov/b.zip", "Census", "PD", "Blocks")
 
 
 def write_audit(repo_root: Path, rows: list[dict[str, str]]) -> None:
@@ -116,6 +118,33 @@ def test_boundaries_fails_when_a_pending_state_is_unchanged(
     monkeypatch.setattr(cli, "PENDING", {"ME": "No shapefile published yet."})
     assert run(tmp_path) == 1
     assert "ME: marked pending but the audit says unchanged." in capsys.readouterr().out
+
+
+def test_boundaries_builds_a_state_from_blocks(fake_pipeline, monkeypatch, tmp_path, capsys):
+    blocks = gpd.GeoDataFrame(
+        {"GEOID20": ["a", "b", "c", "d"], "ALAND20": [1, 1, 1, 1]},
+        geometry=[box(0, 0, 0.5, 1), box(0.5, 0, 1, 1), box(1, 0, 1.5, 1), box(1.5, 0, 2, 1)],
+        crs="EPSG:4269",
+    )
+    assignment = pd.Series({"a": "1", "b": "1", "c": "2", "d": "2"})
+    seen = {}
+
+    def fake_assignment(path, member, block_column, district_column):
+        seen["assignment"] = (path, member, block_column, district_column)
+        return assignment
+
+    monkeypatch.setattr(cli, "read_block_assignment", fake_assignment)
+    monkeypatch.setattr(cli, "read_blocks", lambda path: blocks)
+    block_map = BlockAssignmentMap("ME", ME_SOURCE, "BAF.xlsx", "Block", "District", ME_BLOCKS)
+    monkeypatch.setattr(cli, "STATE_MAPS", {"ME": block_map})
+    write_audit(tmp_path, audit_rows(changed=("ME",)))
+    assert run(tmp_path) == 0
+    assert seen["assignment"] == (Path("/fake/me-test-2026.zip"), "BAF.xlsx", "Block", "District")
+    fetched = [source_id for source_id, _, _ in fake_pipeline["fetched"]]
+    assert "census-blocks-test-23" in fetched
+    maine = output(tmp_path).query("state == 'ME'").sort_values("district_id")
+    assert maine.geometry.iloc[0].equals(box(0, 0, 1, 1))
+    assert list(maine["map_source"]) == ["me-test-2026"] * 2
 
 
 def test_boundaries_fails_when_a_replacement_leaves_land_uncovered(
