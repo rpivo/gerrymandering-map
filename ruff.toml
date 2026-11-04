@@ -1,0 +1,17 @@
+# Ruff settings for all Python in the repo (pipeline/ and tools/).
+line-length = 100
+target-version = "py313"
+extend-exclude = ["site"]
+
+[lint]
+select = ["E", "F", "W", "I", "B", "UP", "D"]
+
+[lint.pydocstyle]
+convention = "google"
+
+[lint.per-file-ignores]
+# Test names say what they check; docstrings would only repeat them.
+"**/tests/**" = ["D"]
+
+[lint.isort]
+known-first-party = ["gerry", "check_function_length", "check_pr_size"]
