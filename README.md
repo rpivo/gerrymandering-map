@@ -64,7 +64,9 @@ Each district gets three standard compactness measures, computed in an equal-are
 - **Reock:** area compared with the smallest circle around the district. Low for stretched shapes.
 - **Convex hull:** area compared with a rubber band stretched around the district. Low for shapes with bites or tentacles.
 
-For each measure, a district's percentile is where it falls among the 429 districts that have lines (the six at-large states have one district covering the whole state, so they are measured but not ranked). The irregularity score is 100 minus the average of the three percentiles: 0 is the most compact district, near 100 the least. A score describes shape, not intent: coastlines, islands and rivers all lower it, and so can the Voting Rights Act.
+Reock and convex hull are measured against land: only the part of the circle or rubber band that falls on the district's own state counts. Water between islands or beyond a coastline is space no district could use, so it doesn't count against a district, while land a district leaves out still does. Without this, island districts such as Hawaii's 2nd or the Florida Keys ranked among the least compact for their geography alone.
+
+For each measure, a district's percentile is where it falls among the 429 districts that have lines (the six at-large states have one district covering the whole state, so they are measured but not ranked). The irregularity score is 100 minus the average of the three percentiles: 0 is the most compact district, near 100 the least. A score describes shape, not intent: a ragged coastline still lowers Polsby-Popper, and the Voting Rights Act can call for irregular districts.
 
 ## License
 

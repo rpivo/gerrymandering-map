@@ -1,7 +1,8 @@
 import geopandas as gpd
 import pandas as pd
 import pytest
-from shapely.geometry import Point, Polygon, box
+import shapely
+from shapely.geometry import MultiPolygon, Point, Polygon, box
 
 from gerry.scoring import score_districts
 
@@ -103,3 +104,23 @@ def test_output_is_one_row_per_district_sorted_with_map_source_kept():
     assert list(scores["district_id"]) == ["ME-01", "ME-02"]
     assert list(scores["map_source"]) == ["census", "census"]
     assert "geometry" not in scores.columns
+
+
+def test_land_keeps_water_between_islands_from_counting():
+    islands = MultiPolygon([box(-100, 41, -99.9, 41.1), box(-99.6, 41, -99.5, 41.1)])
+    frame = gpd.GeoDataFrame(
+        {
+            "district_id": ["ME-01", "ME-02"],
+            "state": "ME",
+            "number": pd.array([1, 2], dtype="Int64"),
+        },
+        geometry=[islands, at(-90, 41, "L")],
+        crs="EPSG:4269",
+    )
+    without = score_districts(frame).set_index("district_id")
+    assert without.loc["ME-01", "irregularity"] == 50  # the island pair looks worse
+    # Only the islands are land out east; around the L, its bite is land it leaves out.
+    land = {"ME": shapely.union_all([islands, box(-91, 40, -89, 42)])}
+    with_land = score_districts(frame, land).set_index("district_id")
+    assert with_land.loc["ME-01", "convex_hull"] == pytest.approx(1, abs=1e-6)
+    assert with_land.loc["ME-01", "irregularity"] < with_land.loc["ME-02", "irregularity"]
