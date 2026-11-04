@@ -78,8 +78,14 @@ The site is a neutral reference tool. Scores describe shape, not intent.
 
 ## Commands
 
-The M0 scaffold will fill these in.
+Run from the repo root. The README describes each one.
 
-- Pipeline tests: _TBD_
-- Site build: _TBD_
+- Set up: `make setup`
+- Before every commit: `make check` (lint, tests, function length). A hook in `.claude/settings.json` runs it on every `git commit` and blocks the commit if it fails.
+- Tests only: `make test`
+- Fix formatting: `make format`
+- PR size against `main`: `make pr-size`
+- Site build: _added with the site scaffold_
 - Full rebuild: `make all` (planned)
+
+CI runs `make check` and the PR size check on every PR.
