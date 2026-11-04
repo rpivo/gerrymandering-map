@@ -4,7 +4,7 @@ A website that lists every US congressional district, shows its shape, and score
 
 The scores describe shape, not intent. An irregular district isn't proof of a gerrymander, and a compact one isn't proof against it.
 
-**Status:** the pipeline builds the district map in effect for the 2026 election and scores every district. The real site comes next.
+**Status:** the site is built: a searchable grid of all 435 districts, a page for every district and state, and a methodology page. It isn't deployed yet. Run `make site-dev` to see it at http://localhost:4324.
 
 ## Layout
 
