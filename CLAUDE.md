@@ -13,6 +13,7 @@ These rules apply to every change in this repo. If a request conflicts with one 
 - Never commit directly to `main`. Make a branch for each change (`m0-scaffold`, `fix-reock-multipolygon`) and open a PR.
 - Before every commit, run the pipeline tests and the site build. Never commit with either one failing. If a failure is unrelated to the change, report it rather than working around it.
 - Commit or push only when Ryan asks.
+- Before merging a PR, wait for every check to finish. Never merge with a check that is failing or still pending. Once all checks pass, merge without asking again. If the repo has no checks configured, say so when merging.
 - Keep each PR to one milestone or one concern. Don't bundle unrelated fixes.
 - When a decision changes the plan (a new data source, a different metric, a changed milestone), update `plans/PLAN.md` in the same piece of work.
 - Ask before adding a dependency. Say what it's for and why the existing stack doesn't cover it.
