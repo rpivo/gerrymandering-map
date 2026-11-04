@@ -1,0 +1,11 @@
+# Cloudflare Pages response headers. See https://developers.cloudflare.com/pages/configuration/headers/
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# Astro fingerprints these file names, so a new build always gets new names.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

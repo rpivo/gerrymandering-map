@@ -68,6 +68,24 @@ Reock and convex hull are measured against land: only the part of the circle or 
 
 For each measure, a district's percentile is where it falls among the 429 districts that have lines (the six at-large states have one district covering the whole state, so they are measured but not ranked). The irregularity score is 100 minus the average of the three percentiles: 0 is the most compact district, near 100 the least. A score describes shape, not intent: a ragged coastline still lowers Polsby-Popper, and the Voting Rights Act can call for irregular districts.
 
+## Deploy
+
+The site is hosted on Cloudflare Pages, connected to this GitHub repo. Every merge to `main` deploys to production, and every PR gets its own preview URL.
+
+Pages project settings (Workers & Pages, Create, Pages, Connect to Git):
+
+| Setting | Value |
+|---|---|
+| Production branch | `main` |
+| Framework preset | Astro |
+| Root directory | `site` |
+| Build command | `pnpm build` |
+| Build output directory | `dist` |
+
+Cloudflare reads the Node version from `site/.nvmrc` and the pnpm version from `packageManager` in `site/package.json`. Response headers (security headers, and long-term caching for Astro's fingerprinted assets) are in `site/public/_headers`.
+
+The pipeline doesn't run on Cloudflare: the site builds only from the committed data in `site/src/data/`, so a data change ships by committing regenerated files.
+
 ## License
 
 Not chosen yet.
