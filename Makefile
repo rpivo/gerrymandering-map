@@ -2,7 +2,7 @@
 UV := uv run --project pipeline
 PY_PATHS := pipeline tools
 
-.PHONY: setup lint format test check-functions check pr-size site-dev site-check
+.PHONY: setup lint format test check-functions check pr-size site-dev site-check boundaries
 
 setup:
 	uv sync --project pipeline
@@ -12,9 +12,10 @@ lint:
 	$(UV) ruff check $(PY_PATHS)
 	$(UV) ruff format --check $(PY_PATHS)
 
+# Format first: the lint fix stops on errors it can't fix, which would skip formatting.
 format:
-	$(UV) ruff check --fix $(PY_PATHS)
 	$(UV) ruff format $(PY_PATHS)
+	$(UV) ruff check --fix $(PY_PATHS)
 
 test:
 	cd pipeline && uv run pytest
@@ -31,6 +32,10 @@ site-dev:
 
 # Everything CI runs. Must pass before every commit.
 check: lint test check-functions site-check
+
+# Download (once, then cached) and validate the Census district boundaries.
+boundaries:
+	$(UV) python -m gerry boundaries
 
 pr-size:
 	$(UV) python tools/check_pr_size.py origin/main
