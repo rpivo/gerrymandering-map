@@ -119,3 +119,30 @@ def test_state_records_join_names_seats_and_the_audit():
     assert tx["source_url"] == "https://example.gov/maps"
     assert wy["at_large"] is True and wy["changed_since_2024"] is False
     assert wy["enacted"] is None
+
+
+def test_sources_json_lists_every_source_with_its_role(tmp_path):
+    from gerry.export import write_sources_json
+
+    entries = {
+        "census-tiger-cd119-2025-04": {"id": "census-tiger-cd119-2025-04", "url": "https://c/t",
+            "publisher": "U.S. Census Bureau", "license": "PD", "description": "TIGER AZ",
+            "downloaded": "2026-11-04", "sha256": "a" * 64},
+        "census-cd119-cb-2025-500k": {"id": "census-cd119-cb-2025-500k", "url": "https://c/cb",
+            "publisher": "U.S. Census Bureau", "license": "PD", "description": "CD119",
+            "downloaded": "2026-11-04", "sha256": "b" * 64},
+    }  # fmt: skip
+    path = tmp_path / "sources.json"
+    write_sources_json(entries, path)
+    data = json.loads(path.read_text())
+    assert [s["id"] for s in data["sources"]] == [
+        "census-cd119-cb-2025-500k",
+        "census-tiger-cd119-2025-04",
+    ]
+    roles = {s["id"]: s["role"] for s in data["sources"]}
+    assert roles == {
+        "census-cd119-cb-2025-500k": "boundaries",
+        "census-tiger-cd119-2025-04": "calibration",
+    }
+    assert "sha256" not in data["sources"][0]
+    assert data["sources"][0]["downloaded"] == "2026-11-04"

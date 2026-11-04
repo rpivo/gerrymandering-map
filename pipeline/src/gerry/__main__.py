@@ -18,8 +18,13 @@ from shapely.geometry.base import BaseGeometry
 from gerry.blocks import assemble_districts, read_block_assignment, read_blocks
 from gerry.boundaries import load_districts, load_state_outlines
 from gerry.calibrate import calibrate
-from gerry.export import write_districts_json, write_shapes_json, write_states_json
-from gerry.fetch import CENSUS_CD119, CENSUS_STATES, fetch
+from gerry.export import (
+    write_districts_json,
+    write_shapes_json,
+    write_sources_json,
+    write_states_json,
+)
+from gerry.fetch import CENSUS_CD119, CENSUS_STATES, fetch, read_manifest
 from gerry.generalize import absorb_fragments, simplify_to_census
 from gerry.replacement import (
     check_audit_match,
@@ -133,6 +138,7 @@ def scores(repo_root: Path) -> int:
     write_districts_json(table, site_data / "districts.json")
     write_shapes_json(districts, site_data / "shapes.json")
     write_states_json(read_state_audit(data / "sources" / "states.csv"), site_data / "states.json")
+    write_sources_json(read_manifest(data / "sources" / "sources.csv"), site_data / "sources.json")
     table.to_csv(built.parent / "scores.csv", index=False)
     ranked = table[~table["at_large"]].sort_values("rank_national")
     print(
@@ -140,7 +146,7 @@ def scores(repo_root: Path) -> int:
     )
     top = ", ".join(f"{r.district_id} ({r.irregularity})" for r in ranked.head(10).itertuples())
     print(f"Most irregular: {top}")
-    print("Wrote site/src/data/ (districts, shapes, states) and data/build/scores.csv")
+    print("Wrote site/src/data/ (districts, shapes, states, sources) and data/build/scores.csv")
     return 0
 
 

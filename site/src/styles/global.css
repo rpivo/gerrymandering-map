@@ -7,6 +7,16 @@
   --text-muted: #5d5a54;
   --border: #e3e0d8;
   --accent: #2f5bd3;
+  --shape: #5b6b8a;
+  --shape-muted: #d9d6ce;
+  /* Irregularity bands, light to dark on one hue so no band reads as good or bad. */
+  --band-very-compact: #dfe7f5;
+  --band-compact: #b3c5e6;
+  --band-middle: #7f9bd1;
+  --band-irregular: #4c6fb8;
+  --band-very-irregular: #26468f;
+  --band-text-dark: #10204a;
+  --band-text-light: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -17,6 +27,15 @@
     --text-muted: #a6a39b;
     --border: #34332f;
     --accent: #8eaaff;
+    --shape: #a9b8d6;
+    --shape-muted: #3a3935;
+    --band-very-compact: #24314d;
+    --band-compact: #2f4573;
+    --band-middle: #45629f;
+    --band-irregular: #6f8fd0;
+    --band-very-irregular: #a9c0f0;
+    --band-text-dark: #0d1730;
+    --band-text-light: #ecebe6;
   }
 }
 
@@ -45,4 +64,24 @@ a {
 a:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+.band-very-compact { --band: var(--band-very-compact); --on-band: var(--band-text-dark); }
+.band-compact { --band: var(--band-compact); --on-band: var(--band-text-dark); }
+.band-middle { --band: var(--band-middle); --on-band: var(--band-text-light); }
+.band-irregular { --band: var(--band-irregular); --on-band: var(--band-text-light); }
+.band-very-irregular { --band: var(--band-very-irregular); --on-band: var(--band-text-light); }
+
+@media (prefers-color-scheme: dark) {
+  .band-middle, .band-irregular, .band-very-irregular { --on-band: var(--band-text-dark); }
+  .band-very-compact, .band-compact { --on-band: var(--band-text-light); }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }

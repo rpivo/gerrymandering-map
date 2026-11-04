@@ -1,0 +1,154 @@
+---
+import Base from "../layouts/Base.astro";
+import { rankedCount, sources, states } from "../lib/data";
+
+const boundarySources = sources.filter((s) => s.role === "boundaries");
+const calibrationCount = sources.filter((s) => s.role === "calibration").length;
+const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
+---
+
+<Base title="How scores work | Gerrymandering Map" description="How this site measures the shape of every congressional district, and what the scores can and can't tell you.">
+  <main>
+    <h1>How scores work</h1>
+    <p class="lede">
+      This site measures one thing: how compact each congressional district's shape is. A
+      compact district is roughly round or square. An irregular one snakes, sprawls or has
+      pieces cut out of it.
+    </p>
+
+    <h2>The three measures</h2>
+    <p>Each runs from 0 to 1, where 1 is as compact as a shape can be.</p>
+    <dl>
+      <dt>Polsby-Popper</dt>
+      <dd>
+        Compares a district's area with its perimeter. A circle scores 1. Jagged edges and long
+        thin arms add perimeter without adding area, so they pull the score down.
+      </dd>
+      <dt>Reock</dt>
+      <dd>
+        Compares a district's area with the smallest circle that fits around it. A stretched-out
+        district fills little of its circle and scores low.
+      </dd>
+      <dt>Convex hull</dt>
+      <dd>
+        Compares a district's area with a rubber band stretched around it (its "convex hull"). A
+        district with bites taken out of it, or tentacles reaching out, scores low.
+      </dd>
+    </dl>
+
+    <h2>Measuring against land</h2>
+    <p>
+      Reock and convex hull count only the part of the circle or rubber band that falls on the
+      district's own state. Water between islands or past a coastline is space no district could
+      use, so it doesn't count against a district. Land a district leaves out still does.
+      Without this, island districts such as Hawaii's 2nd or the Florida Keys would rank among
+      the least compact for their geography alone.
+    </p>
+    <p>
+      Polsby-Popper has no such adjustment, so a ragged coastline still lowers it. Each district
+      is measured in an equal-area map projection centered on the district, so a district in
+      Alaska is measured the same way as one in Maine.
+    </p>
+
+    <h2>From three measures to one score</h2>
+    <p>
+      For each measure, a district gets a percentile: where it falls among the {rankedCount}
+      districts that have lines to draw. The six states with a single district covering the whole
+      state are measured but not ranked. The <strong>irregularity score</strong> is 100 minus the
+      average of the three percentiles, so 0 is the most compact district and scores near 100 are
+      the least compact. Percentiles put the three measures on one scale, since their raw values
+      sit in very different ranges.
+    </p>
+    <p>
+      "Less compact than X% of districts" on each district's page comes straight from its rank
+      by irregularity score.
+    </p>
+
+    <h2>What a score can't tell you</h2>
+    <ul>
+      <li>
+        <strong>Intent.</strong> An irregular shape is not proof of a gerrymander, and a compact
+        one is not proof against it. A map of neat squares can still be drawn to favor one party.
+      </li>
+      <li>
+        <strong>Good reasons for odd shapes.</strong> Districts follow rivers, coastlines, county
+        and city lines, and communities that belong together. The Voting Rights Act can require
+        districts that keep a minority community together, and those can be irregular on purpose.
+      </li>
+      <li>
+        <strong>Comparisons with other sites.</strong> Measured perimeter depends on how detailed
+        the map is, so these scores should only be compared with each other.
+      </li>
+    </ul>
+
+    <h2>Which map</h2>
+    <p>
+      Scores are for the districts used in the November 3, 2026 election. Most come from the U.S.
+      Census Bureau's map of the 2024 districts. {redrawn.length} states used new lines in 2026
+      ({redrawn.join(", ")}), and for those the site uses each state's official 2026 map.
+      Missouri and Virginia passed new maps that were not used in 2026, so they keep their earlier
+      lines.
+    </p>
+    <p>
+      The state files are much more detailed than the Census map, and more detail means a longer
+      measured perimeter. So the new maps are simplified to the Census map's level of detail
+      first. The settings were calibrated against the Census Bureau's own detailed and simplified
+      versions of the same districts for 12 states, using {calibrationCount} extra Census files.
+    </p>
+
+    <h2>Data sources</h2>
+    <ul class="sources">
+      {
+        boundarySources.map((s) => (
+          <li>
+            <a href={s.url}>{s.publisher}</a>: {s.description.replace(/ Page: .*$/, "")}. {s.license}.
+            Downloaded {s.downloaded}.
+          </li>
+        ))
+      }
+    </ul>
+    <p>
+      Every step, from download to score, is open source and can be rerun:
+      {" "}<a href="https://github.com/rpivo/gerrymandering-map">github.com/rpivo/gerrymandering-map</a>.
+    </p>
+  </main>
+</Base>
+
+<style>
+  main {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+  }
+
+  h1 {
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+  }
+
+  .lede {
+    font-size: 1.15rem;
+    color: var(--text-muted);
+  }
+
+  h2 {
+    margin-top: 2.5rem;
+    font-size: 1.25rem;
+  }
+
+  dt {
+    margin-top: 1rem;
+    font-weight: 600;
+  }
+
+  dd {
+    margin: 0.25rem 0 0;
+  }
+
+  li + li {
+    margin-top: 0.75rem;
+  }
+
+  .sources {
+    font-size: 0.95rem;
+  }
+</style>
