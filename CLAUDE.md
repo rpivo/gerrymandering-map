@@ -15,6 +15,7 @@ These rules apply to every change in this repo. If a request conflicts with one 
 - Commit or push only when Ryan asks.
 - Before merging a PR, wait for every check to finish. Never merge with a check that is failing or still pending. Once all checks pass, merge without asking again. If the repo has no checks configured, say so when merging.
 - Keep each PR to one milestone or one concern. Don't bundle unrelated fixes.
+- A PR must not exceed 1000 changed lines (added plus removed). If it would, split it into smaller PRs that each make sense alone, and merge them in order. Lockfiles and generated files (`site/src/data/*`) don't count toward the limit, but say in the PR description when a PR includes them.
 - When a decision changes the plan (a new data source, a different metric, a changed milestone), update `plans/PLAN.md` in the same piece of work.
 - Ask before adding a dependency. Say what it's for and why the existing stack doesn't cover it.
 
@@ -48,6 +49,7 @@ The site is a neutral reference tool. Scores describe shape, not intent.
 
 ## Code
 
+- No function may exceed 100 lines. This applies to Python, TypeScript, and the script parts of Astro components. If a function would be longer, break it into smaller named functions.
 - Keep the pipeline and the site separate. The site reads only exported JSON, never raw data, and never runs Python.
 - Use TypeScript strict mode in `site/`, and type hints in `pipeline/`.
 - Pages must work at phone width, in light and dark mode, and by keyboard.
