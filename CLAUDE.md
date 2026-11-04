@@ -87,7 +87,7 @@ Run from the repo root. The README describes each one.
 - Set up: `make setup`
 - Before every commit: `make check` (pipeline lint, tests and function length, plus the site check). A hook in `.claude/settings.json` runs it on every `git commit` and blocks the commit if it fails.
 - Tests only: `make test`
-- Download and validate district boundaries: `make boundaries` (`python -m gerry boundaries`)
+- Build and validate the 2026 district map: `make boundaries` (`python -m gerry boundaries`), written to `data/build/districts.gpkg`. Redrawn states are registered in `pipeline/src/gerry/state_maps.py`, and must match the audit.
 - Validate the state map audit: `make audit` (`python -m gerry audit`). `make test` also validates the committed `states.csv` and `sources.csv`.
 - Fix formatting: `make format`
 - PR size against `main`: `make pr-size`

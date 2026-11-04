@@ -10,6 +10,7 @@ from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
+from shapely.geometry.base import BaseGeometry
 
 from gerry.states import STATES_BY_FIPS
 
@@ -67,6 +68,21 @@ def normalize_districts(raw: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         crs=raw.crs,
     )
     return result.sort_values("district_id", ignore_index=True)
+
+
+def load_state_outlines(path: Path) -> dict[str, BaseGeometry]:
+    """Read a Census state boundary file into {USPS code: outline} for the 50 states.
+
+    The cartographic boundary files are clipped to the shoreline, so these outlines
+    are the land each state's districts are clipped to.
+    """
+    location = f"zip://{path}" if path.suffix == ".zip" else path
+    states = gpd.read_file(location)
+    states = states[states["STATEFP"].isin(STATES_BY_FIPS.keys())]
+    return {
+        STATES_BY_FIPS[fips].usps: geometry
+        for fips, geometry in zip(states["STATEFP"], states.geometry, strict=True)
+    }
 
 
 def load_districts(path: Path) -> gpd.GeoDataFrame:
