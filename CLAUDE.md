@@ -39,6 +39,13 @@ These rules apply to every change in this repo. If a request conflicts with one 
 - Any change to the scoring formula must also update the methodology page.
 - In the PR description, say which tests were written first and which guards were checked by breaking the code.
 
+## Documentation
+
+- Any change to setup, commands or project structure updates the README and the Commands section of this file in the same PR.
+- Every public Python function and exported TypeScript function has a short docstring saying what it does and what it returns, including units where they matter (metres, square kilometres, a 0 to 1 ratio).
+- Comments explain why, not what. Don't restate what the code already says.
+- A PR that changes behaviour visible on the site, or a data source, updates the matching docs (the methodology page, `data/sources/`, the README) in the same PR. A PR that changes neither says "No docs needed" in its description, so the check is never skipped silently.
+
 ## Copy and tone
 
 The site is a neutral reference tool. Scores describe shape, not intent.
