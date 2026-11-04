@@ -4,6 +4,7 @@ Commands:
     boundaries  Build the map in effect for 2026: the Census 2024 districts with the
                 redrawn states swapped in, validated, written to data/build/.
     audit       Validate data/sources/states.csv and list states with new 2026 maps.
+    scores      Score the built map; write site/src/data/districts.json.
     calibrate   Re-derive the map generalization settings from Census files.
 """
 
@@ -17,6 +18,7 @@ from shapely.geometry.base import BaseGeometry
 from gerry.blocks import assemble_districts, read_block_assignment, read_blocks
 from gerry.boundaries import load_districts, load_state_outlines
 from gerry.calibrate import calibrate
+from gerry.export import write_districts_json
 from gerry.fetch import CENSUS_CD119, CENSUS_STATES, fetch
 from gerry.generalize import absorb_fragments, simplify_to_census
 from gerry.replacement import (
@@ -26,6 +28,7 @@ from gerry.replacement import (
     normalize_state_map,
     replace_states,
 )
+from gerry.scoring import score_districts
 from gerry.state_audit import changed_states, read_state_audit, validate_state_audit
 from gerry.state_maps import PENDING, STATE_MAPS, BlockAssignmentMap, StateMap, read_state_map
 from gerry.validate import validate_districts
@@ -116,9 +119,29 @@ def audit(repo_root: Path) -> int:
     return 0
 
 
+def scores(repo_root: Path) -> int:
+    """Score the built map; write site/src/data/districts.json and data/build/scores.csv."""
+    built = repo_root / "data" / "build" / "districts.gpkg"
+    if not built.exists():
+        print(f"{built.relative_to(repo_root)} not found. Run make boundaries first.")
+        return 1
+    table = score_districts(gpd.read_file(built))
+    write_districts_json(table, repo_root / "site" / "src" / "data" / "districts.json")
+    table.to_csv(built.parent / "scores.csv", index=False)
+    ranked = table[~table["at_large"]].sort_values("rank_national")
+    print(
+        f"Scored {len(table)} districts ({len(ranked)} ranked, {table['at_large'].sum()} at-large)."
+    )
+    top = ", ".join(f"{r.district_id} ({r.irregularity})" for r in ranked.head(10).itertuples())
+    print(f"Most irregular: {top}")
+    print("Wrote site/src/data/districts.json and data/build/scores.csv")
+    return 0
+
+
 COMMANDS = {
     "boundaries": (boundaries, "Build and validate the 2026 district map."),
     "audit": (audit, "Validate the state map audit and list changed states."),
+    "scores": (scores, "Score the built map and write the site's data."),
     "calibrate": (calibrate, "Re-derive the settings in gerry.generalize from Census files."),
 }
 

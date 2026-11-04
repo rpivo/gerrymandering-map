@@ -1,25 +1,17 @@
-import math
-
 import geopandas as gpd
 import pytest
-from shapely.geometry import MultiPolygon, Point, box
+from shapely.geometry import MultiPolygon, box
 from test_generalize import MAIN_1, MAIN_2, frame, zigzag_pair
 
 from gerry.calibrate import (
     CALIBRATION_STATES,
     clipping_artifacts,
     load_tiger_districts,
-    polsby_popper,
     sweep,
     tiger_source,
     touching_piece_sizes,
 )
 from gerry.states import STATES_BY_USPS
-
-
-def test_polsby_popper_of_known_shapes():
-    assert polsby_popper(box(0, 0, 1, 1)) == pytest.approx(math.pi / 4)
-    assert polsby_popper(Point(0, 0).buffer(1, quad_segs=256)) == pytest.approx(1, abs=1e-4)
 
 
 def test_tiger_sources_cover_the_calibration_states():

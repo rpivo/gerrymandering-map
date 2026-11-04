@@ -4,7 +4,7 @@ A website that lists every US congressional district, shows its shape, and score
 
 The scores describe shape, not intent. An irregular district isn't proof of a gerrymander, and a compact one isn't proof against it.
 
-**Status:** early setup. The pipeline builds the district map in effect for the 2026 election and validates it. Scoring and the real site come next.
+**Status:** the pipeline builds the district map in effect for the 2026 election and scores every district. The real site comes next.
 
 ## Layout
 
@@ -42,6 +42,8 @@ Run these from the repo root.
 | `make boundaries` | Builds the 2026 district map into `data/build/districts.gpkg`: the Census districts with each redrawn state's official map swapped in, then checks it (435 districts, each state's count, valid shapes, no overlaps, full land coverage). Downloads are cached in `data/raw/` |
 | `make audit` | Checks `data/sources/states.csv` and lists the states whose 2026 map differs from the Census boundaries |
 | `make calibrate` | Re-derives the settings that bring state files to the Census level of detail, from Census files for 12 unchanged states |
+| `make scores` | Scores the built map: Polsby-Popper, Reock and convex hull for every district, percentiles among the 429 districts with lines, a 0 to 100 irregularity score and ranks. Writes `site/src/data/districts.json` (committed) and `data/build/scores.csv` |
+| `make data` | `make boundaries` then `make scores` |
 | `make test` | Runs the Python tests (`pipeline/tests` and `tools/tests`) |
 | `make lint` | Checks Python style and docstrings with ruff, without changing files |
 | `make format` | Fixes Python style and formatting in place |
@@ -53,6 +55,16 @@ Run these from the repo root.
 Raw downloads go in `data/raw/`, which is not committed. Every source is recorded in `data/sources/sources.csv` with its SHA-256 checksum. If a source changes upstream, the pipeline stops rather than quietly using different data.
 
 Current boundaries: the U.S. Census Bureau's 2025 cartographic boundary file for the 119th Congress (1:500,000, clipped to the shoreline). These are the lines used in the 2024 election. Nine states used a different map in the 2026 election (`data/sources/states.csv` records each with a source). For eight of them (Alabama, California, Florida, Louisiana, North Carolina, Tennessee, Texas and Utah) the pipeline downloads the state's official 2026 shapefile and swaps it in. Ohio publishes its map only as a block assignment file, so the pipeline joins it to the Census 2020 block shapes and merges the blocks into districts. Each state's districts are then put on the same footing as the Census districts: clipped to the Census outline of the state (land only), with clipping slivers merged into their neighbours, and internal borders simplified to the Census file's level of detail. Without that last step, the more detailed state files would score about 2% less compact on average for no real reason. `make calibrate` re-derives both settings from the Census Bureau's own full-detail and generalized versions of the same districts. Missouri and Virginia passed new maps that were not used in 2026.
+
+## Scores
+
+Each district gets three standard compactness measures, computed in an equal-area projection centred on the district:
+
+- **Polsby-Popper:** area compared with perimeter. Low for jagged or snaking shapes.
+- **Reock:** area compared with the smallest circle around the district. Low for stretched shapes.
+- **Convex hull:** area compared with a rubber band stretched around the district. Low for shapes with bites or tentacles.
+
+For each measure, a district's percentile is where it falls among the 429 districts that have lines (the six at-large states have one district covering the whole state, so they are measured but not ranked). The irregularity score is 100 minus the average of the three percentiles: 0 is the most compact district, near 100 the least. A score describes shape, not intent: coastlines, islands and rivers all lower it, and so can the Voting Rights Act.
 
 ## License
 
