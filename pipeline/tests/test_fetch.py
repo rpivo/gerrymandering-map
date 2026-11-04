@@ -94,6 +94,29 @@ def test_http_error_leaves_no_file_and_no_manifest_entry(paths):
     assert read_manifest(paths[1]) == {}
 
 
+def test_filename_overrides_a_url_without_one(paths):
+    raw_dir, manifest = paths
+    source = Source(
+        id="test-api",
+        url="https://example.test/api/download/v1/items/abc/shapefile?layers=0",
+        publisher="Test",
+        license="PD",
+        description="API download",
+        filename="plan.zip",
+    )
+    path = fetch(source, raw_dir, manifest, client=FakeServer().client(), today=TODAY)
+    assert path == raw_dir / "test-api" / "plan.zip"
+    assert list(read_manifest(manifest)["test-api"]) == [
+        "id",
+        "url",
+        "publisher",
+        "license",
+        "description",
+        "downloaded",
+        "sha256",
+    ]
+
+
 def test_manifest_keeps_other_sources_sorted_by_id(paths):
     raw_dir, manifest = paths
     manifest.write_text(
