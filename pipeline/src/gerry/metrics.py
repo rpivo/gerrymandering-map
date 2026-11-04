@@ -1,8 +1,8 @@
 """Compactness metrics for one district shape.
 
-All four take a shape in metres (or any equal-area units). `compactness` handles the
+All four take a shape in meters (or any equal-area units). `compactness` handles the
 projection: each district is measured in a Lambert azimuthal equal-area projection
-centred on itself, which keeps distortion small anywhere, Alaska and Hawaii included.
+centered on itself, which keeps distortion small anywhere, Alaska and Hawaii included.
 
 A district made of several pieces uses its total area and total perimeter, and one
 hull and one circle around all the pieces.
@@ -39,7 +39,7 @@ def schwartzberg(geometry: BaseGeometry) -> float:
 
 
 def project_around(geometry: BaseGeometry, crs: CRS | str) -> BaseGeometry:
-    """Return a shape in metres, in an equal-area projection centred on the shape itself."""
+    """Return a shape in meters, in an equal-area projection centered on the shape itself."""
     to_lonlat = Transformer.from_crs(crs, "EPSG:4326", always_xy=True)
     lonlat = shapely.transform(geometry, to_lonlat.transform, interleaved=False)
     to_local = Transformer.from_crs(crs, local_crs(lonlat), always_xy=True)

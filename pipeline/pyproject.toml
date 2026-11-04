@@ -28,7 +28,7 @@ packages = ["src/gerry"]
 [tool.pytest.ini_options]
 testpaths = ["tests", "../tools/tests"]
 addopts = "--strict-markers"
-# Library warnings often flag behaviour changes (for example geopandas missing vs empty).
+# Library warnings often flag behavior changes (for example geopandas missing vs empty).
 filterwarnings = ["error"]
 
 # Ruff is configured repo-wide in ../ruff.toml.

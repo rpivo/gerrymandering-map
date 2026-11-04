@@ -48,7 +48,7 @@ class TestKnownAnswers:
 
 
 def square_in_lonlat(lon: float, lat: float, side_m: float = 50_000) -> Polygon:
-    """A square of side_m metres centred on (lon, lat), expressed in lon/lat."""
+    """A square of side_m meters centered on (lon, lat), expressed in lon/lat."""
     crs = local_crs(Point(lon, lat))
     to_lonlat = Transformer.from_crs(crs, "EPSG:4269", always_xy=True)
     h = side_m / 2

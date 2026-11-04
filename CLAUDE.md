@@ -26,7 +26,7 @@ These rules apply to every change in this repo. If a request conflicts with one 
 ## Data integrity
 
 - Compute every score from full-resolution geometry. Simplified shapes are for display only.
-- Measure area and perimeter in an equal-area projection centred on each district, never on raw latitude and longitude.
+- Measure area and perimeter in an equal-area projection centered on each district, never on raw latitude and longitude.
 - Never commit `data/raw/`. Every source goes in `data/sources/` with its URL, the publisher, the date it was downloaded, and its license.
 - Never hand-edit generated files (`site/src/data/*`). Change the pipeline and regenerate.
 - The pipeline must be reproducible: the same inputs always give the same outputs. Pin source versions and avoid unseeded randomness.
@@ -35,7 +35,7 @@ These rules apply to every change in this repo. If a request conflicts with one 
 
 ## Testing (test-driven development)
 
-- Write the test first for any new behaviour, in the pipeline or the site. Run it and confirm it fails for the expected reason (not an import error or a typo) before writing the code. Then write the smallest code that makes it pass, then tidy up with the tests still green.
+- Write the test first for any new behavior, in the pipeline or the site. Run it and confirm it fails for the expected reason (not an import error or a typo) before writing the code. Then write the smallest code that makes it pass, then tidy up with the tests still green.
 - When fixing a bug, first write a test that reproduces it and fails, then fix it.
 - Tests must be able to fail. For any check that guards against something (a validation, an absence check, a race or edge case), prove it works by temporarily breaking the code it guards and watching the test fail. Then restore the code. A test that has only ever passed proves nothing.
 - Every new or changed metric needs a known-answer test (a circle, a square, an L shape, a multi-part district).
@@ -46,15 +46,15 @@ These rules apply to every change in this repo. If a request conflicts with one 
 ## Documentation
 
 - Any change to setup, commands or project structure updates the README and the Commands section of this file in the same PR.
-- Every public Python function and exported TypeScript function has a short docstring saying what it does and what it returns, including units where they matter (metres, square kilometres, a 0 to 1 ratio).
+- Every public Python function and exported TypeScript function has a short docstring saying what it does and what it returns, including units where they matter (meters, square kilometers, a 0 to 1 ratio).
 - Comments explain why, not what. Don't restate what the code already says.
-- A PR that changes behaviour visible on the site, or a data source, updates the matching docs (the methodology page, `data/sources/`, the README) in the same PR. A PR that changes neither says "No docs needed" in its description, so the check is never skipped silently.
+- A PR that changes behavior visible on the site, or a data source, updates the matching docs (the methodology page, `data/sources/`, the README) in the same PR. A PR that changes neither says "No docs needed" in its description, so the check is never skipped silently.
 
 ## UI changes
 
 - After any change that affects what the site looks like or how it behaves in the browser, run the local dev server and check the change in the browser before calling it done. Check the browser console for errors too.
 - Show Ryan every UI change with:
-  - **Screenshots** of each changed page at desktop width and phone width, plus dark mode when colours or theming change. Send them as files, so they reach Ryan on any device.
+  - **Screenshots** of each changed page at desktop width and phone width, plus dark mode when colors or theming change. Send them as files, so they reach Ryan on any device.
   - **A local server link** straight to each changed page (for example `http://localhost:4324/tx/35`), not just the home page.
 - The local link only works on this Mac. If Ryan is working from another device, say so, and rely on the screenshots.
 - Leave the dev server running after reporting, so the link still works when Ryan opens it.
@@ -67,9 +67,10 @@ The site is a neutral reference tool. Scores describe shape, not intent.
 
 - Never write "X% gerrymandered" or call a specific district a gerrymander. Write "less compact than X% of districts" or "irregularity score".
 - Every displayed score carries its context: the coastal, VRA, at-large and redrawn-mid-decade notes where they apply, and a link to the methodology page.
-- Never let colour carry meaning alone. Always show the number next to it.
+- Never let color carry meaning alone. Always show the number next to it.
 - Credit every data source on the methodology page.
 - No em dashes in any user-facing copy, in commit messages, or in PR descriptions. Use commas, colons, parentheses, or two sentences instead.
+- Use American English spellings in all docs: README, this file, docstrings and comments, site copy, data notes, commit messages and PR descriptions (color, center, meter, neighbor, behavior, labeled). Names you don't control keep their spelling, such as the HTML attribute `aria-labelledby` or a package name.
 - Write in plain language for a general audience. Explain any technical term the first time it appears.
 
 ## Code

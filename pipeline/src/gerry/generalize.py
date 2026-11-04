@@ -31,24 +31,24 @@ MAX_FRAGMENT_KM2 = 0.25
 # The Census 1:500,000 district file has no piece smaller than this.
 MIN_PIECE_KM2 = 0.01
 TOLERANCE_M = 75
-# Shared border shorter than this (metres) counts as touching at a point.
+# Shared border shorter than this (meters) counts as touching at a point.
 MIN_SHARED_M = 1.0
 
 
 def local_crs(geometry: BaseGeometry) -> CRS:
-    """Return an equal-area projection in metres centred on a (lon/lat) geometry."""
+    """Return an equal-area projection in meters centered on a (lon/lat) geometry."""
     c = geometry.centroid
     return CRS.from_proj4(f"+proj=laea +lat_0={c.y} +lon_0={c.x} +ellps=GRS80 +units=m +no_defs")
 
 
 def _projector(crs: CRS, around: BaseGeometry) -> Callable[[BaseGeometry], BaseGeometry]:
-    """Return a function that projects a geometry from crs into metres around a geometry."""
+    """Return a function that projects a geometry from crs into meters around a geometry."""
     lonlat = gpd.GeoSeries([around], crs=crs).to_crs("EPSG:4326").iloc[0]
     transformer = Transformer.from_crs(crs, local_crs(lonlat), always_xy=True)
     return lambda geometry: shapely.transform(geometry, transformer.transform, interleaved=False)
 
 
-def _absorbing_neighbour(
+def _absorbing_neighbor(
     part: BaseGeometry, own: int, geoms: dict, project: Callable, max_km2: float
 ) -> int | None:
     """Return the district a stray piece should join, or None to keep it where it is."""
@@ -70,7 +70,7 @@ def _absorb_state(geoms: dict, project: Callable, max_km2: float) -> dict:
         parts = sorted(shapely.get_parts(geoms[own]), key=lambda p: -project(p).area)
         keep = [parts[0]]
         for part in parts[1:]:
-            target = _absorbing_neighbour(part, own, geoms, project, max_km2)
+            target = _absorbing_neighbor(part, own, geoms, project, max_km2)
             if target is not None:
                 geoms[target] = shapely.union(geoms[target], part)
             elif project(part).area / 1e6 >= MIN_PIECE_KM2:
@@ -82,7 +82,7 @@ def _absorb_state(geoms: dict, project: Callable, max_km2: float) -> dict:
 def absorb_fragments(
     districts: gpd.GeoDataFrame, max_km2: float = MAX_FRAGMENT_KM2
 ) -> gpd.GeoDataFrame:
-    """Merge small stray pieces into the neighbouring district they share the most border with.
+    """Merge small stray pieces into the neighboring district they share the most border with.
 
     A piece (other than a district's largest) moves when it is under max_km2 and shares
     a border with another district in the same state. Islands, which touch no other

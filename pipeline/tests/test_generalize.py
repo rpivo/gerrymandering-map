@@ -22,7 +22,7 @@ def frame(state, geometries):
 
 
 class TestAbsorbFragments:
-    def test_small_piece_touching_a_neighbour_joins_that_neighbour(self):
+    def test_small_piece_touching_a_neighbor_joins_that_neighbor(self):
         sliver = box(1.5, 41, 1.502, 41.002)  # sits on top of district 2
         result = absorb_fragments(frame("ME", [MultiPolygon([MAIN_1, sliver]), MAIN_2]))
         assert result.geometry.iloc[0].equals(MAIN_1)
@@ -49,7 +49,7 @@ class TestAbsorbFragments:
         assert result.geometry.iloc[0].equals(MAIN_1)
         assert result.geometry.iloc[1].equals(MultiPolygon([MAIN_2, island]))
 
-    def test_large_piece_touching_a_neighbour_stays(self):
+    def test_large_piece_touching_a_neighbor_stays(self):
         piece = box(1.5, 41, 1.52, 41.02)
         result = absorb_fragments(frame("ME", [MultiPolygon([MAIN_1, piece]), MAIN_2]))
         assert len(shapely.get_parts(result.geometry.iloc[0])) == 2
@@ -62,7 +62,7 @@ class TestAbsorbFragments:
         assert result.geometry.iloc[1].area == pytest.approx(MAIN_2.area + sliver.area)
         assert result.geometry.iloc[2].equals(main_3)
 
-    def test_only_districts_in_the_same_state_count_as_neighbours(self):
+    def test_only_districts_in_the_same_state_count_as_neighbors(self):
         sliver = box(1.5, 41, 1.502, 41.002)
         me = frame("ME", [MultiPolygon([MAIN_1, sliver]), box(5, 40, 6, 41)])
         nh = frame("NH", [MAIN_2, box(7, 40, 8, 41)])
