@@ -1,87 +1,260 @@
 ---
+import DistrictShape from "../components/DistrictShape.astro";
+import ScoreBadge from "../components/ScoreBadge.astro";
 import Base from "../layouts/Base.astro";
+import { districts, getState, outline, rankedCount, states } from "../lib/data";
+import { districtPath } from "../lib/districts";
+import { type Card, sortCards } from "../lib/grid";
 
-const repoUrl = "https://github.com/rpivo/gerrymandering-map";
+const cards = sortCards(
+  districts.map(
+    (d): Card => ({
+      id: d.id,
+      state: d.state,
+      stateName: getState(d.state).name,
+      number: d.number,
+      score: d.irregularity,
+      rank: d.rank_national,
+    }),
+  ),
+  "irregular",
+);
 ---
 
-<Base
-  title="Gerrymandering Map"
-  description="Every US congressional district, its shape, and how irregular that shape is."
->
+<Base title="Gerrymandering Map" description="Every US congressional district, its shape, and how irregular that shape is compared with all the others.">
   <main>
-    <p class="eyebrow">Work in progress</p>
     <h1>Gerrymandering Map</h1>
     <p class="lede">
-      Every US congressional district, what it looks like, and how irregular its shape is
-      compared with all the others.
+      Every US congressional district in the 2026 election, what it looks like, and how irregular
+      its shape is compared with the other {rankedCount - 1} districts with lines.{" "}
+      <a href="/methodology">How scores work</a>
     </p>
-
-    <section aria-labelledby="coming">
-      <h2 id="coming">Coming soon</h2>
-      <ul>
-        <li>Outlines of all 435 districts, searchable by state, district or representative.</li>
-        <li>
-          An irregularity score from 0 to 100 for each one, based on three standard measures
-          of compactness.
-        </li>
-        <li>A plain-language explanation of what the scores can and can't tell you.</li>
-      </ul>
-    </section>
-
     <p class="note">
-      A score describes a district's shape, not the intent behind it. Coastlines, rivers and
-      the Voting Rights Act can all make a district irregular for good reasons.
+      A score describes shape, not intent. Coastlines, rivers and the Voting Rights Act can all
+      make a district irregular for good reasons.
     </p>
 
-    <p><a href={repoUrl}>Follow along on GitHub</a></p>
+    <form class="controls" role="search" aria-label="Find districts">
+      <label>
+        Search
+        <input type="search" name="query" placeholder="TX-35, Texas, Ohio" autocomplete="off" />
+      </label>
+      <label>
+        State
+        <select name="state">
+          <option value="">All states</option>
+          {states.map((s) => <option value={s.state}>{s.name}</option>)}
+        </select>
+      </label>
+      <label>
+        Sort
+        <select name="sort">
+          <option value="irregular">Most irregular first</option>
+          <option value="compact">Most compact first</option>
+          <option value="state">State, A to Z</option>
+        </select>
+      </label>
+      <label class="check">
+        <input type="checkbox" name="atLarge" checked />
+        Show at-large districts
+      </label>
+    </form>
+    <p class="count" aria-live="polite" data-count>Showing all {cards.length} districts.</p>
+
+    <ul class="grid" data-grid>
+      {
+        cards.map((c) => (
+          <li
+            data-card
+            data-id={c.id}
+            data-state={c.state}
+            data-state-name={c.stateName}
+            data-number={c.number ?? ""}
+            data-score={c.score ?? ""}
+            data-rank={c.rank ?? ""}
+          >
+            <a href={districtPath(c.id)}>
+              <div class="shape">
+                <DistrictShape outline={outline(c.id, "card")} label={`Outline of ${c.id}`} />
+              </div>
+              <span class="id">{c.id}</span>
+              <span class="state-name">{c.stateName}</span>
+              <ScoreBadge score={c.score} />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="empty" data-empty hidden>No districts match. Try a state name or an ID like TX-35.</p>
   </main>
 </Base>
 
-<style>
-  main {
-    max-width: 40rem;
-    margin: 0 auto;
-    padding: 4rem 1rem;
+<script>
+  import { type Card, type SortKey, matches, sortCards } from "../lib/grid";
+
+  const form = document.querySelector<HTMLFormElement>("form.controls");
+  const grid = document.querySelector<HTMLElement>("[data-grid]");
+  const count = document.querySelector<HTMLElement>("[data-count]");
+  const empty = document.querySelector<HTMLElement>("[data-empty]");
+  const items = [...document.querySelectorAll<HTMLElement>("[data-card]")];
+  const toNumber = (value: string | undefined) => (value ? Number(value) : null);
+  const cards = new Map<Card, HTMLElement>(
+    items.map((el) => [
+      {
+        id: el.dataset["id"] ?? "",
+        state: el.dataset["state"] ?? "",
+        stateName: el.dataset["stateName"] ?? "",
+        number: toNumber(el.dataset["number"]),
+        score: toNumber(el.dataset["score"]),
+        rank: toNumber(el.dataset["rank"]),
+      },
+      el,
+    ]),
+  );
+
+  function update() {
+    if (!form || !grid || !count || !empty) return;
+    const data = new FormData(form);
+    const filters = {
+      query: String(data.get("query") ?? ""),
+      state: String(data.get("state") ?? ""),
+      includeAtLarge: data.get("atLarge") === "on",
+    };
+    const sorted = sortCards([...cards.keys()], String(data.get("sort")) as SortKey);
+    let shown = 0;
+    for (const card of sorted) {
+      const el = cards.get(card);
+      if (!el) continue;
+      const visible = matches(card, filters);
+      el.hidden = !visible;
+      shown += visible ? 1 : 0;
+      grid.append(el);
+    }
+    count.textContent =
+      shown === cards.size ? `Showing all ${shown} districts.` : `Showing ${shown} of ${cards.size} districts.`;
+    empty.hidden = shown > 0;
   }
 
-  .eyebrow {
-    margin: 0;
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+  form?.addEventListener("input", update);
+  form?.addEventListener("submit", (event) => event.preventDefault());
+</script>
+
+<style>
+  main {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
   }
 
   h1 {
-    margin: 0.25rem 0 1rem;
+    margin: 0 0 0.5rem;
     font-size: clamp(2rem, 6vw, 3rem);
     line-height: 1.1;
   }
 
   .lede {
-    font-size: 1.2rem;
+    max-width: 44rem;
+    font-size: 1.15rem;
     color: var(--text-muted);
-  }
-
-  h2 {
-    margin-top: 2.5rem;
-    font-size: 1.1rem;
-  }
-
-  ul {
-    padding-left: 1.2rem;
-  }
-
-  li + li {
-    margin-top: 0.5rem;
   }
 
   .note {
-    margin: 2rem 0;
-    padding: 1rem 1.25rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--surface);
+    max-width: 44rem;
     color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+    align-items: end;
+    margin-top: 1.5rem;
+  }
+
+  label {
+    display: grid;
+    gap: 0.25rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .check {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+    padding-bottom: 0.4rem;
+  }
+
+  input[type="search"],
+  select {
+    min-width: 12rem;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+  }
+
+  .count,
+  .empty {
+    color: var(--text-muted);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .grid a {
+    display: grid;
+    gap: 0.2rem;
+    padding: 0.75rem;
+    height: 100%;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .grid a:hover,
+  .grid a:focus-visible {
+    border-color: var(--accent);
+  }
+
+  .shape {
+    aspect-ratio: 1;
+    padding: 0.5rem;
+  }
+
+  .id {
+    font-weight: 700;
+  }
+
+  .state-name {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  @media (max-width: 40rem) {
+    input[type="search"],
+    select {
+      min-width: 0;
+      width: 100%;
+    }
+
+    .controls label:not(.check) {
+      flex: 1 1 100%;
+    }
+
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 </style>
