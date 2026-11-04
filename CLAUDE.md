@@ -46,6 +46,17 @@ These rules apply to every change in this repo. If a request conflicts with one 
 - Comments explain why, not what. Don't restate what the code already says.
 - A PR that changes behaviour visible on the site, or a data source, updates the matching docs (the methodology page, `data/sources/`, the README) in the same PR. A PR that changes neither says "No docs needed" in its description, so the check is never skipped silently.
 
+## UI changes
+
+- After any change that affects what the site looks like or how it behaves in the browser, run the local dev server and check the change in the browser before calling it done. Check the browser console for errors too.
+- Show Ryan every UI change with:
+  - **Screenshots** of each changed page at desktop width and phone width, plus dark mode when colours or theming change. Send them as files, so they reach Ryan on any device.
+  - **A local server link** straight to each changed page (for example `http://localhost:4321/tx/35`), not just the home page.
+- The local link only works on this Mac. If Ryan is working from another device, say so, and rely on the screenshots.
+- Leave the dev server running after reporting, so the link still works when Ryan opens it.
+- In the PR description, list the pages that were checked and at which widths.
+- The dev server is started from `.claude/launch.json` (added in M0).
+
 ## Copy and tone
 
 The site is a neutral reference tool. Scores describe shape, not intent.
