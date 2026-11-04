@@ -1,0 +1,52 @@
+---
+import { measurePercentileText } from "../lib/format";
+
+interface Props {
+  name: string;
+  value: number;
+  percentile: number | null;
+  explanation: string;
+}
+
+const { name, value, percentile, explanation } = Astro.props;
+---
+
+<div class="metric">
+  <dt>{name}</dt>
+  <dd>
+    <span class="value">{value.toFixed(2)}</span>
+    {percentile !== null && <span class="pct">{measurePercentileText(percentile)}</span>}
+    <p class="explanation">{explanation}</p>
+  </dd>
+</div>
+
+<style>
+  .metric {
+    padding: 0.75rem 0;
+    border-top: 1px solid var(--border);
+  }
+
+  dt {
+    font-weight: 600;
+  }
+
+  dd {
+    margin: 0.25rem 0 0;
+  }
+
+  .value {
+    font-size: 1.25rem;
+    font-variant-numeric: tabular-nums;
+    margin-right: 0.75rem;
+  }
+
+  .pct,
+  .explanation {
+    color: var(--text-muted);
+  }
+
+  .explanation {
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+  }
+</style>

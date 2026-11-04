@@ -1,0 +1,50 @@
+---
+const bands = [
+  { key: "very-compact", label: "Very compact", range: "0 to 19" },
+  { key: "compact", label: "Compact", range: "20 to 39" },
+  { key: "middle", label: "Middle", range: "40 to 59" },
+  { key: "irregular", label: "Irregular", range: "60 to 79" },
+  { key: "very-irregular", label: "Very irregular", range: "80 to 100" },
+];
+---
+
+<ul class="legend" aria-label="Irregularity score colors">
+  {
+    bands.map((b) => (
+      <li>
+        <span class:list={["swatch", `band-${b.key}`]} aria-hidden="true" />
+        {b.label} <span class="range">({b.range})</span>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.85rem;
+  }
+
+  li {
+    display: flex;
+    gap: 0.35rem;
+    align-items: center;
+  }
+
+  .swatch {
+    width: 0.9rem;
+    height: 0.9rem;
+    border-radius: 3px;
+    background: var(--band);
+    border: 1px solid var(--border);
+  }
+
+  .range {
+    color: var(--text-muted);
+  }
+</style>

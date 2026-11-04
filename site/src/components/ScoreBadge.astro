@@ -1,0 +1,51 @@
+---
+import { scoreBand } from "../lib/format";
+
+interface Props {
+  score: number | null;
+  size?: "small" | "large";
+}
+
+const { score, size = "small" } = Astro.props;
+const band = score === null ? null : scoreBand(score);
+---
+
+{
+  band ? (
+    <span class:list={["badge", size, `band-${band.key}`]}>
+      <strong>{score}</strong>
+      <span class="label">{band.label}</span>
+    </span>
+  ) : (
+    <span class:list={["badge", size, "unranked"]}>Not ranked (at-large)</span>
+  )
+}
+
+<style>
+  .badge {
+    display: inline-flex;
+    gap: 0.4em;
+    align-items: baseline;
+    padding: 0.15em 0.55em;
+    border-radius: 999px;
+    background: var(--band);
+    color: var(--on-band);
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+
+  .large {
+    font-size: 1.15rem;
+    padding: 0.3em 0.8em;
+  }
+
+  .large strong {
+    font-size: 1.6em;
+  }
+
+  .unranked {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+</style>

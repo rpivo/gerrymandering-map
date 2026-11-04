@@ -1,0 +1,65 @@
+---
+import { districtsInState, stateMap } from "../lib/data";
+import { districtPath } from "../lib/districts";
+import { scoreBand } from "../lib/format";
+
+interface Props {
+  state: string;
+  stateName: string;
+  highlight?: string;
+}
+
+const { state, stateName, highlight } = Astro.props;
+const map = stateMap(state);
+const rows = districtsInState(state).map((d) => ({
+  district: d,
+  path: map.paths[d.id] ?? "",
+  band: d.irregularity === null ? "unranked" : `band-${scoreBand(d.irregularity).key}`,
+  title: d.irregularity === null ? `${d.id}: at-large` : `${d.id}: irregularity ${d.irregularity}`,
+}));
+---
+
+<svg
+  class:list={["state-map", { "has-highlight": highlight }]}
+  viewBox={map.viewBox}
+  role="img"
+  aria-label={highlight ? `${highlight} highlighted on a map of ${stateName}` : `Map of ${stateName}'s districts`}
+>
+  {
+    rows.map(({ district, path, band, title }) => (
+      <a href={districtPath(district.id)} class:list={[band, { current: district.id === highlight }]}>
+        <title>{title}</title>
+        <path d={path} fill-rule="evenodd" />
+      </a>
+    ))
+  }
+</svg>
+
+<style>
+  .state-map {
+    display: block;
+    width: 100%;
+    max-height: 32rem;
+  }
+
+  path {
+    fill: var(--band, var(--shape-muted));
+    stroke: var(--bg);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .has-highlight path {
+    fill: var(--shape-muted);
+  }
+
+  .has-highlight .current path {
+    fill: var(--accent);
+  }
+
+  a:hover path,
+  a:focus-visible path {
+    stroke: var(--text);
+    stroke-width: 2;
+  }
+</style>

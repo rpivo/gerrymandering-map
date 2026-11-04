@@ -1,0 +1,154 @@
+---
+import ScoreBadge from "../../components/ScoreBadge.astro";
+import ScoreLegend from "../../components/ScoreLegend.astro";
+import StateMapSvg from "../../components/StateMapSvg.astro";
+import Base from "../../layouts/Base.astro";
+import { districtsInState, states, type StateInfo } from "../../lib/data";
+import { districtPath } from "../../lib/districts";
+import { ordinal } from "../../lib/format";
+
+export function getStaticPaths() {
+  return states.map((state) => ({ params: { state: state.state.toLowerCase() }, props: { state } }));
+}
+
+interface Props {
+  state: StateInfo;
+}
+
+const { state } = Astro.props;
+const rows = districtsInState(state.state);
+const drawnBy: Record<string, string> = {
+  legislature: "the state legislature",
+  commission: "a redistricting commission",
+  court: "a court",
+  "ballot-measure": "the legislature, approved by voters",
+  "at-large": "nobody: the state has one district",
+};
+---
+
+<Base title={`${state.name} | Gerrymandering Map`} description={`How compact each of ${state.name}'s congressional districts is.`}>
+  <main>
+    <h1>{state.name}</h1>
+    <p class="lede">
+      {state.at_large ? "One at-large district covering the whole state." : `${state.seats} congressional districts.`}
+    </p>
+
+    <div class="layout">
+      <section aria-labelledby="map-heading">
+        <h2 id="map-heading" class="visually-hidden">Map</h2>
+        <StateMapSvg state={state.state} stateName={state.name} />
+        {!state.at_large && <ScoreLegend />}
+        {!state.at_large && <p class="hint">Select a district for details.</p>}
+      </section>
+
+      <section class="facts" aria-labelledby="map-in-effect">
+        <h2 id="map-in-effect">Map used in 2026</h2>
+        <p>{state.map_in_effect_2026}</p>
+        <dl>
+          <dt>Drawn by</dt>
+          <dd>{drawnBy[state.drawn_by] ?? state.drawn_by}</dd>
+          {state.enacted && <><dt>Enacted</dt><dd>{state.enacted}</dd></>}
+          <dt>Changed since 2024</dt>
+          <dd>{state.changed_since_2024 ? "Yes, new lines for 2026" : "No"}</dd>
+        </dl>
+        <p class="source"><a href={state.source_url}>Source: {state.source_publisher}</a> (checked {state.checked})</p>
+      </section>
+    </div>
+
+    <section aria-labelledby="table-heading">
+      <h2 id="table-heading">Districts</h2>
+      <table>
+        <thead>
+          <tr><th scope="col">District</th><th scope="col">Irregularity</th><th scope="col">National rank</th></tr>
+        </thead>
+        <tbody>
+          {
+            rows.map((d) => (
+              <tr>
+                <th scope="row"><a href={districtPath(d.id)}>{d.id}</a></th>
+                <td><ScoreBadge score={d.irregularity} /></td>
+                <td>{d.rank_national === null ? "Not ranked" : `${ordinal(d.rank_national)} least compact`}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+      <p class="caveat">Scores describe shape, not intent. <a href="/methodology">How scores work</a></p>
+    </section>
+  </main>
+</Base>
+
+<style>
+  main {
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+  }
+
+  h1 {
+    margin: 0 0 0.25rem;
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+  }
+
+  .lede,
+  .hint,
+  .source,
+  .caveat {
+    color: var(--text-muted);
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .facts {
+    padding: 1rem 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .facts h2 {
+    margin-top: 0;
+    font-size: 1.1rem;
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.25rem 1rem;
+  }
+
+  dt {
+    color: var(--text-muted);
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+
+  @media (max-width: 40rem) {
+    .layout {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
