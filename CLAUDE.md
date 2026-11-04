@@ -51,7 +51,7 @@ These rules apply to every change in this repo. If a request conflicts with one 
 - After any change that affects what the site looks like or how it behaves in the browser, run the local dev server and check the change in the browser before calling it done. Check the browser console for errors too.
 - Show Ryan every UI change with:
   - **Screenshots** of each changed page at desktop width and phone width, plus dark mode when colours or theming change. Send them as files, so they reach Ryan on any device.
-  - **A local server link** straight to each changed page (for example `http://localhost:4321/tx/35`), not just the home page.
+  - **A local server link** straight to each changed page (for example `http://localhost:4324/tx/35`), not just the home page.
 - The local link only works on this Mac. If Ryan is working from another device, say so, and rely on the screenshots.
 - Leave the dev server running after reporting, so the link still works when Ryan opens it.
 - In the PR description, list the pages that were checked and at which widths.
@@ -81,11 +81,12 @@ The site is a neutral reference tool. Scores describe shape, not intent.
 Run from the repo root. The README describes each one.
 
 - Set up: `make setup`
-- Before every commit: `make check` (lint, tests, function length). A hook in `.claude/settings.json` runs it on every `git commit` and blocks the commit if it fails.
+- Before every commit: `make check` (pipeline lint, tests and function length, plus the site check). A hook in `.claude/settings.json` runs it on every `git commit` and blocks the commit if it fails.
 - Tests only: `make test`
 - Fix formatting: `make format`
 - PR size against `main`: `make pr-size`
-- Site build: _added with the site scaffold_
+- Site dev server: `make site-dev` (http://localhost:4324), or the `site` entry in `.claude/launch.json`
+- Site lint, typecheck, tests and build: `make site-check`
 - Full rebuild: `make all` (planned)
 
 CI runs `make check` and the PR size check on every PR.
