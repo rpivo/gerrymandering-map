@@ -109,7 +109,7 @@ _MAPS = [
             "2025-sl2025-95-congress",
             "https://webservices.ncleg.gov/ViewBillDocument/2025/7667/0/SL%202025-95%20-%20Shapefile",
             "North Carolina General Assembly",
-            "S.L. 2025-95 (SB 249) congressional plan, labelled for the 2026 election. "
+            "S.L. 2025-95 (SB 249) congressional plan, labeled for the 2026 election. "
             "Page: https://www.ncleg.gov/Redistricting",
         ),
         "DISTRICT",

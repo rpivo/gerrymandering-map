@@ -55,7 +55,7 @@ def load_tiger_districts(path: Path) -> gpd.GeoDataFrame:
 
 
 def _projected_by_state(districts: gpd.GeoDataFrame) -> dict[str, gpd.GeoDataFrame]:
-    """Project each state's districts into metres around that state, indexed by district."""
+    """Project each state's districts into meters around that state, indexed by district."""
     out = {}
     for state, rows in districts.groupby("state"):
         crs = local_crs(rows.to_crs("EPSG:4326").union_all())
