@@ -1,0 +1,31 @@
+---
+import type { Outline } from "../lib/data";
+
+interface Props {
+  outline: Outline;
+  label: string;
+  class?: string;
+}
+
+const { outline, label, class: className } = Astro.props;
+---
+
+<svg class:list={["district-shape", className]} viewBox={outline.viewBox} role="img" aria-label={label}>
+  <path d={outline.d} fill-rule="evenodd"></path>
+</svg>
+
+<style>
+  .district-shape {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  path {
+    fill: var(--shape);
+    stroke: var(--shape);
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+  }
+</style>

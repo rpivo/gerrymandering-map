@@ -1,0 +1,180 @@
+---
+import DistrictShape from "../../components/DistrictShape.astro";
+import MetricRow from "../../components/MetricRow.astro";
+import ScoreBadge from "../../components/ScoreBadge.astro";
+import StateMapSvg from "../../components/StateMapSvg.astro";
+import Base from "../../layouts/Base.astro";
+import { adjacent, districts, getState, outline, rankedCount, type District } from "../../lib/data";
+import { districtPath } from "../../lib/districts";
+import { districtTitle, lessCompactThan, ordinal } from "../../lib/format";
+
+export function getStaticPaths() {
+  return districts.map((district) => {
+    const [, state, number] = districtPath(district.id).split("/");
+    return { params: { state, district: number }, props: { district } };
+  });
+}
+
+interface Props {
+  district: District;
+}
+
+const { district } = Astro.props;
+const state = getState(district.state);
+const title = districtTitle(state.name, district.number);
+const { previous, next } = adjacent(district.id);
+const ranked = district.rank_national !== null;
+---
+
+<Base title={`${district.id}: ${title} | Gerrymandering Map`} description={`How compact ${title} is, compared with every other congressional district.`}>
+  <main>
+    <p class="crumbs"><a href={`/${state.state.toLowerCase()}`}>{state.name}</a> / {district.id}</p>
+    <h1>{title}</h1>
+
+    <div class="top">
+      <div class="outline">
+        <DistrictShape outline={outline(district.id, "page")} label={`Outline of ${title}`} />
+      </div>
+      <section class="summary" aria-labelledby="score-heading">
+        <h2 id="score-heading" class="visually-hidden">Score</h2>
+        <ScoreBadge score={district.irregularity} size="large" />
+        {
+          ranked && district.rank_national !== null && district.rank_state !== null ? (
+            <>
+              <p class="sentence">
+                Less compact than {lessCompactThan(district.rank_national, rankedCount)}% of
+                other congressional districts.
+              </p>
+              <p class="ranks">
+                {ordinal(district.rank_national)} least compact of {rankedCount} nationally,
+                {" "}{ordinal(district.rank_state)} of {state.seats} in {state.name}.
+              </p>
+            </>
+          ) : (
+            <p class="sentence">
+              {state.name} has one district covering the whole state, so there are no lines to
+              compare. Its shape is the state's shape.
+            </p>
+          )
+        }
+        <p class="caveat">
+          A score describes shape, not intent. Coastlines, rivers and the Voting Rights Act can
+          all make a district irregular. <a href="/methodology">How scores work</a>
+        </p>
+      </section>
+    </div>
+
+    <section aria-labelledby="measures-heading">
+      <h2 id="measures-heading">The three measures</h2>
+      <dl>
+        <MetricRow name="Polsby-Popper" value={district.polsby_popper} percentile={district.polsby_popper_pct}
+          explanation="Area compared with perimeter. Low for jagged or snaking edges." />
+        <MetricRow name="Reock" value={district.reock} percentile={district.reock_pct}
+          explanation="Area compared with the smallest circle around the district, counting only land. Low for stretched shapes." />
+        <MetricRow name="Convex hull" value={district.convex_hull} percentile={district.convex_hull_pct}
+          explanation="Area compared with a rubber band stretched around the district, counting only land. Low for bites and tentacles." />
+      </dl>
+      <p class="note">Each measure runs from 0 to 1, where 1 is a perfect circle or a shape with no dents.</p>
+    </section>
+
+    {
+      district.redrawn_2026 && (
+        <section class="callout" aria-labelledby="redrawn-heading">
+          <h2 id="redrawn-heading">New lines for 2026</h2>
+          <p>
+            {state.name} used a different map in the 2026 election than in 2024: the {state.map_in_effect_2026}.
+            {" "}<a href={state.source_url}>Source: {state.source_publisher}</a>
+          </p>
+        </section>
+      )
+    }
+
+    <section aria-labelledby="state-heading">
+      <h2 id="state-heading">Where it sits in {state.name}</h2>
+      <StateMapSvg state={state.state} stateName={state.name} highlight={district.id} />
+    </section>
+
+    <nav class="pager" aria-label="Other districts in this state">
+      {previous ? <a href={districtPath(previous)}>Previous: {previous}</a> : <span />}
+      {next ? <a href={districtPath(next)}>Next: {next}</a> : <span />}
+    </nav>
+  </main>
+</Base>
+
+<style>
+  main {
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+  }
+
+  .crumbs {
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+  h1 {
+    margin: 0.25rem 0 1.5rem;
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    line-height: 1.15;
+  }
+
+  .top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .outline {
+    aspect-ratio: 1;
+    padding: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .sentence {
+    font-size: 1.2rem;
+  }
+
+  .ranks,
+  .caveat,
+  .note {
+    color: var(--text-muted);
+  }
+
+  dl {
+    margin: 0;
+  }
+
+  .callout {
+    margin-top: 2rem;
+    padding: 1rem 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .callout h2 {
+    margin-top: 0;
+    font-size: 1.1rem;
+  }
+
+  h2 {
+    margin-top: 2.5rem;
+    font-size: 1.25rem;
+  }
+
+  .pager {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+  }
+
+  @media (max-width: 40rem) {
+    .top {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
