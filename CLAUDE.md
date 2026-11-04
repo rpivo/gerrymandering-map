@@ -13,7 +13,11 @@ These rules apply to every change in this repo. If a request conflicts with one 
 - Never commit directly to `main`. Make a branch for each change (`m0-scaffold`, `fix-reock-multipolygon`) and open a PR.
 - Before every commit, run the pipeline tests and the site build. Never commit with either one failing. If a failure is unrelated to the change, report it rather than working around it.
 - Commit or push only when Ryan asks.
-- Before merging a PR, wait for every check to finish. Never merge with a check that is failing or still pending. Once all checks pass, merge without asking again. If the repo has no checks configured, say so when merging.
+- Merging: never merge with a check that is failing or still pending. Once all checks pass, merge without asking again. `main` requires the Pipeline, Site and PR size checks, so GitHub enforces this:
+  - Right after opening a PR, turn on auto-merge (`gh pr merge --auto --squash`). GitHub then squash-merges it once every required check passes, and deletes the branch.
+  - If GitHub refuses because the PR is already ready (all checks passed), merge it directly with `gh pr merge --squash`.
+  - If a check fails, fix it on the branch. Auto-merge stays on and merges once the fix passes.
+  - Never bypass or remove the required checks. When a CI job is added or renamed, tell Ryan so its name can be added to the required checks on `main`.
 - Keep each PR to one milestone or one concern. Don't bundle unrelated fixes.
 - A PR must not exceed 1000 changed lines (added plus removed). If it would, split it into smaller PRs that each make sense alone, and merge them in order. Lockfiles and generated files (`site/src/data/*`) don't count toward the limit, but say in the PR description when a PR includes them.
 - When a decision changes the plan (a new data source, a different metric, a changed milestone), update `plans/PLAN.md` in the same piece of work.
