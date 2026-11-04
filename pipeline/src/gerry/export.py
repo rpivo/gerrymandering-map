@@ -152,3 +152,22 @@ def write_states_json(audit: list[dict[str, str]], path: Path) -> None:
         "states": records,
     }
     _write_json(data, path)
+
+
+SOURCE_FIELDS = ["id", "publisher", "description", "url", "license", "downloaded"]
+
+
+def write_sources_json(entries: dict[str, dict[str, str]], path: Path) -> None:
+    """Write site/src/data/sources.json from the sources manifest, for the methodology page.
+
+    Census TIGER files are used only by `python -m gerry calibrate`, so their role is
+    "calibration"; every other source supplies boundaries.
+    """
+    sources = [
+        {
+            **{field: entries[key][field] for field in SOURCE_FIELDS},
+            "role": "calibration" if key.startswith("census-tiger-") else "boundaries",
+        }
+        for key in sorted(entries)
+    ]
+    _write_json({"description": "Every data source behind the map.", "sources": sources}, path)

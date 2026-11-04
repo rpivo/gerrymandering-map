@@ -1,0 +1,221 @@
+{
+  "description": "Every data source behind the map.",
+  "sources": [
+    {
+      "id": "al-2023-sb5-congress",
+      "publisher": "Alabama GeoHub (Alabama Redistricting Plans, linked from the Alabama Legislature's reapportionment page)",
+      "description": "2023 Alabama Congressional Plan (SB 5, Livingston Plan 3), reinstated for 2026. Page: https://alabamaredistrictingplans-algeohub.hub.arcgis.com/datasets/cf6612d18f4f4a97b8f2b1392c70654a_0",
+      "url": "https://alabamaredistrictingplans-algeohub.hub.arcgis.com/api/download/v1/items/cf6612d18f4f4a97b8f2b1392c70654a/shapefile?layers=0",
+      "license": "No license stated (public government record)",
+      "downloaded": "2026-11-04",
+      "role": "boundaries"
+    },
+    {
+      "id": "ca-2025-ab604-congress",
+      "publisher": "California State Senate Elections and Constitutional Amendments Committee",
+      "description": "AB 604 congressional districts (Proposition 50 map), chaptered 2025-08-21. Page: https://selc.senate.ca.gov/node/1171",
+      "url": "https://selc.senate.ca.gov/system/files/2025-08/ab604.zip",
+      "license": "No license stated (public government record)",
+      "downloaded": "2026-11-04",
+      "role": "boundaries"
+    },
+    {
+      "id": "census-blocks-2020-39",
+      "publisher": "U.S. Census Bureau",
+      "description": "TIGER/Line 2020 census blocks, Ohio. Used to build Ohio's districts.",
+      "url": "https://www2.census.gov/geo/tiger/TIGER2020/TABBLOCK20/tl_2020_39_tabblock20.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-04",
+      "role": "boundaries"
+    },
+    {
+      "id": "census-cd119-cb-2025-500k",
+      "publisher": "U.S. Census Bureau",
+      "description": "Cartographic boundary file, 119th Congress districts, 2025 edition, 1:500,000, clipped to the shoreline",
+      "url": "https://www2.census.gov/geo/tiger/GENZ2025/shp/cb_2025_us_cd119_500k.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-04",
+      "role": "boundaries"
+    },
+    {
+      "id": "census-states-cb-2025-500k",
+      "publisher": "U.S. Census Bureau",
+      "description": "Cartographic boundary file, states, 2025 edition, 1:500,000, clipped to the shoreline. Used to clip replacement district maps to land.",
+      "url": "https://www2.census.gov/geo/tiger/GENZ2025/shp/cb_2025_us_state_500k.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-04",
+      "role": "boundaries"
+    },
+    {
+      "id": "census-tiger-cd119-2025-04",
+      "publisher": "U.S. Census Bureau",
+      "description": "TIGER/Line 2025, 119th Congress districts, full detail, AZ. Used only to calibrate gerry.generalize.",
+      "url": "https://www2.census.gov/geo/tiger/TIGER2025/CD/tl_2025_04_cd119.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-04",
+      "role": "calibration"
+    },
+    {
+      "id": "census-tiger-cd119-2025-08",
+      "publisher": "U.S. Census Bureau",
+      "description": "TIGER/Line 2025, 119th Congress districts, full detail, CO. Used only to calibrate gerry.generalize.",
+      "url": "https://www2.census.gov/geo/tiger/TIGER2025/CD/tl_2025_08_cd119.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-04",
+      "role": "calibration"
+    },
+    {
+      "id": "census-tiger-cd119-2025-13",
+      "publisher": "U.S. Census Bureau",
+      "description": "TIGER/Line 2025, 119th Congress districts, full detail, GA. Used only to calibrate gerry.generalize.",
+      "url": "https://www2.census.gov/geo/tiger/TIGER2025/CD/tl_2025_13_cd119.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-04",
+      "role": "calibration"
+    },
+    {
+      "id": "census-tiger-cd119-2025-17",
+      "publisher": "U.S. Census Bureau",
+      "description": "TIGER/Line 2025, 119th Congress districts, full detail, IL. Used only to calibrate gerry.generalize.",
+      "url": "https://www2.census.gov/geo/tiger/TIGER2025/CD/tl_2025_17_cd119.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-04",
+      "role": "calibration"
+    },
+    {
+      "id": "census-tiger-cd119-2025-25",
+      "publisher": "U.S. Census Bureau",
+      "description": "TIGER/Line 2025, 119th Congress districts, full detail, MA. Used only to calibrate gerry.generalize.",
+      "url": "https://www2.census.gov/geo/tiger/TIGER2025/CD/tl_2025_25_cd119.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-04",
+      "role": "calibration"
+    },
+    {
+      "id": "census-tiger-cd119-2025-26",
+      "publisher": "U.S. Census Bureau",
+      "description": "TIGER/Line 2025, 119th Congress districts, full detail, MI. Used only to calibrate gerry.generalize.",
+      "url": "https://www2.census.gov/geo/tiger/TIGER2025/CD/tl_2025_26_cd119.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-04",
+      "role": "calibration"
+    },
+    {
+      "id": "census-tiger-cd119-2025-27",
+      "publisher": "U.S. Census Bureau",
+      "description": "TIGER/Line 2025, 119th Congress districts, full detail, MN. Used only to calibrate gerry.generalize.",
+      "url": "https://www2.census.gov/geo/tiger/TIGER2025/CD/tl_2025_27_cd119.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-04",
+      "role": "calibration"
+    },
+    {
+      "id": "census-tiger-cd119-2025-34",
+      "publisher": "U.S. Census Bureau",
+      "description": "TIGER/Line 2025, 119th Congress districts, full detail, NJ. Used only to calibrate gerry.generalize.",
+      "url": "https://www2.census.gov/geo/tiger/TIGER2025/CD/tl_2025_34_cd119.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-04",
+      "role": "calibration"
+    },
+    {
+      "id": "census-tiger-cd119-2025-36",
+      "publisher": "U.S. Census Bureau",
+      "description": "TIGER/Line 2025, 119th Congress districts, full detail, NY. Used only to calibrate gerry.generalize.",
+      "url": "https://www2.census.gov/geo/tiger/TIGER2025/CD/tl_2025_36_cd119.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-04",
+      "role": "calibration"
+    },
+    {
+      "id": "census-tiger-cd119-2025-42",
+      "publisher": "U.S. Census Bureau",
+      "description": "TIGER/Line 2025, 119th Congress districts, full detail, PA. Used only to calibrate gerry.generalize.",
+      "url": "https://www2.census.gov/geo/tiger/TIGER2025/CD/tl_2025_42_cd119.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-04",
+      "role": "calibration"
+    },
+    {
+      "id": "census-tiger-cd119-2025-51",
+      "publisher": "U.S. Census Bureau",
+      "description": "TIGER/Line 2025, 119th Congress districts, full detail, VA. Used only to calibrate gerry.generalize.",
+      "url": "https://www2.census.gov/geo/tiger/TIGER2025/CD/tl_2025_51_cd119.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-04",
+      "role": "calibration"
+    },
+    {
+      "id": "census-tiger-cd119-2025-53",
+      "publisher": "U.S. Census Bureau",
+      "description": "TIGER/Line 2025, 119th Congress districts, full detail, WA. Used only to calibrate gerry.generalize.",
+      "url": "https://www2.census.gov/geo/tiger/TIGER2025/CD/tl_2025_53_cd119.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-04",
+      "role": "calibration"
+    },
+    {
+      "id": "fl-2026-eogpcrp2026-congress",
+      "publisher": "Florida Legislature, Office of Economic and Demographic Research",
+      "description": "2026 congressional plan EOGPCRP2026 (HB 1-D), revised 2026-05-04. Page: https://www.edr.state.fl.us/Content/redistricting/2026redistricting/index.cfm",
+      "url": "https://www.edr.state.fl.us/Content/redistricting/2026redistricting/EOGPCRP2026.zip",
+      "license": "No license stated (public government record)",
+      "downloaded": "2026-11-04",
+      "role": "boundaries"
+    },
+    {
+      "id": "la-2026-act2-congress",
+      "publisher": "Louisiana Legislature",
+      "description": "Congress Act 2 (SB 121), 2026 Regular Session. Page: https://redist.legis.la.gov/2026_Files/2026CONGRESSACT2.aspx",
+      "url": "https://redist.legis.la.gov/2026_Files/Act2Congress/Shapefile/Shapefile%20-%20Act_2_(2026_RS).zip",
+      "license": "No license stated (public government record)",
+      "downloaded": "2026-11-04",
+      "role": "boundaries"
+    },
+    {
+      "id": "nc-2025-sl2025-95-congress",
+      "publisher": "North Carolina General Assembly",
+      "description": "S.L. 2025-95 (SB 249) congressional plan, labeled for the 2026 election. Page: https://www.ncleg.gov/Redistricting",
+      "url": "https://webservices.ncleg.gov/ViewBillDocument/2025/7667/0/SL%202025-95%20-%20Shapefile",
+      "license": "No license stated (public government record)",
+      "downloaded": "2026-11-04",
+      "role": "boundaries"
+    },
+    {
+      "id": "oh-2025-orc-congress",
+      "publisher": "Ohio Redistricting Commission",
+      "description": "Congressional Redistricting Plan adopted 2025-10-31 (block assignment file). Page: https://redistricting.ohio.gov/maps",
+      "url": "https://redistricting.ohio.gov/api/public/districtmaps/430/download",
+      "license": "No license stated (public government record)",
+      "downloaded": "2026-11-04",
+      "role": "boundaries"
+    },
+    {
+      "id": "tn-2026-hb7003-congress",
+      "publisher": "State of Tennessee, TNMap (Office for Information Resources)",
+      "description": "TN Congressional Districts, 2026 boundaries (HB 7003). Page: https://hub.arcgis.com/datasets/90e4742978674ef4aaf08eb9f9f845bb_2",
+      "url": "https://tn-tnmap.opendata.arcgis.com/api/download/v1/items/90e4742978674ef4aaf08eb9f9f845bb/shapefile?layers=2",
+      "license": "No license stated (public government record)",
+      "downloaded": "2026-11-04",
+      "role": "boundaries"
+    },
+    {
+      "id": "tx-2025-planc2333-congress",
+      "publisher": "Texas Legislative Council",
+      "description": "PLANC2333, enacted by the 89th Legislature, 2nd Called Session, 2025. Page: https://data.capitol.texas.gov/dataset/planc2333",
+      "url": "https://data.capitol.texas.gov/dataset/748c952b-e926-4f44-8d01-a738884b3ec8/resource/5712ebe1-d777-4d4a-b836-0534e17bca01/download/planc2333.zip",
+      "license": "No license stated (public government record)",
+      "downloaded": "2026-11-04",
+      "role": "boundaries"
+    },
+    {
+      "id": "ut-2026-map1a-congress",
+      "publisher": "Utah Geospatial Resource Center (UGRC)",
+      "description": "Utah US Congress Districts 2026 to 2032 (court-adopted Map 1A). Page: https://gis.utah.gov/products/sgid/political/us-congressional-districts/",
+      "url": "https://opendata.gis.utah.gov/api/download/v1/items/d3388c1f7d894ab789247f6442855d66/shapefile?layers=0",
+      "license": "No license stated (public government record)",
+      "downloaded": "2026-11-04",
+      "role": "boundaries"
+    }
+  ]
+}
