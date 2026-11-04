@@ -21,6 +21,18 @@ class StateMap:
     member: str | None = None
 
 
+@dataclass(frozen=True)
+class BlockAssignmentMap:
+    """A state whose current map is published only as a block assignment file."""
+
+    state: str
+    source: Source
+    member: str | None
+    block_column: str | int
+    district_column: str | int
+    blocks: Source
+
+
 NO_LICENSE = "No license stated (public government record)"
 
 
@@ -142,16 +154,34 @@ _MAPS = [
         "DISTRICT",
     ),
 ]
-STATE_MAPS: dict[str, StateMap] = {m.state: m for m in _MAPS}
+_BLOCK_MAPS = [
+    BlockAssignmentMap(
+        "OH",
+        _source(
+            "OH",
+            "2025-orc-congress",
+            "https://redistricting.ohio.gov/api/public/districtmaps/430/download",
+            "Ohio Redistricting Commission",
+            "Congressional Redistricting Plan adopted 2025-10-31 (block assignment file). "
+            "Page: https://redistricting.ohio.gov/maps",
+        ),
+        member="October 31 2025 CD BAF.xlsx",
+        block_column="Block",
+        district_column="DistrictID:1",
+        blocks=Source(
+            id="census-blocks-2020-39",
+            url="https://www2.census.gov/geo/tiger/TIGER2020/TABBLOCK20/tl_2020_39_tabblock20.zip",
+            publisher="U.S. Census Bureau",
+            license="Public domain (U.S. Government work)",
+            description="TIGER/Line 2020 census blocks, Ohio. Used to build Ohio's districts.",
+        ),
+    ),
+]
+STATE_MAPS: dict[str, StateMap | BlockAssignmentMap] = {m.state: m for m in _MAPS + _BLOCK_MAPS}
 
 # States the audit marks as changed whose current map can't be loaded yet, with why.
 # The build keeps their 2024 lines and says so; check_audit_match allows only these.
-PENDING: dict[str, str] = {
-    "OH": (
-        "The Ohio Redistricting Commission publishes only a block assignment file, and the "
-        "Secretary of State's shapefile page blocks automated downloads."
-    ),
-}
+PENDING: dict[str, str] = {}
 
 
 def read_state_map(path: Path, member: str | None = None) -> gpd.GeoDataFrame:

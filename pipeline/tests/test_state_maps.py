@@ -6,7 +6,7 @@ from shapely.geometry import box
 
 from gerry.boundaries import load_state_outlines
 from gerry.fetch import Source
-from gerry.state_maps import STATE_MAPS, StateMap, read_state_map
+from gerry.state_maps import PENDING, STATE_MAPS, BlockAssignmentMap, StateMap, read_state_map
 from gerry.states import STATES_BY_USPS
 
 
@@ -67,14 +67,29 @@ def test_read_state_map_reads_geojson(tmp_path):
 
 
 @pytest.mark.parametrize("state_map", STATE_MAPS.values(), ids=lambda m: m.state)
-def test_registered_maps_are_well_formed(state_map: StateMap):
+def test_registered_maps_are_well_formed(state_map: StateMap | BlockAssignmentMap):
     assert state_map.state in STATES_BY_USPS
-    assert isinstance(state_map.source, Source)
-    assert state_map.source.url.startswith("https://")
+    sources = [state_map.source]
+    if isinstance(state_map, BlockAssignmentMap):
+        sources.append(state_map.blocks)
+        assert state_map.blocks.id.startswith("census-blocks-")
+    else:
+        assert state_map.district_field
+    for source in sources:
+        assert isinstance(source, Source)
+        assert source.url.startswith("https://")
     assert state_map.source.id.startswith(f"{state_map.state.lower()}-")
-    assert state_map.district_field
 
 
 def test_source_ids_are_unique():
     ids = [m.source.id for m in STATE_MAPS.values()]
     assert len(ids) == len(set(ids))
+
+
+def test_every_changed_state_is_registered_or_pending():
+    from gerry.__main__ import REPO_ROOT
+    from gerry.replacement import check_audit_match
+    from gerry.state_audit import changed_states, read_state_audit
+
+    changed = changed_states(read_state_audit(REPO_ROOT / "data" / "sources" / "states.csv"))
+    assert check_audit_match(changed, set(STATE_MAPS), set(PENDING)) == []

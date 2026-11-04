@@ -13,6 +13,7 @@ from pathlib import Path
 import geopandas as gpd
 from shapely.geometry.base import BaseGeometry
 
+from gerry.blocks import assemble_districts, read_block_assignment, read_blocks
 from gerry.boundaries import load_districts, load_state_outlines
 from gerry.fetch import CENSUS_CD119, CENSUS_STATES, fetch
 from gerry.replacement import (
@@ -23,7 +24,7 @@ from gerry.replacement import (
     replace_states,
 )
 from gerry.state_audit import changed_states, read_state_audit, validate_state_audit
-from gerry.state_maps import PENDING, STATE_MAPS, StateMap, read_state_map
+from gerry.state_maps import PENDING, STATE_MAPS, BlockAssignmentMap, StateMap, read_state_map
 from gerry.validate import validate_districts
 
 # pipeline/src/gerry/__main__.py -> repo root
@@ -32,13 +33,26 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 MAX_COVERAGE_GAP = 0.005
 
 
+def _read_plan(
+    state_map: StateMap | BlockAssignmentMap, raw: Path, manifest: Path
+) -> tuple[gpd.GeoDataFrame, str]:
+    """Fetch one state's current map. Returns the plan and its district field name."""
+    path = fetch(state_map.source, raw, manifest)
+    if isinstance(state_map, StateMap):
+        return read_state_map(path, state_map.member), state_map.district_field
+    assignment = read_block_assignment(
+        path, state_map.member, state_map.block_column, state_map.district_column
+    )
+    blocks = read_blocks(fetch(state_map.blocks, raw, manifest))
+    return assemble_districts(blocks, assignment), "DISTRICT"
+
+
 def _load_replacement(
-    state_map: StateMap, land: BaseGeometry, raw: Path, manifest: Path
+    state_map: StateMap | BlockAssignmentMap, land: BaseGeometry, raw: Path, manifest: Path
 ) -> tuple[gpd.GeoDataFrame, list[str]]:
     """Fetch, normalize and clip one state's current map. Returns rows and problems."""
-    path = fetch(state_map.source, raw, manifest)
-    plan = read_state_map(path, state_map.member)
-    rows = normalize_state_map(plan, state_map.state, state_map.district_field)
+    plan, field = _read_plan(state_map, raw, manifest)
+    rows = normalize_state_map(plan, state_map.state, field)
     rows = clip_to_land(rows, land)
     rows["map_source"] = state_map.source.id
     gap = coverage_gap(rows, land)
