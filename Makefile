@@ -2,7 +2,7 @@
 UV := uv run --project pipeline
 PY_PATHS := pipeline tools
 
-.PHONY: setup lint format test check-functions check pr-size site-dev site-check boundaries
+.PHONY: setup lint format test check-functions check pr-size site-dev site-check boundaries audit
 
 setup:
 	uv sync --project pipeline
@@ -36,6 +36,10 @@ check: lint test check-functions site-check
 # Download (once, then cached) and validate the Census district boundaries.
 boundaries:
 	$(UV) python -m gerry boundaries
+
+# Validate data/sources/states.csv and list states whose 2026 map differs from 2024.
+audit:
+	$(UV) python -m gerry audit
 
 pr-size:
 	$(UV) python tools/check_pr_size.py origin/main
