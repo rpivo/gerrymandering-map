@@ -9,6 +9,7 @@ gerry.population), so adding up a place's blocks by district says how many of it
 in each district. Districts follow block lines, so this count is exact for each 2020 block.
 """
 
+import re
 import zipfile
 from pathlib import Path
 
@@ -18,7 +19,9 @@ import pandas as pd
 MAX_PLACES = 10
 
 # 0-based field positions in the PL 94-171 geoheader.
-_PLACE_FIELDS = {"sumlev": 2, "place": 29, "basename": 86, "name": 87, "pop": 90}
+_PLACE_FIELDS = {
+    "sumlev": 2, "place": 29, "basename": 86, "name": 87, "pop": 90, "lat": 92, "lon": 93,
+}  # fmt: skip
 _PLACE = "160"
 # The Census type of a place is its full name minus its base name: "Abbeville city".
 _KIND_WORDS = {"CDP": "community"}
@@ -51,12 +54,29 @@ def place_name_and_kind(name: str, basename: str) -> tuple[str, str]:
     return base, _KIND_WORDS.get(kind, kind)
 
 
+# Kinds of place that are a city and county merged into one government.
+_CONSOLIDATED = {"metropolitan government", "metro government", "unified government",
+                 "consolidated government", "urban county"}  # fmt: skip
+
+
+def map_label(name: str, kind: str) -> str:
+    """Return a place's short name for a map label.
+
+    A city merged with its county carries both names ("Nashville-Davidson",
+    "Louisville/Jefferson County"); a map labels it by the city alone.
+    """
+    if kind in _CONSOLIDATED or name.endswith(" County"):
+        return re.split(r"[-/,]", name, maxsplit=1)[0].strip()
+    return name
+
+
 def read_pl_places(path: Path) -> pd.DataFrame:
     """Read every place in a state's PL 94-171 zip.
 
     Returns:
         place (the 5-digit code blocks carry), name (without its type), kind (see
-        place_kind) and pop (2020 population, all ages), in file order.
+        place_kind), pop (2020 population, all ages), and lat and lon (the Census's
+        internal point, a spot inside the place, in degrees), in file order.
     """
     with zipfile.ZipFile(path) as zf:
         geo_name = next(n for n in zf.namelist() if n.endswith("geo2020.pl"))
@@ -78,7 +98,8 @@ def read_pl_places(path: Path) -> pd.DataFrame:
     ]
     return pd.DataFrame({
         "place": places["place"], "name": [n for n, _ in named], "kind": [k for _, k in named],
-        "pop": places["pop"].astype(int),
+        "pop": places["pop"].astype(int), "lat": places["lat"].astype(float),
+        "lon": places["lon"].astype(float),
     })  # fmt: skip
 
 

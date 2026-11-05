@@ -74,11 +74,16 @@ def fit_to_view(
     Returns:
         The transformed shapes and the (width, height) of the box.
     """
+    matrix, box_size = _fit_matrix(geometries, size)
+    return [affinity.affine_transform(g, matrix) for g in geometries], box_size
+
+
+def _fit_matrix(geometries: list[BaseGeometry], size: int) -> tuple[list[float], tuple[int, int]]:
+    """Return fit_to_view's affine matrix and box size, so points can follow the same scaling."""
     minx, miny, maxx, maxy = shapely.union_all(geometries).bounds
     scale = size / max(maxx - minx, maxy - miny)
     matrix = [scale, 0, 0, -scale, -minx * scale, maxy * scale]
-    fitted = [affinity.affine_transform(g, matrix) for g in geometries]
-    return fitted, (round((maxx - minx) * scale), round((maxy - miny) * scale))
+    return matrix, (round((maxx - minx) * scale), round((maxy - miny) * scale))
 
 
 def _tolerance(geometry: BaseGeometry, detail: float) -> float:
@@ -122,13 +127,47 @@ def state_map(districts, detail: float) -> dict:
     Returns:
         {"viewBox": "0 0 w h", "paths": {district_id: path}}.
     """
+    _, to_view, shapes, (width, height) = _state_frame(districts, detail)
+    fitted = [affinity.affine_transform(g, to_view) for g in shapes]
+    paths = {d: svg_path(g) for d, g in zip(districts["district_id"], fitted, strict=True)}
+    return {"viewBox": f"0 0 {width} {height}", "paths": paths}
+
+
+def _state_frame(districts, detail: float):
+    """Project and simplify a state's districts.
+
+    Returns:
+        The projection, the view matrix, the projected shapes and the view box size.
+
+    The shapes are projected but not yet scaled into the view, so state_points can put
+    points through the same projection and matrix.
+    """
     project = local_projection(districts.union_all(), districts.crs)
     shapes = [project(g) for g in districts.geometry]
     state = shapely.union_all(shapes)
     shapes = list(shapely.coverage_simplify(shapes, _tolerance(state, detail)))
-    fitted, (width, height) = fit_to_view(shapes)
-    paths = {d: svg_path(g) for d, g in zip(districts["district_id"], fitted, strict=True)}
-    return {"viewBox": f"0 0 {width} {height}", "paths": paths}
+    matrix, box_size = _fit_matrix(shapes, VIEW_SIZE)
+    return project, matrix, shapes, box_size
+
+
+def state_points(districts, detail: float, points: list[BaseGeometry]) -> dict:
+    """Return points placed on state_map's drawing of the same districts and detail.
+
+    Args:
+        districts: As for state_map.
+        detail: As for state_map; the same value gives the same view.
+        points: Points in the districts' coordinate reference system.
+
+    Returns:
+        {"viewBox": "0 0 w h", "points": [[x, y], ...]} in view coordinates (whole numbers,
+        y down), in the order given. A point outside the drawing's box falls outside 0..w, 0..h.
+    """
+    project, to_view, _, (width, height) = _state_frame(districts, detail)
+    placed = [affinity.affine_transform(project(p), to_view) for p in points]
+    return {
+        "viewBox": f"0 0 {width} {height}",
+        "points": [[round(p.x), round(p.y)] for p in placed],
+    }
 
 
 # The US map: the lower 48 in the Census Bureau's Albers projection for the contiguous US,

@@ -1,4 +1,5 @@
 ---
+import { cityTiers, dotRadius, labelOffset } from "../lib/cities";
 import { districtsInState, getState, stateMap } from "../lib/data";
 import { districtPath } from "../lib/districts";
 import { scoreBand } from "../lib/format";
@@ -26,11 +27,22 @@ const rows = districtsInState(state).map((d) => {
 });
 const [, , width, height] = map.viewBox.split(/\s+/).map(Number) as [number, number, number, number];
 // The frame matches the drawing's shape exactly, so a tooltip's percent position lands on its district.
-const frameStyle = `aspect-ratio: ${width} / ${height}; width: min(100%, calc(32rem * ${width / height}))`;
+// It's also a size container, so city marks can switch sets with the map's drawn width.
+const frameStyle = `aspect-ratio: ${width} / ${height}; width: min(100%, calc(32rem * ${width / height})); container-type: inline-size`;
 // CSS can't pass a hovered link's ID to its tooltip, so each district gets its own selector.
 const showTips = `${rows
   .map(({ district }) => `.map-frame:has(a[data-tip="${district.id}"]:hover) .map-tip[data-tip="${district.id}"]`)
   .join(",\n")} { display: block; }`;
+// City labels are sized in map units, so each set fits without overlaps across its range of
+// widths. Container queries show the set for the width the map is drawn at.
+const tiers = cityTiers(state);
+const showCities = tiers
+  .map((t, i) => {
+    const range = [t.min > 0 && `(min-width: ${t.min}px)`, t.max !== null && `(max-width: ${t.max - 0.02}px)`];
+    return `@container ${range.filter(Boolean).join(" and ")} { .map-frame .tier-${i} { display: inline; } }`;
+  })
+  .join("\n");
+const round = (n: number) => Math.round(n * 10) / 10;
 ---
 
 <div class="map-frame" style={frameStyle}>
@@ -58,6 +70,25 @@ const showTips = `${rows
       </a>
     ))
   }
+  {
+    tiers.map((tier, i) => (
+      <g class={`cities tier-${i}`} aria-hidden="true" pointer-events="none" font-size={round(tier.fontSize)}>
+        {tier.marks.map((m) => (
+          <>
+            <circle class="city-dot" cx={m.x} cy={m.y} r={round(dotRadius(tier.fontSize))} />
+            <text
+              class="city-label"
+              x={round(m.anchor === "start" ? m.x + labelOffset(tier.fontSize) : m.x - labelOffset(tier.fontSize))}
+              y={m.y}
+              text-anchor={m.anchor}
+            >
+              {m.name}
+            </text>
+          </>
+        ))}
+      </g>
+    ))
+  }
 </svg>
   {
     rows.map(({ district, tip, place }) => (
@@ -74,7 +105,7 @@ const showTips = `${rows
     ))
   }
 </div>
-<style is:inline set:html={showTips} />
+<style is:inline set:html={`${showTips}\n${showCities}`} />
 {map.note && <p class="map-note">{map.note}</p>}
 
 <style>
@@ -194,6 +225,28 @@ const showTips = `${rows
   .outline.current {
     stroke: var(--text);
     stroke-width: 2.5;
+  }
+
+  .cities {
+    display: none;
+  }
+
+  .city-dot {
+    fill: var(--text);
+    stroke: var(--bg);
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+  }
+
+  /* A halo in the page color keeps a label readable over any band color. */
+  .city-label {
+    fill: var(--text);
+    stroke: var(--bg);
+    stroke-width: 0.25em;
+    stroke-linejoin: round;
+    paint-order: stroke;
+    dominant-baseline: central;
+    font-weight: 600;
   }
 
   .halo {
