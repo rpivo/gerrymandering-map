@@ -49,7 +49,7 @@ export interface Source {
   url: string;
   license: string;
   downloaded: string;
-  role: "boundaries" | "calibration";
+  role: "boundaries" | "calibration" | "votes";
 }
 
 /** An SVG outline: a viewBox and a path. */

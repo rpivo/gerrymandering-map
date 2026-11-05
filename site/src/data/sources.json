@@ -173,6 +173,24 @@
       "role": "boundaries"
     },
     {
+      "id": "medsl-house-precinct-2024",
+      "publisher": "MIT Election Data and Science Lab (Harvard Dataverse)",
+      "description": "U.S. House of Representatives Precinct-Level Returns 2024. Page: https://doi.org/10.7910/DVN/USBYR4",
+      "url": "https://dataverse.harvard.edu/api/access/datafile/13731101",
+      "license": "CC0 1.0 (public domain dedication)",
+      "downloaded": "2026-11-05",
+      "role": "votes"
+    },
+    {
+      "id": "medsl-president-precinct-2024",
+      "publisher": "MIT Election Data and Science Lab (Harvard Dataverse)",
+      "description": "U.S. President Precinct-Level Returns 2024. Page: https://doi.org/10.7910/DVN/XDJYKC",
+      "url": "https://dataverse.harvard.edu/api/access/datafile/13730901",
+      "license": "CC0 1.0 (public domain dedication)",
+      "downloaded": "2026-11-05",
+      "role": "votes"
+    },
+    {
       "id": "nc-2025-sl2025-95-congress",
       "publisher": "North Carolina General Assembly",
       "description": "S.L. 2025-95 (SB 249) congressional plan, labeled for the 2026 election. Page: https://www.ncleg.gov/Redistricting",
@@ -180,6 +198,24 @@
       "license": "No license stated (public government record)",
       "downloaded": "2026-11-04",
       "role": "boundaries"
+    },
+    {
+      "id": "nc-s249-president-2024-votes",
+      "publisher": "North Carolina General Assembly",
+      "description": "StatPack for S249 2nd Edition (enacted as S.L. 2025-95), 2024 Election Contest Report - US President: 2024 president by 2026 district. Transcribed to data/sources/votes/nc-s249-president-2024.csv",
+      "url": "https://webservices.ncleg.gov/ViewBillDocument/2025/7591/0/Edition%202%20-%20StatPack%20Report",
+      "license": "No license stated (public government record)",
+      "downloaded": "2026-11-05",
+      "role": "votes"
+    },
+    {
+      "id": "nj-2024-president-by-county-votes",
+      "publisher": "New Jersey Division of Elections",
+      "description": "Official List, Candidates for President, General Election 11/05/2024: votes by county. Transcribed to data/sources/votes/nj-2024-president-by-county.csv",
+      "url": "https://www.nj.gov/state/elections/assets/pdf/election-results/2024/2024-official-general-results-president.pdf",
+      "license": "No license stated (public government record)",
+      "downloaded": "2026-11-05",
+      "role": "votes"
     },
     {
       "id": "oh-2025-orc-congress",
@@ -209,6 +245,15 @@
       "role": "boundaries"
     },
     {
+      "id": "tx-planc2333-president-2024-votes",
+      "publisher": "Texas Legislative Council",
+      "description": "Election Analysis for Congressional Districts, PLANC2333, 2024 General Election (red206): 2024 president by 2026 district. Transcribed to data/sources/votes/tx-planc2333-president-2024.csv",
+      "url": "https://data.capitol.texas.gov/dataset/748c952b-e926-4f44-8d01-a738884b3ec8/resource/94a2fff0-39ca-46f9-9e40-dd72addde245/download/planc2333_r206_election24g.pdf",
+      "license": "No license stated (public government record)",
+      "downloaded": "2026-11-05",
+      "role": "votes"
+    },
+    {
       "id": "ut-2026-map1a-congress",
       "publisher": "Utah Geospatial Resource Center (UGRC)",
       "description": "Utah US Congress Districts 2026 to 2032 (court-adopted Map 1A). Page: https://gis.utah.gov/products/sgid/political/us-congressional-districts/",
@@ -216,6 +261,15 @@
       "license": "No license stated (public government record)",
       "downloaded": "2026-11-04",
       "role": "boundaries"
+    },
+    {
+      "id": "wa-king-county-precincts-2024-votes",
+      "publisher": "King County Elections (King County open data)",
+      "description": "November 2024 General Election Final Precinct Results, with each precinct's congressional district. Page: https://data.kingcounty.gov/d/uuda-pmuy",
+      "url": "https://data.kingcounty.gov/api/views/uuda-pmuy/rows.csv?accessType=DOWNLOAD",
+      "license": "Public domain",
+      "downloaded": "2026-11-05",
+      "role": "votes"
     }
   ]
 }

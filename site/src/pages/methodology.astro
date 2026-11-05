@@ -1,9 +1,11 @@
 ---
 import Base from "../layouts/Base.astro";
 import { rankedCount, sources, states } from "../lib/data";
+import { MIN_DISTRICTS } from "../lib/fairness";
 import { sourceNote } from "../lib/format";
 
 const boundarySources = sources.filter((s) => s.role === "boundaries");
+const voteSources = sources.filter((s) => s.role === "votes");
 const calibrationCount = sources.filter((s) => s.role === "calibration").length;
 const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
 ---
@@ -12,9 +14,10 @@ const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
   <main>
     <h1>How scores work</h1>
     <p class="lede">
-      This site measures one thing: how compact each congressional district's shape is. A
-      compact district is roughly round or square. An irregular one snakes, sprawls or has
-      pieces cut out of it.
+      This site measures how compact each congressional district's shape is. A compact district
+      is roughly round or square. An irregular one snakes, sprawls or has pieces cut out of it.
+      Each state page also scores the state's map for partisan fairness, explained
+      {" "}<a href="#fairness">below</a>.
     </p>
 
     <h2>The three measures</h2>
@@ -97,10 +100,80 @@ const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
       versions of the same districts for 12 states, using {calibrationCount} extra Census files.
     </p>
 
+    <h2 id="fairness">Partisan fairness</h2>
+    <p>
+      Shape is one way to look at a map. Another is how it turns votes into seats: whether one
+      party's voters are packed into a few districts it wins by huge margins, or spread thin across
+      districts it narrowly loses. Each state page scores this with three common measures. All three
+      use the same sign: <strong>positive favors Republicans, negative favors Democrats</strong>, and
+      0 favors neither. State pages show the size of the number and the party it favors in words.
+    </p>
+    <dl>
+      <dt>Efficiency gap</dt>
+      <dd>
+        A vote is "wasted" if it went to a losing candidate, or to a winner beyond the half of the
+        district's votes needed to win. The efficiency gap is Democratic wasted votes minus Republican
+        wasted votes, as a share of all votes. A gap of 10% means one party wastes more votes than the
+        other by 10% of all the votes cast.
+      </dd>
+      <dt>Mean-median difference</dt>
+      <dd>
+        The Democratic share of the vote averaged across the state's districts, minus the Democratic
+        share in its middle (median) district, in percentage points. If the middle district is less
+        Democratic than the average, Democratic voters are concentrated in a few districts, which
+        favors Republicans. The reverse favors Democrats.
+      </dd>
+      <dt>Declination</dt>
+      <dd>
+        Lines up the districts from most Republican to most Democratic and compares how lopsided each
+        party's wins are, as an angle scaled from -1 to 1 (Warrington, 2018). It needs districts won by
+        both parties, so it can't be measured where one party carried every district.
+      </dd>
+    </dl>
+    <h3>Where the votes come from</h3>
+    <p>
+      The measures use the 2024 presidential vote (Kamala Harris and Donald Trump only, so third
+      parties don't count) as a consistent measure of how each district leans. House races are less
+      even: some candidates run unopposed, and incumbents draw extra votes. For states that used the
+      same districts in 2024 and 2026, precinct results are added up within each district. Texas and
+      North Carolina drew new districts for 2026 and published official 2024 results for them, so
+      those are used directly. The other redrawn states published none, so their scores will use the
+      2026 House results once they are final.
+    </p>
+    <h3>What fairness scores can't tell you</h3>
+    <ul>
+      <li>
+        <strong>Small states.</strong> With few districts, one seat changing hands swings every
+        measure, so only states with {MIN_DISTRICTS} or more districts are scored.
+      </li>
+      <li>
+        <strong>States one party sweeps.</strong> When one party carries every district, the
+        efficiency gap is large however the lines are drawn, since every vote for the other party
+        counts as wasted. Where a party's voters are spread evenly across a state, no map may give it
+        a district.
+      </li>
+      <li>
+        <strong>Intent, or one election.</strong> These measures describe how a map performed with
+        one set of votes. Where voters live (cities, for example) shapes the numbers as much as where
+        the lines go, and the scores shift from one election to the next.
+      </li>
+    </ul>
+
     <h2>Data sources</h2>
+    <h3>District maps</h3>
     <ul class="sources">
       {
         boundarySources.map((s) => (
+          <li>
+            <a href={s.url}>{s.publisher}</a>: {sourceNote(s.description, s.license, s.downloaded)}
+          </li>
+        ))
+      }
+    </ul>
+    <h3>Votes</h3>
+    <ul class="sources">
+      {
+        voteSources.map((s) => (
           <li>
             <a href={s.url}>{s.publisher}</a>: {sourceNote(s.description, s.license, s.downloaded)}
           </li>
@@ -138,6 +211,11 @@ const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
   h2 {
     margin-top: 2.5rem;
     font-size: 1.25rem;
+  }
+
+  h3 {
+    margin-top: 1.75rem;
+    font-size: 1.05rem;
   }
 
   dt {
