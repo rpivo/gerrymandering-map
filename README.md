@@ -70,7 +70,7 @@ For each measure, a district's percentile is where it falls among the 429 distri
 
 ## Deploy
 
-The site is a Cloudflare Worker that serves the Astro build as static files (no Worker script), connected to this GitHub repo with Workers Builds. Every merge to `main` deploys to production, and other branches get preview URLs.
+The site is a Cloudflare Worker that serves the Astro build as static files (no Worker script), connected to this GitHub repo with Workers Builds. Every merge to `main` deploys to production at https://gerrymandering-map.ryanpivovar.workers.dev, and other branches and PRs get preview URLs.
 
 The Worker's config is `site/wrangler.json`. Build settings in the Cloudflare dashboard (Workers & Pages, Create application, Continue with GitHub):
 
@@ -81,9 +81,10 @@ The Worker's config is `site/wrangler.json`. Build settings in the Cloudflare da
 | Root directory | `site` |
 | Build command | `pnpm build` |
 | Deploy command | `pnpm exec wrangler deploy` |
-| Non-production branch deploy command | `pnpm exec wrangler versions upload` |
+| Preview command (other branches and PRs) | `pnpm exec wrangler preview` |
+| API token | `gerrymandering-map build token` (used only by this project) |
 
-Wrangler is a pinned dev dependency, so deploys use the locked version. Cloudflare reads the Node version from `site/.nvmrc` and the pnpm version from `packageManager` in `site/package.json`. Response headers (security headers, and long-term caching for Astro's fingerprinted assets) are in `site/public/_headers`, which Workers static assets honor.
+Wrangler is a pinned dev dependency, so deploys use the locked version. Cloudflare reads the Node version from `site/.nvmrc` and the pnpm version from `packageManager` in `site/package.json`. Response headers (security headers, and long-term caching for any Astro asset files) are in `site/public/_headers`, which Workers static assets honor. Astro builds each page as a file (`tx/35.html`), so `/tx/35` is served without a redirect, and unknown addresses get `404.html`.
 
 The pipeline doesn't run on Cloudflare: the site builds only from the committed data in `site/src/data/`, so a data change ships by committing regenerated files.
 
