@@ -14,6 +14,12 @@ beforeAll(async () => {
 });
 
 describe("the methodology page", () => {
+  it("explains how a district's cities and towns are counted", () => {
+    expect(html).toMatch(/<h2[^>]*id="places"/);
+    expect(text).toContain("census-designated places");
+    expect(text).toContain("all of its 2020 residents");
+  });
+
   it("has a fairness section the state pages can link to", () => {
     expect(html).toMatch(/<h2[^>]*id="fairness"/);
   });

@@ -40,7 +40,9 @@ GROUPS = ["hispanic", "nh_white", "nh_black", "nh_aian", "nh_asian", "nh_nhpi"]
 MAX_POPULATION_DEVIATION = 0.03
 
 # 0-based field positions in the PL 94-171 geoheader (97 fields, pipe-delimited).
-_GEO_FIELDS = {"sumlev": 2, "logrecno": 7, "geoid": 9, "pop": 90, "lat": 92, "lon": 93}
+_GEO_FIELDS = {"sumlev": 2, "logrecno": 7, "geoid": 9, "place": 29, "pop": 90, "lat": 92, "lon": 93}
+# A block in no place carries this place code.
+_NO_PLACE = "99999"
 _BLOCK = "750"
 # Segment 2 holds five ID fields, then table P3 (71 counts), then table P4 (73 counts).
 _P4_START = 5 + 71
@@ -78,8 +80,9 @@ def read_pl_blocks(path: Path) -> pd.DataFrame:
     """Read a state's PL 94-171 zip into one row per block.
 
     Returns:
-        geoid, lat, lon (a point inside the block, NAD83 degrees), pop (all ages), vap
-        (18 and over) and each group in GROUPS (voting-age counts).
+        geoid, place (its place code, or None outside any place; see gerry.places), lat,
+        lon (a point inside the block, NAD83 degrees), pop (all ages), vap (18 and over) and
+        each group in GROUPS (voting-age counts).
     """
     with zipfile.ZipFile(path) as zf:
         names = zf.namelist()
@@ -99,7 +102,11 @@ def read_pl_blocks(path: Path) -> pd.DataFrame:
     blocks["pop"] = blocks["pop"].astype(int)
     for column in ["lat", "lon"]:
         blocks[column] = blocks[column].astype(float)
-    return blocks[["geoid", "lat", "lon", "pop", *_P4_FIELDS]].reset_index(drop=True)
+    places = [
+        p if isinstance(p, str) and p not in ("", _NO_PLACE) else None for p in blocks["place"]
+    ]
+    blocks["place"] = pd.Series(places, index=blocks.index, dtype=object)
+    return blocks[["geoid", "place", "lat", "lon", "pop", *_P4_FIELDS]].reset_index(drop=True)
 
 
 def assign_blocks(blocks: pd.DataFrame, districts: gpd.GeoDataFrame) -> pd.DataFrame:

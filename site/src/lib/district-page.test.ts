@@ -23,3 +23,21 @@ describe("a district page's state map", () => {
     expect(html).not.toContain('aria-label="Irregularity score colors"');
   });
 });
+
+describe("a district page's places", () => {
+  it("lists the largest places, just before the state map", async () => {
+    const html = await render("LA-02");
+    const section = html.indexOf('id="places-heading"');
+    // Anchor: the section exists, so the order check below can't pass on a missing one.
+    expect(section).toBeGreaterThan(-1);
+    expect(section).toBeLessThan(html.indexOf('id="state-heading"'));
+    const text = html.slice(section).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+    expect(text).toMatch(/New Orleans city [\d,]+ of its [\d,]+ residents/);
+  });
+
+  it("points to the methodology page for how places are counted", async () => {
+    const html = await render("LA-02");
+    const section = html.slice(html.indexOf('id="places-heading"'), html.indexOf('id="state-heading"'));
+    expect(section).toContain('href="/methodology#places"');
+  });
+});
