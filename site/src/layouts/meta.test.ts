@@ -49,3 +49,13 @@ describe("preview image routes", () => {
     expect(images).toEqual(expect.arrayContaining(["index", "methodology", "tx", "tx/35", "ak/al"]));
   });
 });
+
+describe("footer", () => {
+  it("keeps a space on both sides of the separator between its links", async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Base, { props: { title: "T", description: "D" } });
+    const footer = html.slice(html.indexOf("<footer"), html.indexOf("</footer>"));
+    const text = footer.replace(/<[^>]+>/g, "").replace(/\s+/g, " ");
+    expect(text).toContain("How scores work · Source on GitHub");
+  });
+});
