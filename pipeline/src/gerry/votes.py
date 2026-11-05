@@ -9,11 +9,17 @@ Rules, each found in the data (see plans/PLAN.md section 3.3):
 - Count each precinct once: its TOTAL rows if it has them, else the sum of its other modes.
 - Ignore House rows with zero votes (Ohio lists every precinct under all 15 districts) and
   rows whose district isn't a number (Rhode Island adds STATEWIDE rows).
-- A precinct in more than one district is split by its House votes.
+- Drop rows that total other rows: town totals and county totals (New Jersey's Bergen and
+  Gloucester counties list both, doubling their votes).
+- A precinct in more than one district is split by its House votes. A big row (a county's mail
+  ballots, say) is split the same way, but each district gets its own partisan mix, taken from
+  the county's single-district precincts (Missouri, Oklahoma).
 - A precinct with no House votes goes to the state's unopposed district if it has exactly one
-  (Oklahoma's 3rd had no race on the ballot), else is spread by its county's matched votes.
+  (Oklahoma's 3rd had no race on the ballot), else each party's votes are spread the way that
+  party's matched votes are spread across the county's districts.
 """
 
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -27,6 +33,8 @@ COLUMNS = KEY + ["mode", "party_simplified", "votes", "district"]
 # so splitting it gives every district the same partisan mix. The share of votes in such rows
 # says how far to trust a state's district results.
 BIG_ROW_VOTES = 5000
+# A town or county total row may differ from the precincts it totals by this share (rounding).
+AGGREGATE_TOLERANCE = 0.01
 
 _MEDSL = "MIT Election Data and Science Lab (Harvard Dataverse)"
 _PAGE = "https://doi.org/10.7910/DVN/"
@@ -99,13 +107,40 @@ def unopposed_districts(weights: pd.DataFrame) -> dict[str, list[int]]:
 
 
 def _matched(two: pd.DataFrame, weights: pd.DataFrame) -> pd.DataFrame:
-    """Place precincts the House file covers, splitting multi-district ones by weight."""
+    """Place precincts the House file covers, splitting multi-district ones by weight.
+
+    A big multi-district row is a catch-all (a county's mail ballots), not a precinct. Its
+    House votes still say how many of its voters live in each district, but each district
+    gets its own partisan mix, taken from the county's single-district precincts.
+    """
     m = two.merge(weights, on=KEY)
     parts = m.groupby(KEY)["district"].transform("size")
     m["kind"] = parts.map(lambda n: "exact" if n == 1 else "split")
     m["row_votes"] = m["dem"] + m["rep"]
-    m[["dem", "rep"]] = m[["dem", "rep"]].mul(m["weight"], axis=0)
+    big = (m["kind"] == "split") & (m["row_votes"] > BIG_ROW_VOTES)
+    shares = m[["dem", "rep"]].mul(m["weight"], axis=0)
+    split, m["own_mix"] = _party_shares(m, big), False
+    shares[big] = split[["dem", "rep"]]
+    # A row where any district had no county pattern is only as good as a uniform split.
+    m.loc[big, "own_mix"] = split["own_mix"].groupby([m.loc[big, k] for k in KEY]).transform("any")
+    m[["dem", "rep"]] = shares
     return m
+
+
+def _party_shares(m: pd.DataFrame, big: pd.Series) -> pd.DataFrame:
+    """Split big rows' votes by House weight times each district's county mix, party by party."""
+    county = ["state_po", "county_fips", "district"]
+    exact = m[m["kind"] == "exact"].groupby(county)[["dem", "rep"]].sum()
+    mix = (exact["dem"] / (exact["dem"] + exact["rep"])).rename("mix").reset_index()
+    rows = m[big].reset_index().merge(mix, on=county, how="left").set_index("index")
+    out = pd.DataFrame({"own_mix": rows["mix"].isna()}, index=rows.index)
+    # A district with no single-district precincts in the county takes the row's own mix.
+    rows["mix"] = rows["mix"].fillna(rows["dem"] / rows["row_votes"])
+    for party, seed in (("dem", rows["mix"]), ("rep", 1 - rows["mix"])):
+        weight = rows["weight"] * seed
+        total = weight.groupby([rows[k] for k in KEY]).transform("sum")
+        out[party] = rows[party] * (weight / total).fillna(0.0)
+    return out
 
 
 def _unmatched(two: pd.DataFrame, weights: pd.DataFrame) -> pd.DataFrame:
@@ -124,16 +159,16 @@ def _place_unmatched(
     lone = {s: d[0] for s, d in unopposed.items() if len(d) == 1}
     to_lone = unmatched["state_po"].isin(list(lone))
     a = unmatched[to_lone].assign(district=lambda d: d["state_po"].map(lone), kind="unopposed")
+    # Each party's unmatched votes follow where that party's matched votes are in the county.
     county = ["state_po", "county_fips"]
-    share = (
-        matched.assign(t=matched["dem"] + matched["rep"])
-        .groupby(county + ["district"], as_index=False)["t"]
-        .sum()
-    )
-    share["weight"] = share["t"] / share.groupby(county)["t"].transform("sum")
-    b = unmatched[~to_lone].merge(share.drop(columns="t"), on=county, how="left")
+    share = matched.groupby(county + ["district"], as_index=False)[["dem", "rep"]].sum()
+    for party in ("dem", "rep"):
+        share[f"w_{party}"] = share[party] / share.groupby(county)[party].transform("sum")
+    b = unmatched[~to_lone].merge(share.drop(columns=["dem", "rep"]), on=county, how="left")
     b["kind"] = b["district"].isna().map({True: "lost", False: "county"})
-    b[["dem", "rep"]] = b[["dem", "rep"]].mul(b["weight"].fillna(1.0), axis=0)
+    for party in ("dem", "rep"):
+        b[party] = b[party] * b[f"w_{party}"].fillna(1.0)
+    b = b.drop(columns=["w_dem", "w_rep"])
     return pd.concat([a, b], ignore_index=True)
 
 
@@ -151,13 +186,17 @@ def assign_to_districts(
     out = pd.concat([matched, placed], ignore_index=True)
     out = out.rename(columns={"state_po": "state"})
     out["district"] = out["district"].astype("Int64")
-    return out[["state", "district", "kind", "dem", "rep", "row_votes"]]
+    out["own_mix"] = out["own_mix"].fillna(False).astype(bool)
+    return out[["state", "district", "kind", "dem", "rep", "row_votes", "own_mix"]]
 
 
 def state_quality(assigned: pd.DataFrame) -> pd.DataFrame:
     """Per state, the percent of two-party votes placed exactly, in big catch-all rows, and lost."""
     a = assigned.assign(t=assigned["dem"] + assigned["rep"])
-    a["big"] = (a["kind"] != "exact") & (a["row_votes"] > BIG_ROW_VOTES)
+    # Catch-all rows that couldn't follow a county pattern: big unmatched rows, and big split
+    # rows where a district had no single-district precincts in the county.
+    big = a["row_votes"] > BIG_ROW_VOTES
+    a["big"] = big & ((a["kind"] == "county") | a["own_mix"].fillna(False).astype(bool))
     total = a.groupby("state")["t"].sum()
     pct = pd.DataFrame(
         {
@@ -204,3 +243,42 @@ def check_reference(
                 f"{label}: Democratic share {ours[r.district]:.2%} vs published {published:.2%}."
             )
     return problems
+
+
+def _aggregate_keys(totals: pd.Series) -> set[tuple]:
+    """Find the precinct keys in one county that only repeat other rows' votes."""
+    names = {key[3]: key for key in totals.index}
+    children: dict[str, list[str]] = {}
+    for name in names:
+        base = re.sub(r"\s+\d+\w*$", "", name)
+        if base != name:
+            children.setdefault(base, []).append(name)
+    drop = set()
+    for name, key in names.items():
+        if "COUNTY TOTAL" in name.upper():
+            parts = totals.drop(index=key).sum()
+        elif name in children:
+            parts = sum(totals[names[c]] for c in children[name])
+        else:
+            continue
+        if abs(totals[key] - parts) <= AGGREGATE_TOLERANCE * max(parts, 1):
+            drop.add(key)
+    return drop
+
+
+def drop_aggregate_rows(df: pd.DataFrame) -> pd.DataFrame:
+    """Drop rows that only total other rows: town totals and county totals.
+
+    A town total is "Allendale" over "Allendale 1", "Allendale 2". New Jersey's Bergen and
+    Gloucester counties list both kinds, doubling their votes.
+
+    A row is dropped only if its votes match the rows it would total, to within 1%.
+    """
+    totals = df.groupby(KEY)["votes"].sum()
+    drop = set()
+    for _, county in totals.groupby(level=["state_po", "county_fips"]):
+        drop |= _aggregate_keys(county)
+    if not drop:
+        return df
+    keys = pd.MultiIndex.from_frame(df[KEY])
+    return df[~keys.isin(list(drop))].reset_index(drop=True)

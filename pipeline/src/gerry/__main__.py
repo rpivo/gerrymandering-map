@@ -47,6 +47,7 @@ from gerry.votes import (
     check_reference,
     district_totals,
     district_weights,
+    drop_aggregate_rows,
     one_count_per_precinct,
     read_precinct_returns,
     state_quality,
@@ -174,8 +175,10 @@ MAX_BIG_ROW_PCT = 2.0
 
 def _place_president_2024(raw: Path, manifest: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Join the MIT precinct files. Returns per-district totals and per-state quality."""
-    pres = one_count_per_precinct(read_precinct_returns(fetch(PRESIDENT_2024, raw, manifest)))
-    house = one_count_per_precinct(read_precinct_returns(fetch(HOUSE_2024, raw, manifest)))
+    pres, house = (
+        drop_aggregate_rows(one_count_per_precinct(read_precinct_returns(fetch(s, raw, manifest))))
+        for s in (PRESIDENT_2024, HOUSE_2024)
+    )
     weights = district_weights(house)
     assigned = assign_to_districts(
         two_party_by_precinct(pres), weights, unopposed_districts(weights)

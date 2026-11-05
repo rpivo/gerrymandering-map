@@ -233,3 +233,116 @@ def test_reference_check_flags_a_district_missing_from_the_results():
     )
     ref = pd.DataFrame({"district": [1, 2], "harris": [1, 1], "trump": [1, 1]})
     assert any("TX-02" in p for p in check_reference(totals, "TX", ref, tolerance_pts=0.1))
+
+
+def test_drop_aggregate_rows_removes_town_totals_that_repeat_their_precincts():
+    from gerry.votes import drop_aggregate_rows
+
+    df = returns(
+        [
+            ("NJ", "3", "Allendale 1", "TOTAL", "DEMOCRAT", 10, ""),
+            ("NJ", "3", "Allendale 2", "TOTAL", "DEMOCRAT", 5, ""),
+            ("NJ", "3", "Allendale", "TOTAL", "DEMOCRAT", 15, ""),  # town total: drop
+            ("NJ", "3", "Alpine", "TOTAL", "DEMOCRAT", 7, ""),  # one-precinct town: keep
+            ("NJ", "3", "Oradell", "TOTAL", "DEMOCRAT", 99, ""),  # not their sum: keep
+            ("NJ", "3", "Oradell 1", "TOTAL", "DEMOCRAT", 4, ""),
+        ]
+    )
+    kept = drop_aggregate_rows(df)
+    assert sorted(kept["precinct"]) == [
+        "Allendale 1",
+        "Allendale 2",
+        "Alpine",
+        "Oradell",
+        "Oradell 1",
+    ]
+
+
+def test_drop_aggregate_rows_removes_a_county_total_row():
+    from gerry.votes import drop_aggregate_rows
+
+    df = returns(
+        [
+            ("NJ", "15", "Clayton 1", "TOTAL", "DEMOCRAT", 10, ""),
+            ("NJ", "15", "Glassboro 1", "TOTAL", "REPUBLICAN", 6, ""),
+            ("NJ", "15", "COUNTY TOTAL", "TOTAL", "DEMOCRAT", 10, ""),
+            ("NJ", "15", "COUNTY TOTAL", "TOTAL", "REPUBLICAN", 6, ""),
+        ]
+    )
+    assert "COUNTY TOTAL" not in drop_aggregate_rows(df)["precinct"].tolist()
+
+
+def test_a_big_catch_all_row_takes_each_districts_own_partisan_mix():
+    # County 1: district 1's precincts vote 80% Democratic, district 2's 20%. A county-wide
+    # mail-ballot row split evenly by House votes should follow those mixes, not its own 50%.
+    big = BIG_ROW_VOTES
+    pres = [
+        ("MO", "1", "A", "TOTAL", "DEMOCRAT", 80, ""),
+        ("MO", "1", "A", "TOTAL", "REPUBLICAN", 20, ""),
+        ("MO", "1", "B", "TOTAL", "DEMOCRAT", 20, ""),
+        ("MO", "1", "B", "TOTAL", "REPUBLICAN", 80, ""),
+        ("MO", "1", "MAIL", "TOTAL", "DEMOCRAT", big, ""),
+        ("MO", "1", "MAIL", "TOTAL", "REPUBLICAN", big, ""),
+    ]
+    house = [
+        ("MO", "1", "A", "TOTAL", "DEMOCRAT", 1, "001"),
+        ("MO", "1", "B", "TOTAL", "DEMOCRAT", 1, "002"),
+        ("MO", "1", "MAIL", "TOTAL", "DEMOCRAT", 50, "001"),
+        ("MO", "1", "MAIL", "TOTAL", "DEMOCRAT", 50, "002"),
+    ]
+    out = _assign(pres, house)
+    mail = out[out["kind"] == "split"].set_index("district")
+    assert mail.loc[1, "dem"] == pytest.approx(0.8 * big)
+    assert mail.loc[2, "dem"] == pytest.approx(0.2 * big)
+    # Each party's votes are still all there.
+    assert mail["dem"].sum() == pytest.approx(big)
+    assert mail["rep"].sum() == pytest.approx(big)
+
+
+def test_a_small_split_precinct_keeps_one_mix():
+    pres = [
+        ("XX", "1", "S", "TOTAL", "DEMOCRAT", 30, ""),
+        ("XX", "1", "S", "TOTAL", "REPUBLICAN", 10, ""),
+    ]
+    house = [
+        ("XX", "1", "S", "TOTAL", "DEMOCRAT", 3, "001"),
+        ("XX", "1", "S", "TOTAL", "DEMOCRAT", 1, "002"),
+    ]
+    out = _assign(pres, house).set_index("district")
+    assert (out.loc[1, "dem"], out.loc[1, "rep"]) == (22.5, 7.5)
+
+
+def test_unmatched_votes_spread_by_each_partys_county_pattern():
+    pres = [
+        ("XX", "1", "A", "TOTAL", "DEMOCRAT", 90, ""),
+        ("XX", "1", "A", "TOTAL", "REPUBLICAN", 10, ""),
+        ("XX", "1", "B", "TOTAL", "DEMOCRAT", 10, ""),
+        ("XX", "1", "B", "TOTAL", "REPUBLICAN", 90, ""),
+        ("XX", "1", "C", "TOTAL", "DEMOCRAT", 50, ""),  # unmatched
+        ("XX", "1", "C", "TOTAL", "REPUBLICAN", 50, ""),
+    ]
+    house = [
+        ("XX", "1", "A", "TOTAL", "DEMOCRAT", 1, "001"),
+        ("XX", "1", "B", "TOTAL", "DEMOCRAT", 1, "002"),
+    ]
+    county = _assign(pres, house).query("kind == 'county'").set_index("district")
+    assert county.loc[1, "dem"] == pytest.approx(45)
+    assert county.loc[1, "rep"] == pytest.approx(5)
+
+
+def test_state_quality_doesnt_flag_catch_all_rows_split_by_county_patterns():
+    big = BIG_ROW_VOTES + 1
+    out = _assign(
+        [
+            ("XX", "1", "A", "TOTAL", "DEMOCRAT", 10, ""),
+            ("XX", "1", "B", "TOTAL", "DEMOCRAT", 10, ""),
+            ("XX", "1", "MAIL", "TOTAL", "DEMOCRAT", big, ""),
+        ],
+        [
+            ("XX", "1", "A", "TOTAL", "DEMOCRAT", 1, "001"),
+            ("XX", "1", "B", "TOTAL", "DEMOCRAT", 1, "002"),
+            ("XX", "1", "MAIL", "TOTAL", "DEMOCRAT", 1, "001"),
+            ("XX", "1", "MAIL", "TOTAL", "DEMOCRAT", 1, "002"),
+        ],
+    )
+    assert state_quality(out).set_index("state").loc["XX", "big_row_pct"] == 0
