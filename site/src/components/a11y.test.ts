@@ -50,6 +50,42 @@ describe("StateMapSvg hover outline", () => {
   });
 });
 
+describe("StateMapSvg tooltips", () => {
+  it("has one hidden tooltip per district, out of the accessibility tree", async () => {
+    const html = await container.renderToString(StateMapSvg, { props: { state: "TX", stateName: "Texas" } });
+    const tips = html.match(/<div\b[^>]*class="map-tip[^"]*"[^>]*>/g) ?? [];
+    // Anchor: one per Texas district, so an empty match can't pass vacuously.
+    expect(tips).toHaveLength(38);
+    expect(tips.filter((t) => !t.includes('aria-hidden="true"'))).toEqual([]);
+  });
+
+  it("shows a district's tooltip only while that district is hovered", async () => {
+    const html = await container.renderToString(StateMapSvg, { props: { state: "TX", stateName: "Texas" } });
+    // The selector list must end in the rule that shows the tooltip, or it does nothing.
+    expect(html).toMatch(
+      /\.map-frame:has\(a\[data-tip="TX-25"\]:hover\) \.map-tip\[data-tip="TX-25"\][^{]*\{ display: block; \}/,
+    );
+    expect(html).toMatch(/<a\b[^>]*data-tip="TX-25"/);
+    expect(html).toMatch(/class="map-tip[^"]*"[^>]*data-tip="TX-25"|data-tip="TX-25"[^>]*class="map-tip/);
+  });
+
+  it("tells the district's score and context in the tooltip", async () => {
+    const html = await container.renderToString(StateMapSvg, { props: { state: "TX", stateName: "Texas" } });
+    const start = html.search(/<div\b[^>]*data-tip="TX-25"/);
+    const tip = html.slice(start, html.indexOf("</div>", start));
+    expect(start).toBeGreaterThan(-1);
+    expect(tip).toContain("TX-25");
+    expect(tip).toMatch(/Irregularity score \d+/);
+    expect(tip).toContain("least compact of 38 in Texas");
+  });
+
+  it("drops the browser's own title tooltip, which would show on top of the new one", async () => {
+    const html = await container.renderToString(StateMapSvg, { props: { state: "TX", stateName: "Texas" } });
+    expect(html).toContain("<svg"); // anchor: the map rendered
+    expect(html).not.toContain("<title>");
+  });
+});
+
 describe("StateMapSvg notes", () => {
   it("says what a cropped map leaves out", async () => {
     const html = await container.renderToString(StateMapSvg, { props: { state: "HI", stateName: "Hawaii" } });

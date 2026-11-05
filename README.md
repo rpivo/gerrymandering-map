@@ -97,6 +97,10 @@ Preview builds are off because Cloudflare's preview setup (in open beta in Novem
 
 The site opens in light mode for everyone, whatever their device prefers. A sun and moon switch in the header (announced to screen readers as a "Dark mode" switch) changes it and remembers the choice in that browser (`localStorage`). The colors for both modes are in `site/src/styles/global.css` (dark ones under `:root[data-theme="dark"]`), and `site/src/lib/theme.ts` holds the two small inline scripts: one in the page head applies a saved dark choice before the page draws, so it never flashes light, and one runs the switch. Without JavaScript the switch stays hidden and the site is light. Link preview images are always light.
 
+### Map tooltips
+
+Hovering a district on a state map shows a tooltip beside it: the irregularity score, how many districts it's less compact than, its rank in the state, and short notes where they apply (10% or more of its border on the state's edge, majority-minority, new lines for 2026). It uses no JavaScript. Every tooltip is built into the page, placed next to its district at build time (`site/src/lib/tooltip.ts`), and shown with CSS while that district is hovered. On narrow screens a tooltip spans the map's width. Tooltips are hidden from screen readers, since the districts table on the same page has the same information.
+
 ### Link previews
 
 Every page has a 1200 by 630 preview image for social sites and chat apps: one per district, one per state, and one for the home and methodology pages (the 404 page uses the home image). They're drawn as SVG in `site/src/lib/og.ts` and turned into PNGs at build time by `@resvg/resvg-js` in `site/src/pages/og/[...image].png.ts`, so they land in `dist/og/` (about 9 MB). Text uses the Inter font committed in `site/src/assets/fonts/` (SIL Open Font License, in `OFL.txt` there) with system fonts turned off, so the images look the same on every machine; the build stops if the font can't load. Preview tags need absolute URLs, so the site's address is `SITE_URL` in `og.ts`: change it if the domain changes.

@@ -94,17 +94,24 @@ export function sourceNote(description: string, license: string, downloaded: str
 }
 
 /**
+ * Return how much of a district's border is the state's own edge, as a whole percent.
+ * @param share - Share of the border on the state's edge, 0 to 1.
+ * @returns 0 to 100, but 99 at most unless all of it is, so "100%" is never rounded up to.
+ */
+export function stateEdgePercent(share: number): number {
+  const pct = Math.round(share * 100);
+  return pct === 100 && share < 1 ? 99 : pct;
+}
+
+/**
  * Describe how much of a district's border is the state's own edge.
  * @param share - Share of the border on the state's edge, 0 to 1.
  * @returns A sentence with a whole percent (99% at most unless all of it is), or null if it rounds to 0%.
  */
 export function stateEdgeText(share: number): string | null {
-  let pct = Math.round(share * 100);
+  const pct = stateEdgePercent(share);
   if (pct === 0) {
     return null;
-  }
-  if (pct === 100 && share < 1) {
-    pct = 99;
   }
   return `${pct}% of this district's border is the state's edge: a coastline, a national border or a state line.`;
 }
