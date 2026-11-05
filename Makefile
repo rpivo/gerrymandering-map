@@ -2,7 +2,7 @@
 UV := uv run --project pipeline
 PY_PATHS := pipeline tools
 
-.PHONY: setup lint format test check-functions check pr-size site-dev site-check boundaries audit calibrate scores data votes fairness
+.PHONY: setup lint format test check-functions check pr-size site-dev site-check boundaries audit calibrate scores data votes fairness population
 
 setup:
 	uv sync --project pipeline
@@ -51,6 +51,11 @@ votes:
 # Score each state's map for partisan fairness from the votes (run make votes first).
 fairness:
 	$(UV) python -m gerry fairness
+
+# Add up 2020 voting-age population by race in each district (run make boundaries first).
+# Downloads the 2020 Census redistricting file for every state (about 1.3 GB, once).
+population:
+	$(UV) python -m gerry population
 
 # Validate data/sources/states.csv and list states whose 2026 map differs from 2024.
 audit:

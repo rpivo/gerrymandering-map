@@ -8,6 +8,7 @@ Commands:
     calibrate   Re-derive the map generalization settings from Census files.
     votes       Place 2024 presidential votes in districts; write data/build/.
     fairness    Score each state's map for partisan fairness from the votes.
+    population  Add up 2020 voting-age population by race per district; write data/build/.
 """
 
 import argparse
@@ -31,6 +32,13 @@ from gerry.export import (
 from gerry.fairness import MIN_DISTRICTS, state_fairness
 from gerry.fetch import CENSUS_CD119, CENSUS_STATES, fetch, read_manifest
 from gerry.generalize import absorb_fragments, simplify_to_census
+from gerry.population import (
+    assign_blocks,
+    district_population,
+    pl_source,
+    population_problems,
+    read_pl_blocks,
+)
 from gerry.replacement import (
     check_audit_match,
     clip_to_land,
@@ -265,6 +273,32 @@ def fairness(repo_root: Path) -> int:
     return 0
 
 
+def population(repo_root: Path) -> int:
+    """Add up 2020 voting-age population by race in each built district (gerry.population)."""
+    build = repo_root / "data" / "build"
+    built = build / "districts.gpkg"
+    if not built.exists():
+        print(f"{built.relative_to(repo_root)} not found. Run make boundaries first.")
+        return 1
+    districts = gpd.read_file(built).to_crs("EPSG:4269")
+    raw, manifest = repo_root / "data" / "raw", repo_root / "data" / "sources" / "sources.csv"
+    tables = []
+    for state in STATES:
+        blocks = read_pl_blocks(fetch(pl_source(state.usps), raw, manifest))
+        blocks["state"] = state.usps
+        tables.append(district_population(assign_blocks(blocks, districts)))
+    table = pd.concat(tables, ignore_index=True)
+    out = build / "population-by-district.csv"
+    table.to_csv(out, index=False)
+    problems = population_problems(table)
+    if problems:
+        _print_problems(problems, " in the 2020 population check")
+    nearest = table["nearest_pop"].sum() / table["pop"].sum()
+    print(f"Placed {table['pop'].sum():,} people in {len(table)} districts "
+          f"({nearest:.3%} by nearest district). Wrote {out.relative_to(repo_root)}")  # fmt: skip
+    return 1 if problems else 0
+
+
 COMMANDS = {
     "boundaries": (boundaries, "Build and validate the 2026 district map."),
     "audit": (audit, "Validate the state map audit and list changed states."),
@@ -272,6 +306,7 @@ COMMANDS = {
     "calibrate": (calibrate, "Re-derive the settings in gerry.generalize from Census files."),
     "votes": (votes, "Place 2024 presidential votes in districts."),
     "fairness": (fairness, "Score each state's map for partisan fairness."),
+    "population": (population, "Add up 2020 voting-age population by race per district."),
 }
 
 

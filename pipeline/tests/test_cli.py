@@ -380,3 +380,38 @@ def test_fairness_scores_states_from_the_votes_output(tmp_path, capsys):
 def test_fairness_asks_for_the_votes_first(tmp_path, capsys):
     assert cli.main(["fairness", "--repo-root", str(tmp_path)]) == 1
     assert "make votes" in capsys.readouterr().out
+
+
+def test_population_places_census_blocks_in_the_built_districts(tmp_path, monkeypatch, capsys):
+    from shapely.geometry import box as shape_box
+    from test_population import write_pl_zip
+
+    from gerry.states import STATES_BY_USPS
+
+    build = tmp_path / "data" / "build"
+    build.mkdir(parents=True)
+    gpd.GeoDataFrame(
+        {"district_id": ["WY-AL"], "state": ["WY"], "number": [None], "map_source": ["x"]},
+        geometry=[shape_box(-106, 41, -105, 42)],
+        crs="EPSG:4269",
+    ).to_file(build / "districts.gpkg")
+    pl_zip = write_pl_zip(tmp_path)
+    fetched = []
+
+    def fake_fetch(source, raw, manifest):
+        fetched.append(source.id)
+        return pl_zip
+
+    monkeypatch.setattr(cli, "fetch", fake_fetch)
+    monkeypatch.setattr(cli, "STATES", [STATES_BY_USPS["WY"]])
+    assert cli.main(["population", "--repo-root", str(tmp_path)]) == 0
+    assert fetched == ["census-pl94171-2020-56"]
+    table = pd.read_csv(build / "population-by-district.csv")
+    assert table["district_id"].tolist() == ["WY-AL"]
+    assert (table.loc[0, "pop"], table.loc[0, "vap"], table.loc[0, "minority"]) == (200, 150, 85)
+    assert "WY-AL" not in capsys.readouterr().out  # no problems to report
+
+
+def test_population_asks_for_the_built_map_first(tmp_path, capsys):
+    assert cli.main(["population", "--repo-root", str(tmp_path)]) == 1
+    assert "make boundaries" in capsys.readouterr().out
