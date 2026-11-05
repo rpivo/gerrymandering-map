@@ -42,11 +42,29 @@ describe("StateMapSvg hover outline", () => {
     expect(html.match(/<use\b/g)).toHaveLength(76);
   });
 
-  it("marks the highlighted district's fill, not just its link", async () => {
+  it("keeps every district's score color on a district page", async () => {
     const html = await container.renderToString(StateMapSvg, {
       props: { state: "TX", stateName: "Texas", highlight: "TX-25" },
     });
-    expect(html).toMatch(/<use\b[^>]*href="#shape-TX-25"[^>]*class="[^"]*\bcurrent\b|<use\b[^>]*class="[^"]*\bcurrent\b[^>]*href="#shape-TX-25"/);
+    const fills = html.match(/<use\b[^>]*class="fill band-[a-z-]+[^"]*"/g) ?? [];
+    // Anchor: every Texas district is scored, so all 38 fills carry a band.
+    expect(fills).toHaveLength(38);
+    // has-highlight is what used to turn every other district gray.
+    expect(html).not.toContain("has-highlight");
+  });
+
+  it("outlines the highlighted district in the top layer, so it stands out among the colors", async () => {
+    const html = await container.renderToString(StateMapSvg, {
+      props: { state: "TX", stateName: "Texas", highlight: "TX-25" },
+    });
+    const start = html.search(/<a\b[^>]*data-tip="TX-25"/);
+    const link = html.slice(start, html.indexOf("</a>", start));
+    expect(start).toBeGreaterThan(-1);
+    expect(link).toMatch(/<use\b[^>]*class="outline current"/);
+    expect(html.match(/class="outline current"/g)).toHaveLength(1);
+    // A halo in the page color goes under the outline, so the outline shows on any band.
+    expect(link).toMatch(/<use\b[^>]*class="halo"[^>]*>(?:<\/use>)?\s*<use\b[^>]*class="outline current"/);
+    expect(html.match(/class="halo"/g)).toHaveLength(1);
   });
 });
 

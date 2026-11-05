@@ -2,6 +2,7 @@
 import DistrictShape from "../../components/DistrictShape.astro";
 import MetricRow from "../../components/MetricRow.astro";
 import ScoreBadge from "../../components/ScoreBadge.astro";
+import ScoreLegend from "../../components/ScoreLegend.astro";
 import PopulationNote from "../../components/PopulationNote.astro";
 import StateEdgeNote from "../../components/StateEdgeNote.astro";
 import StateMapSvg from "../../components/StateMapSvg.astro";
@@ -98,6 +99,7 @@ const ranked = district.rank_national !== null;
     <section aria-labelledby="state-heading">
       <h2 id="state-heading">Where it sits in {state.name}</h2>
       <StateMapSvg state={state.state} stateName={state.name} highlight={district.id} />
+      {!state.at_large && <ScoreLegend />}
     </section>
 
     <nav class="pager" aria-label="Other districts in this state">
