@@ -84,10 +84,10 @@ The Worker's config is `site/wrangler.json`. Build settings in the Cloudflare da
 | Root directory | `site` |
 | Build command | `pnpm build` |
 | Deploy command | `pnpm exec wrangler deploy` |
-| Preview command (other branches and PRs) | `pnpm exec wrangler preview` |
+| Preview command (other branches and PRs, under "Previews Base") | `pnpm exec wrangler versions upload` |
 | API token | `gerrymandering-map build token` (used only by this project) |
 
-`wrangler preview` (still in open beta) refuses to run unless `wrangler.json` has a `previews` block; an empty one is enough. Wrangler is a pinned dev dependency, so deploys use the locked version. Cloudflare reads the Node version from `site/.nvmrc` and the pnpm version from `packageManager` in `site/package.json`. Response headers (security headers, and long-term caching for any Astro asset files) are in `site/public/_headers`, which Workers static assets honor. Astro builds each page as a file (`tx/35.html`), so `/tx/35` is served without a redirect, and unknown addresses get `404.html`.
+Branches and PRs use `wrangler versions upload`, which uploads a new version with its own preview URL without making it live. The open-beta `wrangler preview` command failed at the asset upload with no detail (it also needs the empty `previews` block in `wrangler.json`, kept so it can be tried again later). Wrangler is a pinned dev dependency, so deploys use the locked version. Cloudflare reads the Node version from `site/.nvmrc` and the pnpm version from `packageManager` in `site/package.json`. Response headers (security headers, and long-term caching for any Astro asset files) are in `site/public/_headers`, which Workers static assets honor. Astro builds each page as a file (`tx/35.html`), so `/tx/35` is served without a redirect, and unknown addresses get `404.html`.
 
 ### Link previews
 

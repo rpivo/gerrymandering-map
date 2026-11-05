@@ -12,7 +12,7 @@ describe("Cloudflare Worker config", () => {
     expect("main" in config).toBe(false);
   });
 
-  it("has a previews block, which `wrangler preview` (the PR build's deploy command) requires", () => {
+  it("has a previews block, which `wrangler preview` requires, so it can be tried again for PR builds", () => {
     expect(config).toHaveProperty("previews");
   });
 
