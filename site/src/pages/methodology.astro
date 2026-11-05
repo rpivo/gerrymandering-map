@@ -157,6 +157,19 @@ const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
       average, so the dot always falls inside the district.
     </p>
 
+    <h2 id="closeups">Close-ups of crowded areas</h2>
+    <p>
+      Some districts cover only a few city neighborhoods, so on a state map they're too small to
+      see or click. Below those maps, close-ups redraw the crowded areas larger, each outlined
+      with dashes on the map and named after the largest city in it. A district counts as too
+      small when, on a map drawn 512 pixels tall, it has less than 8 pixels from its middle to its
+      edge. Nearby small districts share a close-up, which enlarges its area 2 to 8 times and is
+      redrawn from the detailed district lines, not just magnified. Where districts are still too
+      small even then, as in central Los Angeles, Manhattan and Brooklyn, and central Houston, a
+      close-up gets a close-up of its own. Close-ups are for display only. Scores always use each
+      district's full shape.
+    </p>
+
     <h2>Which map</h2>
     <p>
       Scores are for the districts used in the November 3, 2026 election. Most come from the U.S.

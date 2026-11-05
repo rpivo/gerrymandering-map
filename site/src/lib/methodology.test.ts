@@ -30,6 +30,14 @@ describe("the methodology page", () => {
     expect(text).toContain("gets a dot in each part");
   });
 
+  it("explains when a state map gets close-ups, and that they're for display only", () => {
+    expect(html).toMatch(/<h2[^>]*id="closeups"/);
+    expect(text).toContain("less than 8 pixels from its middle to its edge");
+    expect(text).toContain("redrawn from the detailed district lines");
+    expect(text).toContain("a close-up of its own");
+    expect(text).toContain("Scores always use each district's full shape");
+  });
+
   it("has a fairness section the state pages can link to", () => {
     expect(html).toMatch(/<h2[^>]*id="fairness"/);
   });

@@ -1,0 +1,93 @@
+---
+import { closeupFor, closeups } from "../lib/closeups";
+import DistrictMap from "./DistrictMap.astro";
+
+interface Props {
+  state: string;
+  stateName: string;
+  /** On a district page: show only the close-up this district lies in, with it outlined. */
+  highlight?: string;
+}
+
+const { state, highlight } = Astro.props;
+const all = closeups(state);
+const shown = highlight ? [closeupFor(highlight)].filter((c) => c !== undefined) : all;
+const times = (zoom: number) => `${Math.round(zoom)} times`;
+// The outlines of a close-up's own close-ups, when they're shown too.
+const nestedBoxes = (c: (typeof all)[number]) =>
+  shown.filter((n) => n.parent !== undefined && all[n.parent] === c).map((n) => n.box);
+---
+
+{
+  shown.length > 0 && (
+    <div class="closeups">
+      <p class="closeups-intro">
+        {
+          shown.length === 1
+            ? "The area outlined with dashes on the map, enlarged so its smaller districts can be seen."
+            : "The areas outlined with dashes, enlarged so their smaller districts can be seen."
+        }
+      </p>
+      <div class="closeup-grid">
+        {shown.map((c, i) => (
+          <figure class:list={["closeup", { wide: c.wide }]}>
+            <DistrictMap
+              state={state}
+              viewBox={c.viewBox}
+              paths={c.paths}
+              label={`Close-up of the ${c.name}`}
+              highlight={highlight}
+              idPrefix={`closeup-${i}-`}
+            >
+              {nestedBoxes(c).map(([x0, y0, x1, y1]) => (
+                <rect class="closeup-box" x={x0} y={y0} width={x1 - x0} height={y1 - y0} />
+              ))}
+            </DistrictMap>
+            <figcaption>{c.name}, enlarged {times(c.zoom)}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .closeups {
+    margin-top: 1.5rem;
+  }
+
+  .closeups-intro {
+    margin: 0 0 0.75rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  /* Two to a row where there's room. The close-ups that enlarge least take a whole row, up to
+     the state map's own size, since they need the room most. */
+  .closeup-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .closeup {
+    margin: 0;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    background: var(--surface);
+  }
+
+  .closeup.wide {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: min(100%, 32rem);
+  }
+
+  figcaption {
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+</style>

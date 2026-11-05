@@ -61,9 +61,22 @@ export interface Outline {
 }
 
 /** A state's districts drawn together: one viewBox, a path per district, and a note if part is left out. */
+/** A box of a state map, redrawn enlarged because districts in it are drawn too small to see. */
+export interface StateCloseup {
+  /** The box, as [x0, y0, x1, y1] in the state map's viewBox units (or its parent's). */
+  box: [number, number, number, number];
+  /** The close-up's own drawing: the box scaled to 1000 units on its longer side. */
+  viewBox: string;
+  /** Every district in the box, cut to it. */
+  paths: Record<string, string>;
+  /** For a close-up of a close-up: the index of the one it enlarges, whose units box is in. */
+  parent?: number;
+}
+
 export interface StateMap {
   viewBox: string;
   paths: Record<string, string>;
+  closeups: StateCloseup[];
   note?: string;
 }
 
