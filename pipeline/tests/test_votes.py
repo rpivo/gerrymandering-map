@@ -472,3 +472,17 @@ def test_assign_doesnt_guess_between_two_towns_with_the_same_short_name():
     )
     # Not renamed, so not matched to either district.
     assert not out["kind"].isin(["exact", "split"]).any()
+
+
+def test_read_official_results_gives_district_totals_marked_as_official(tmp_path):
+    from gerry.votes import read_official_results
+
+    path = tmp_path / "tx.csv"
+    path.write_text("state,district,harris,trump\nTX,1,30,70\nTX,2,60,40\n")
+    out = read_official_results(path)
+    assert out[["state", "district", "dem", "rep"]].values.tolist() == [
+        ["TX", 1, 30, 70],
+        ["TX", 2, 60, 40],
+    ]
+    assert out["dem_share"].tolist() == [0.3, 0.6]
+    assert set(out["method"]) == {"official report"}

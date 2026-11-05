@@ -292,12 +292,16 @@ def write_votes_repo(tmp_path: Path, tx_harris: int) -> Path:
     (votes / "nj-2024-president-by-county.csv").write_text(
         "state,county_fips,county,harris,trump\n"
     )
+    (votes / "tx-planc2333-president-2024.csv").write_text(
+        "state,district,harris,trump\nTX,1,30,70\n"
+    )
+    (votes / "nc-s249-president-2024.csv").write_text("state,district,harris,trump\n")
     checks = tmp_path / "data" / "checks"
     checks.mkdir(parents=True)
     (checks / "tx-planc2193-president-2024.csv").write_text(
         f"district,harris,trump\n1,{tx_harris},40\n2,120,40\n"
     )
-    write_audit(tmp_path, audit_rows(changed=("TX",)))
+    write_audit(tmp_path, audit_rows(changed=("TX", "NC")))
     return raw
 
 
@@ -316,10 +320,17 @@ def test_votes_writes_unchanged_states_and_checks_texas(tmp_path, monkeypatch, c
     assert cli.main(["votes", "--repo-root", str(tmp_path)]) == 0
     out = pd.read_csv(tmp_path / "data" / "build" / "president-2024-by-district.csv")
     # Texas redrew for 2026, so its 2024-map results are only used for the check.
-    # Wyoming has one at-large seat: no lines, nothing to place.
-    assert out["state"].unique().tolist() == ["WA"]
+    # Wyoming has one at-large seat: no lines, nothing to place. Texas redrew, so its
+    # precinct join (on the 2024 map) is only for the check; its official report is used.
+    assert sorted(out["state"].unique()) == ["TX", "WA"]
+    wa = out[out["state"] == "WA"]
     # King County's one precinct (6 Harris votes, district 1) joins WA's other precincts.
-    assert out[["district", "dem", "rep"]].values.tolist() == [[1, 66, 40], [2, 120, 40]]
+    assert wa[["district", "dem", "rep"]].values.tolist() == [[1, 66, 40], [2, 120, 40]]
+    assert set(wa["method"]) == {"precinct join"}
+    tx = out[out["state"] == "TX"]
+    assert tx[["district", "dem", "rep", "method"]].values.tolist() == [
+        [1, 30, 70, "official report"]
+    ]
     printed = capsys.readouterr().out
     assert "Texas check passed" in printed
     assert "WY" not in printed
@@ -330,3 +341,13 @@ def test_votes_fails_when_texas_stops_matching_the_official_report(tmp_path, mon
     monkeypatch.setattr(cli, "fetch", fake_votes_fetch(raw))
     assert cli.main(["votes", "--repo-root", str(tmp_path)]) == 1
     assert "TX-01" in capsys.readouterr().out
+
+
+def test_votes_refuses_an_official_report_for_a_state_that_kept_its_lines(
+    tmp_path, monkeypatch, capsys
+):
+    raw = write_votes_repo(tmp_path, tx_harris=60)
+    write_audit(tmp_path, audit_rows())  # Texas not marked as redrawn
+    monkeypatch.setattr(cli, "fetch", fake_votes_fetch(raw))
+    assert cli.main(["votes", "--repo-root", str(tmp_path)]) == 1
+    assert "TX" in capsys.readouterr().out
