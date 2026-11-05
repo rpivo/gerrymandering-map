@@ -1,0 +1,143 @@
+---
+import type { StateInfo } from "../lib/data";
+import { getFairness, leanText, unscoredReason, voteSummary } from "../lib/fairness";
+
+interface Props {
+  state: StateInfo;
+}
+
+const { state } = Astro.props;
+const f = getFairness(state.state);
+const scored = f.status === "scored";
+
+interface Measure {
+  name: string;
+  value: string;
+  lean: string | null;
+  explanation: string;
+}
+
+function measures(): Measure[] {
+  const eg = f.efficiency_gap ?? 0;
+  const mm = f.mean_median ?? 0;
+  return [
+    {
+      name: "Efficiency gap",
+      value: `${(Math.abs(eg) * 100).toFixed(1)}%`,
+      lean: leanText(eg, 3),
+      explanation:
+        "Counts each party's wasted votes: votes for a losing candidate, plus a winner's votes beyond the half needed to win. The gap is the difference between the two parties' wasted votes, as a share of all votes.",
+    },
+    {
+      name: "Mean-median difference",
+      value: `${(Math.abs(mm) * 100).toFixed(1)} points`,
+      lean: leanText(mm, 3),
+      explanation:
+        "The gap between a party's average vote share across the districts and its share in the middle (median) district. When the middle district leans away from a party's average, that party's voters are packed into a few lopsided districts.",
+    },
+    {
+      name: "Declination",
+      value: f.declination === null ? "Not measurable" : Math.abs(f.declination).toFixed(2),
+      lean: f.declination === null ? null : leanText(f.declination, 2),
+      explanation:
+        "Compares how lopsided each party's wins are. A party that wins a few districts by huge margins and loses the rest narrowly is at a disadvantage. Runs from 0 (even) to 1.",
+    },
+  ];
+}
+
+const method =
+  f.method === "official report"
+    ? "Votes are the state's official 2024 results, reported for its new 2026 districts."
+    : "Votes are 2024 presidential results by precinct, added up within each district. This state used the same districts in 2024 and 2026.";
+---
+
+<section class="fairness" aria-labelledby="fairness-heading">
+  <h2 id="fairness-heading">Partisan fairness</h2>
+  {
+    scored ? (
+      <>
+        <p>How the 2024 presidential vote splits across these districts. {voteSummary(f)}</p>
+        {f.one_party_won_every_district && (
+          <p class="note">
+            When one party carries every district, the efficiency gap is large however the lines are drawn,
+            since every vote for the other party counts as wasted. Declination needs districts won by both
+            parties, so it can't be measured here.
+          </p>
+        )}
+        <dl>
+          {measures().map((m) => (
+            <div class="measure">
+              <dt>{m.name}</dt>
+              <dd>
+                <span class="value">{m.value}</span>{" "}
+                {m.lean && <span class="lean">{m.lean}</span>}
+                <p class="explanation">{m.explanation}</p>
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <p class="caveat">
+          {method} These measures show how a map turns one election's votes into seats. They don't show why
+          the lines were drawn, and they shift from one election to the next.
+          {" "}<a href="/methodology#fairness">How fairness scores work</a>
+        </p>
+      </>
+    ) : (
+      <p>
+        {unscoredReason(f, state.seats)} <a href="/methodology#fairness">How fairness scores work</a>
+      </p>
+    )
+  }
+</section>
+
+<style>
+  .fairness {
+    margin-top: 2rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  .note {
+    padding: 0.75rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  dl {
+    margin: 0;
+  }
+
+  .measure {
+    padding: 0.75rem 0;
+    border-top: 1px solid var(--border);
+  }
+
+  dt {
+    font-weight: 600;
+  }
+
+  dd {
+    margin: 0.25rem 0 0;
+  }
+
+  .value {
+    font-size: 1.25rem;
+    font-variant-numeric: tabular-nums;
+    margin-right: 0.75rem;
+  }
+
+  .lean,
+  .explanation,
+  .caveat {
+    color: var(--text-muted);
+  }
+
+  .explanation {
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+    max-width: 42rem;
+  }
+</style>

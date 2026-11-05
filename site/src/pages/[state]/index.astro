@@ -1,4 +1,5 @@
 ---
+import FairnessSection from "../../components/FairnessSection.astro";
 import ScoreBadge from "../../components/ScoreBadge.astro";
 import ScoreLegend from "../../components/ScoreLegend.astro";
 import StateMapSvg from "../../components/StateMapSvg.astro";
@@ -75,6 +76,8 @@ const drawnBy: Record<string, string> = {
       </table>
       <p class="caveat">Scores describe shape, not intent. <a href="/methodology">How scores work</a></p>
     </section>
+
+    <FairnessSection state={state} />
   </main>
 </Base>
 

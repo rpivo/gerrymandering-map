@@ -2,8 +2,10 @@ import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import DistrictShape from "./DistrictShape.astro";
+import FairnessSection from "./FairnessSection.astro";
 import ScoreBadge from "./ScoreBadge.astro";
 import StateMapSvg from "./StateMapSvg.astro";
+import { getState } from "../lib/data";
 
 let container: AstroContainer;
 
@@ -45,5 +47,62 @@ describe("ScoreBadge", () => {
     // Screen readers join inline text without spaces, so the words need their own.
     const text = html.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
     expect(text).toBe("Irregularity score 85 Very irregular");
+  });
+});
+
+describe("FairnessSection", () => {
+  const render = async (usps: string) => {
+    const html = await container.renderToString(FairnessSection, { props: { state: getState(usps) } });
+    return { html, text: html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() };
+  };
+
+  it("shows each measure's number with the direction it leans in words", async () => {
+    const { html, text } = await render("NC");
+    expect(html).toContain('aria-labelledby="fairness-heading"');
+    expect(text).toContain("Efficiency gap 25.7% Favors Republicans");
+    expect(text).toContain("Mean-median difference 5.8 points Favors Republicans");
+    expect(text).toContain("Declination 0.58 Favors Republicans");
+    expect(text).toContain("carried 3 of 14 districts");
+    expect(text).toContain("official 2024 results");
+    expect(html).toContain('href="/methodology#fairness"');
+  });
+
+  it("keeps a space between the number and its direction, as screen readers read them", async () => {
+    const { html } = await render("NC");
+    // Screen readers join inline text without spaces, so strip tags without adding any.
+    const joined = html.replace(/<[^>]+>/g, "").replace(/\s+/g, " ");
+    expect(joined).toContain("25.7% Favors Republicans");
+  });
+
+  it("names a state that favors Democrats that way", async () => {
+    const { text } = await render("IL");
+    expect(text).toMatch(/Efficiency gap \d+\.\d% Favors Democrats/);
+  });
+
+  it("explains a sweep, and doesn't show a declination", async () => {
+    const { text } = await render("CT");
+    expect(text).toContain("carried all 5 districts");
+    expect(text).toContain("Declination Not measurable");
+    expect(text).toMatch(/When one party carries every district, the efficiency gap/);
+  });
+
+  it("leaves the sweep note off a state that split its districts", async () => {
+    const { text } = await render("NC");
+    expect(text).toContain("Declination 0.58"); // anchor: this is the scored layout
+    expect(text).not.toContain("When one party carries every district");
+  });
+
+  it("says why an unscored state has no scores, and shows none", async () => {
+    const { text } = await render("UT");
+    expect(text).toContain("2026 House results");
+    expect(text).not.toContain("Efficiency gap");
+  });
+
+  it("never calls a map gerrymandered", async () => {
+    for (const usps of ["NC", "IL", "CT", "UT", "WY", "NH"]) {
+      const { text } = await render(usps);
+      expect(text.length).toBeGreaterThan(50); // anchor: there is text to check
+      expect(text.toLowerCase()).not.toContain("gerrymander");
+    }
   });
 });

@@ -1,6 +1,6 @@
 # gerrymandering-map
 
-A static website that lists every US congressional district, shows its shape, and scores how irregular it is. A second phase adds partisan fairness scores for each state's map.
+A static website that lists every US congressional district, shows its shape, and scores how irregular it is. State pages also show partisan fairness scores for each state's map.
 
 - `pipeline/`: Python (geopandas, shapely, pyproj). Downloads raw data, computes scores, exports JSON.
 - `site/`: Astro + TypeScript. Builds static pages from the exported JSON.
