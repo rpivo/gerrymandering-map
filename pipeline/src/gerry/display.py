@@ -283,6 +283,10 @@ CLOSEUP_PADDING = 0.15
 CLOSEUP_MIN_SIDE = VIEW_SIZE / 8
 # ...and the largest, since enlarging under 2 times isn't worth a second map.
 CLOSEUP_MAX_SIDE = VIEW_SIZE / 2
+# A close-up whose districts are still too small gets close-ups of its own (one level deep).
+# Its tiny districts can spread wider (greater Los Angeles), so a square up to 0.6 of it is
+# kept: 1.7 times larger again.
+CLOSEUP_NESTED_MAX_SIDE = 0.6 * VIEW_SIZE
 
 
 def _inner_radius(shape: BaseGeometry) -> float:
@@ -303,16 +307,22 @@ def _square_around(cluster: BaseGeometry, size: tuple[int, int]) -> tuple[float,
     return x0, y0, x1, y1
 
 
-def closeup_boxes(shapes: list[BaseGeometry], size: tuple[int, int]) -> list[tuple[float, ...]]:
-    """Return the squares of a state map to show enlarged, so its smallest districts can be seen.
+def closeup_boxes(
+    shapes: list[BaseGeometry],
+    size: tuple[int, int],
+    max_side: float = CLOSEUP_MAX_SIDE,
+) -> list[tuple[float, ...]]:
+    """Return the squares of a drawing to show enlarged, so its smallest districts can be seen.
 
     Args:
-        shapes: The districts as drawn, in view units (as state_map draws them).
-        size: The map's (width, height) in view units.
+        shapes: The districts as drawn, in view units (as state_map draws them). Only these
+            can count as small; the rest of the drawing doesn't matter here.
+        size: The drawing's (width, height) in view units.
+        max_side: The largest square worth enlarging, in view units.
 
     Returns:
-        (x0, y0, x1, y1) boxes in view units, inside the map, largest first. Each is square
-        unless the map's edge cuts it, and none overlap.
+        (x0, y0, x1, y1) boxes in view units, inside the drawing, largest first. Each is square
+        unless the drawing's edge cuts it, and none overlap.
     """
     small = [s for s in shapes if not s.is_empty and _inner_radius(s) < CLOSEUP_SMALL_RADIUS]
     if not small:
@@ -336,7 +346,7 @@ def closeup_boxes(shapes: list[BaseGeometry], size: tuple[int, int]) -> list[tup
             if merged:
                 break
     boxes = [_square_around(c, size) for c in clusters]
-    boxes = [b for b in boxes if max(b[2] - b[0], b[3] - b[1]) <= CLOSEUP_MAX_SIDE]
+    boxes = [b for b in boxes if max(b[2] - b[0], b[3] - b[1]) <= max_side]
     return sorted(boxes, key=lambda b: (-(b[2] - b[0]) * (b[3] - b[1]), b[0], b[1]))
 
 
@@ -346,11 +356,47 @@ def _polygons(geometry: BaseGeometry) -> BaseGeometry:
     return shapely.union_all(parts) if parts else shapely.Polygon()
 
 
+def _to_projected(box: tuple[float, ...], to_view: list[float]) -> BaseGeometry:
+    """Return a box in view units as a box in projected meters (the view flips y)."""
+    scale, _, _, _, offset_x, offset_y = to_view
+    x0, y0, x1, y1 = box
+    return shapely.box((x0 - offset_x) / scale, (offset_y - y1) / scale,
+                       (x1 - offset_x) / scale, (offset_y - y0) / scale)  # fmt: skip
+
+
+def _draw_closeup(ids, full: list[BaseGeometry], area: BaseGeometry, detail: float):
+    """Draw the full-detail districts cut to a square (projected meters), fitted to its view.
+
+    Returns:
+        The drawn districts' IDs, their shapes in view units, the view matrix and its size.
+    """
+    kept, cut = [], []
+    for district, shape in zip(ids, full, strict=True):
+        piece = _polygons(shape.intersection(area))
+        if not piece.is_empty:
+            kept.append(district)
+            cut.append(piece)
+    cut = list(shapely.coverage_simplify(cut, _tolerance(area, detail)))
+    matrix, size = _fit_matrix([area], VIEW_SIZE)
+    return kept, [affinity.affine_transform(g, matrix) for g in cut], matrix, size
+
+
+def _closeup_record(box, ids, fitted, size, parent: int | None) -> dict:
+    record = {
+        "box": [round(v, 2) for v in box],
+        "viewBox": f"0 0 {size[0]} {size[1]}",
+        "paths": {d: svg_path(g) for d, g in zip(ids, fitted, strict=True)},
+    }
+    return record if parent is None else record | {"parent": parent}
+
+
 def state_closeups(districts, detail: float) -> list[dict]:
     """Return a state map's close-ups: its squares with small districts, redrawn enlarged.
 
     Each close-up is drawn from the full-detail districts cut to its square, simplified at
-    detail times the square's side, so it's as sharp as the state map is.
+    detail times the square's side, so it's as sharp as the state map is. A close-up whose
+    districts are still too small to see gets close-ups of its own, one level deep. Only
+    districts wholly inside it count there: one cut by its edge is bigger than it looks.
 
     Args:
         districts: As for state_map.
@@ -360,28 +406,23 @@ def state_closeups(districts, detail: float) -> list[dict]:
         [{"box": [x0, y0, x1, y1], "viewBox": "0 0 w h", "paths": {district_id: path}}], where box
         is the square in state_map's view units (to two decimal places) and the close-up's view
         maps it to VIEW_SIZE on its longer side. Only districts inside the square are drawn.
+        A nested close-up follows its parent and has "parent": the parent's index, and its box
+        is in the parent's view units.
     """
     _, to_view, simplified, size = _state_frame(districts, detail)
     drawn = [affinity.affine_transform(g, to_view) for g in simplified]
     _, full = _state_projected(districts)
-    scale, _, _, _, offset_x, offset_y = to_view
+    all_ids = list(districts["district_id"])
     closeups = []
-    for x0, y0, x1, y1 in closeup_boxes(drawn, size):
-        # Back from view units to projected meters (the view flips y).
-        area = shapely.box((x0 - offset_x) / scale, (offset_y - y1) / scale,
-                           (x1 - offset_x) / scale, (offset_y - y0) / scale)  # fmt: skip
-        ids, cut = [], []
-        for district, shape in zip(districts["district_id"], full, strict=True):
-            piece = _polygons(shape.intersection(area))
-            if not piece.is_empty:
-                ids.append(district)
-                cut.append(piece)
-        cut = list(shapely.coverage_simplify(cut, _tolerance(area, detail)))
-        matrix, (width, height) = _fit_matrix([area], VIEW_SIZE)
-        fitted = [affinity.affine_transform(g, matrix) for g in cut]
-        closeups.append({
-            "box": [round(v, 2) for v in (x0, y0, x1, y1)],
-            "viewBox": f"0 0 {width} {height}",
-            "paths": {d: svg_path(g) for d, g in zip(ids, fitted, strict=True)},
-        })  # fmt: skip
+    for box in closeup_boxes(drawn, size):
+        ids, fitted, matrix, inner_size = _draw_closeup(
+            all_ids, full, _to_projected(box, to_view), detail
+        )
+        parent = len(closeups)
+        closeups.append(_closeup_record(box, ids, fitted, inner_size, None))
+        edge = shapely.box(0, 0, *inner_size).boundary
+        whole = [g for g in fitted if g.distance(edge) > 1]
+        for inner in closeup_boxes(whole, inner_size, CLOSEUP_NESTED_MAX_SIDE):
+            nested = _draw_closeup(all_ids, full, _to_projected(inner, matrix), detail)
+            closeups.append(_closeup_record(inner, nested[0], nested[1], nested[3], parent))
     return closeups

@@ -9,6 +9,7 @@ from test_metrics import square_in_lonlat
 
 from gerry.display import (
     CLOSEUP_MIN_SIDE,
+    CLOSEUP_SMALL_RADIUS,
     VIEW_SIZE,
     closeup_boxes,
     display_crop,
@@ -295,6 +296,15 @@ class TestCloseupBoxes:
         # Narrow enough to count as small, but its square would be most of the map.
         assert closeup_boxes([box(0, 400, 1000, 410)], self.SIZE) == []
 
+    def test_takes_a_bigger_largest_square_when_asked(self):
+        [(x0, _, x1, _)] = closeup_boxes([box(300, 400, 700, 410)], self.SIZE, max_side=600)
+        assert 500 < x1 - x0 <= 600
+
+
+def top_level(districts) -> list[dict]:
+    """A state's close-ups of the state map itself, leaving out nested ones."""
+    return [c for c in state_closeups(districts, 0.002) if "parent" not in c]
+
 
 class TestStateCloseups:
     @pytest.fixture
@@ -319,7 +329,7 @@ class TestStateCloseups:
     def test_draws_the_tiny_districts_enlarged_where_the_square_shows_them(self, state, request):
         districts = request.getfixturevalue(state)
         main = state_map(districts, 0.002)
-        [closeup] = state_closeups(districts, 0.002)
+        [closeup] = top_level(districts)
         x0, y0, x1, y1 = closeup["box"]
         width, height = map(int, closeup["viewBox"].split()[2:])
         assert max(width, height) == VIEW_SIZE
@@ -334,13 +344,13 @@ class TestStateCloseups:
             assert cx1 - cx0 == pytest.approx((mx1 - mx0) * zoom, abs=2 * zoom)
 
     def test_draws_the_districts_around_them_cut_to_the_square(self, districts):
-        [closeup] = state_closeups(districts, 0.002)
+        [closeup] = top_level(districts)
         assert set(closeup["paths"]) == {"KS-01", "KS-02", "KS-03"}
         width, height = map(int, closeup["viewBox"].split()[2:])
         assert bounds_of(closeup["paths"]["KS-01"]) == (0, 0, width, height)
 
     def test_keeps_shared_borders_identical(self, districts):
-        [closeup] = state_closeups(districts, 0.002)
+        [closeup] = top_level(districts)
         shared = set(points(closeup["paths"]["KS-02"])) & set(points(closeup["paths"]["KS-03"]))
         assert len(shared) >= 2
 
@@ -352,7 +362,7 @@ class TestStateCloseups:
         west = Polygon([(-99.01, 40.99), *zigzag, (-99.01, 41.0)])
         east = Polygon([*zigzag[::-1][:1], (-98.99, 41.0), (-98.99, 40.99), *zigzag])
         districts.loc[1, "geometry"], districts.loc[2, "geometry"] = west, east.buffer(0)
-        [closeup] = state_closeups(districts, 0.002)
+        [closeup] = top_level(districts)
         shapes = [evenodd_shape(p) for p in closeup["paths"].values()]
         width, height = map(int, closeup["viewBox"].split()[2:])
         # Exact to a square unit: a few dozen square units of gap is what separately simplified
@@ -365,7 +375,7 @@ class TestStateCloseups:
         notch = box(-99.0055, 40.9945, -99.005, 41.0)
         districts.loc[1, "geometry"] = districts.geometry[1].difference(notch)
         districts.loc[0, "geometry"] = districts.geometry[0].union(notch)
-        [closeup] = state_closeups(districts, 0.002)
+        [closeup] = top_level(districts)
         main = state_map(districts, 0.002)
         assert len(points(closeup["paths"]["KS-02"])) > len(points(main["paths"]["KS-02"]))
 
@@ -375,4 +385,52 @@ class TestStateCloseups:
             geometry=[box(-100, 40, -99, 42), box(-99, 40, -98, 42)],
             crs="EPSG:4269",
         )
-        assert state_closeups(halves, 0.002) == []
+        assert top_level(halves) == []
+
+
+class TestNestedCloseups:
+    """A close-up whose districts are still too small to see gets close-ups of its own."""
+
+    @staticmethod
+    def state(*extra, dot=None):
+        # A 2-degree state with a cluster of 1 km districts at its middle, one of which has a
+        # 0.0004-degree district (about 40 m) inside it: too small to see even 8 times larger.
+        speck = box(-99.0052, 40.9948, -99.0048, 40.9952)
+        tiny = [box(-99.01, 40.99, -99.0, 41.0).difference(speck), box(-99.0, 40.99, -98.99, 41.0)]
+        tiny += [speck.difference(dot), dot] if dot else [speck]
+        shapes = [*tiny, *extra]
+        rest = box(-100, 40, -98, 42).difference(shapely.union_all(shapes))
+        ids = [f"KS-{i:02d}" for i in range(1, len(shapes) + 2)]
+        return gpd.GeoDataFrame(
+            {"district_id": ids, "state": "KS"}, geometry=[rest, *shapes], crs="EPSG:4269"
+        )
+
+    def test_a_close_up_with_a_district_still_too_small_gets_its_own(self):
+        outer, inner = state_closeups(self.state(), 0.002)
+        assert "parent" not in outer
+        assert inner["parent"] == 0
+        # The inner square is in the outer close-up's units, around where it draws the speck.
+        x0, y0, x1, y1 = inner["box"]
+        sx0, sy0, sx1, sy1 = bounds_of(outer["paths"]["KS-04"])
+        assert x0 <= sx0 and sx1 <= x1 and y0 <= sy0 and sy1 <= y1
+        assert x1 - x0 == pytest.approx(CLOSEUP_MIN_SIDE)
+        # Drawn 8 times larger again: the speck, 34 m east to west at this latitude, goes from
+        # about 1.2 units across to 9.7.
+        sx0, _, sx1, _ = bounds_of(inner["paths"]["KS-04"])
+        assert sx1 - sx0 == pytest.approx(9.7, abs=1)
+
+    def test_a_big_district_cut_to_a_sliver_by_the_square_gets_none(self):
+        # A big district whose west edge pokes about 250 m into the outer square: a sliver as
+        # thin as a small district, but only because the square cuts it.
+        big = box(-98.84, 40.2, -98.2, 41.8)
+        closeups = state_closeups(self.state(big), 0.002)
+        x0, _, x1, _ = bounds_of(closeups[0]["paths"]["KS-05"])
+        width, _ = map(int, closeups[0]["viewBox"].split()[2:])
+        # Anchor: the sliver is drawn, at the edge, and thin enough to count as small.
+        assert x1 == width and (x1 - x0) / 2 < CLOSEUP_SMALL_RADIUS
+        assert [c.get("parent") for c in closeups] == [None, 0]  # only the speck's
+
+    def test_close_ups_go_two_levels_deep_at_most(self):
+        # Ten times smaller again: still too small in the inner close-up, but there it stops.
+        dot = box(-99.00502, 40.99498, -99.00498, 40.99502)
+        assert [c.get("parent") for c in state_closeups(self.state(dot=dot), 0.002)] == [None, 0]
