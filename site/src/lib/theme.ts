@@ -6,7 +6,7 @@ export interface ThemeRoot {
   dataset: Record<string, string | undefined>;
 }
 
-/** The toggle button, as far as the theme needs it. */
+/** The light/dark switch (a button with role="switch"), as far as the theme needs it. */
 export interface ThemeButton {
   hidden: boolean;
   setAttribute(name: string, value: string): void;
@@ -46,7 +46,7 @@ export function setupThemeToggle(
   if (!button) {
     return;
   }
-  const sync = () => button.setAttribute("aria-pressed", String(root.dataset.theme === "dark"));
+  const sync = () => button.setAttribute("aria-checked", String(root.dataset.theme === "dark"));
   button.addEventListener("click", () => {
     const dark = root.dataset.theme !== "dark";
     if (dark) {
