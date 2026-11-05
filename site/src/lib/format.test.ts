@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { sources } from "./data";
-import { districtTitle, lessCompactThan, measurePercentileText, ordinal, scoreBand, sourceNote } from "./format";
+import { districtTitle, lessCompactThan, measurePercentileText, ordinal, scoreBand, sourceNote, stateEdgeText } from "./format";
 
 describe("ordinal", () => {
   it.each([
@@ -103,5 +103,38 @@ describe("sourceNote", () => {
     const notes = sources.filter((s) => s.role === "boundaries").map((s) => sourceNote(s.description, s.license, s.downloaded));
     expect(notes.length).toBeGreaterThan(10);
     expect(notes.filter((n) => n.includes(".."))).toEqual([]);
+  });
+});
+
+describe("stateEdgeText", () => {
+  it.each([
+    [0.533, "53% of this district's border is the state's edge: a coastline, a national border or a state line."],
+    [0.069, "7% of this district's border is the state's edge: a coastline, a national border or a state line."],
+    [0.005, "1% of this district's border is the state's edge: a coastline, a national border or a state line."],
+  ])("%f is %s", (share, expected) => {
+    expect(stateEdgeText(share)).toBe(expected);
+  });
+
+  it("says nothing when no part of the border is the state's edge", () => {
+    expect(stateEdgeText(0)).toBeNull();
+    expect(stateEdgeText(0.004)).toBeNull();
+  });
+
+  it("never claims all of a district's border for a district that shares any line", () => {
+    expect(stateEdgeText(0.996)).toContain("99%");
+  });
+});
+
+describe("the generated edge shares", () => {
+  it("are 0 to 1, and 1 for every at-large district", async () => {
+    const { districts } = await import("./data");
+    expect(districts).toHaveLength(435); // anchor
+    for (const d of districts) {
+      expect(d.state_edge_share).toBeGreaterThanOrEqual(0);
+      expect(d.state_edge_share).toBeLessThanOrEqual(1);
+    }
+    const atLarge = districts.filter((d) => d.at_large);
+    expect(atLarge).toHaveLength(6);
+    expect(atLarge.map((d) => d.state_edge_share)).toEqual([1, 1, 1, 1, 1, 1]);
   });
 });

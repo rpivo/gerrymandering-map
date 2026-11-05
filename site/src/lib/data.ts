@@ -15,6 +15,8 @@ export interface District {
   reock: number;
   convex_hull: number;
   schwartzberg: number;
+  /** Share (0 to 1) of the district's border on the state's edge: coast, national border or state line. */
+  state_edge_share: number;
   polsby_popper_pct: number | null;
   reock_pct: number | null;
   convex_hull_pct: number | null;

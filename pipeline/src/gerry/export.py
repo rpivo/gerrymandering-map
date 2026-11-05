@@ -43,6 +43,7 @@ FIELDS: list[tuple[str, str, int | None]] = [
     ("reock", "reock", 4),
     ("convex_hull", "convex_hull", 4),
     ("schwartzberg", "schwartzberg", 4),
+    ("state_edge_share", "state_edge_share", 3),
     ("polsby_popper_pct", "polsby_popper_pct", 1),
     ("reock_pct", "reock_pct", 1),
     ("convex_hull_pct", "convex_hull_pct", 1),

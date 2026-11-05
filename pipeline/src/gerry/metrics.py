@@ -11,6 +11,10 @@ Reock and convex hull are measured against land: given the state's land, they co
 only the part of the circle or hull that is on it. Water between islands, or beyond
 a coast, is space no district could use, so it doesn't count against a district,
 while land a district leaves out still does. Polsby-Popper has no such adjustment.
+
+`state_edge_share` measures how much of a district's border is the state's own edge (a
+coast, national border or state line), which mapmakers don't choose. It isn't part of
+the score; district pages show it as context.
 """
 
 import math
@@ -69,6 +73,25 @@ def schwartzberg(geometry: BaseGeometry) -> float:
     return 1 / math.sqrt(polsby_popper(geometry))
 
 
+# How close (in meters) a district's border must be to the state's outline to count as the
+# state's edge. Generalizing the redrawn maps moves their edges up to 75 m (gerry.generalize).
+EDGE_TOLERANCE_M = 100
+
+
+def state_edge_share(
+    geometry: BaseGeometry, outline: BaseGeometry, tolerance: float = EDGE_TOLERANCE_M
+) -> float:
+    """Return the share (0 to 1) of a district's border on its state's outline.
+
+    The outline's edge is the coast, a national border or a state line: lines the district's
+    mapmakers didn't draw. Both shapes are in meters. A border leaving the edge counts its
+    first stretch inland, up to the tolerance, which is well under 1% for real districts.
+    """
+    edge = shapely.boundary(outline).buffer(tolerance)
+    border = shapely.boundary(geometry)
+    return border.intersection(edge).length / border.length
+
+
 def local_projection(geometry: BaseGeometry, crs: CRS | str):
     """Return a function projecting shapes from crs into meters centered on geometry."""
     to_lonlat = Transformer.from_crs(crs, "EPSG:4326", always_xy=True)
@@ -85,12 +108,13 @@ def project_around(geometry: BaseGeometry, crs: CRS | str) -> BaseGeometry:
 def compactness(
     geometry: BaseGeometry, crs: CRS | str, land: BaseGeometry | None = None
 ) -> dict[str, float]:
-    """Project a district (in crs) around itself and return all four scores, each unitless.
+    """Project a district (in crs) around itself and return its four scores and edge share.
 
     Args:
         geometry: The district.
         crs: The CRS of geometry and land.
-        land: The state's land, for measuring Reock and convex hull against land.
+        land: The state's land, for measuring Reock and convex hull against land, and the
+            share of the district's border on the state's edge (None without land).
     """
     project = local_projection(geometry, crs)
     shape = project(geometry)
@@ -100,4 +124,5 @@ def compactness(
         "reock": reock(shape, local_land),
         "convex_hull": convex_hull_ratio(shape, local_land),
         "schwartzberg": schwartzberg(shape),
+        "state_edge_share": None if local_land is None else state_edge_share(shape, local_land),
     }

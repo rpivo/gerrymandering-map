@@ -40,7 +40,7 @@ const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
       </dd>
     </dl>
 
-    <h2>Measuring against land</h2>
+    <h2 id="state-edge">Measuring against land</h2>
     <p>
       Reock and convex hull count only the part of the circle or rubber band that falls on the
       district's own state. Water between islands or past a coastline is space no district could
@@ -52,6 +52,13 @@ const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
       Polsby-Popper has no such adjustment, so a ragged coastline still lowers it. Each district
       is measured in an equal-area map projection centered on the district, so a district in
       Alaska is measured the same way as one in Maine.
+    </p>
+    <p>
+      Each district page also says how much of the district's border is the state's own edge: a
+      coastline, a national border or a state line. Mapmakers don't choose those lines, and a
+      ragged one, like a coastline or a river, lowers Polsby-Popper. A stretch of border counts
+      as the state's edge if it lies within 100 meters of the state's outline, which allows for
+      the small shifts from simplifying the newer state maps (see "Which map" below).
     </p>
 
     <h2>From three measures to one score</h2>

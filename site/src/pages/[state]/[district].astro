@@ -2,6 +2,7 @@
 import DistrictShape from "../../components/DistrictShape.astro";
 import MetricRow from "../../components/MetricRow.astro";
 import ScoreBadge from "../../components/ScoreBadge.astro";
+import StateEdgeNote from "../../components/StateEdgeNote.astro";
 import StateMapSvg from "../../components/StateMapSvg.astro";
 import Base from "../../layouts/Base.astro";
 import { adjacent, districts, getState, outline, rankedCount, type District } from "../../lib/data";
@@ -76,6 +77,8 @@ const ranked = district.rank_national !== null;
       </dl>
       <p class="note">Each measure runs from 0 to 1, where 1 is a perfect circle or a shape with no dents.</p>
     </section>
+
+    <StateEdgeNote district={district} />
 
     {
       district.redrawn_2026 && (
