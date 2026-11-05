@@ -35,7 +35,7 @@ const showTips = `${rows
 
 <div class="map-frame" style={frameStyle}>
 <svg
-  class:list={["state-map", { "has-highlight": highlight }]}
+  class="state-map"
   viewBox={map.viewBox}
   role="img"
   aria-label={highlight ? `${highlight} highlighted on a map of ${stateName}` : `Map of ${stateName}'s districts`}
@@ -46,13 +46,15 @@ const showTips = `${rows
   {/* SVG has no z-index, so all fills go first and the links (which draw only the hover outline) on top. */}
   {
     rows.map(({ district, band }) => (
-      <use href={`#shape-${district.id}`} class:list={["fill", band, { current: district.id === highlight }]} />
+      <use href={`#shape-${district.id}`} class:list={["fill", band]} />
     ))
   }
   {
     rows.map(({ district }) => (
       <a href={districtPath(district.id)} tabindex="-1" data-tip={district.id}>
-        <use href={`#shape-${district.id}`} class="outline" />
+        
+        {district.id === highlight && <use href={`#shape-${district.id}`} class="halo" />}
+        <use href={`#shape-${district.id}`} class:list={["outline", { current: district.id === highlight }]} />
       </a>
     ))
   }
@@ -173,14 +175,6 @@ const showTips = `${rows
     vector-effect: non-scaling-stroke;
   }
 
-  .has-highlight .fill {
-    fill: var(--shape-muted);
-  }
-
-  .has-highlight .fill.current {
-    fill: var(--accent);
-  }
-
   .outline {
     fill: none;
     stroke: none;
@@ -192,5 +186,21 @@ const showTips = `${rows
   a:hover .outline,
   a:focus-visible .outline {
     stroke: var(--text);
+  }
+
+  /* On a district page every district keeps its score color, so the district itself gets a
+     heavier outline that's always shown, over a halo in the page color so it shows on any band,
+     even a dark red one next to a neighbor in the same band. */
+  .outline.current {
+    stroke: var(--text);
+    stroke-width: 2.5;
+  }
+
+  .halo {
+    fill: none;
+    stroke: var(--bg);
+    stroke-width: 6;
+    vector-effect: non-scaling-stroke;
+    pointer-events: none;
   }
 </style>
