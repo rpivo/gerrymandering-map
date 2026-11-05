@@ -63,7 +63,10 @@ describe("footer", () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(Base, { props: { title: "T", description: "D" } });
     const footer = html.slice(html.indexOf("<footer"), html.indexOf("</footer>"));
-    expect(footer).toMatch(/<a href="https:\/\/ko-fi\.com\/rpivovar"[^>]*>Buy me a coffee!<\/a>/);
+    const link = footer.match(/<a href="https:\/\/ko-fi\.com\/rpivovar"[^>]*>([\s\S]*?)<\/a>/)?.[1] ?? "";
+    expect(link.replace(/<svg[\s\S]*?<\/svg>/, "").trim()).toBe("Buy me a coffee!");
+    // A small coffee cup icon, decorative only, so screen readers read just the words.
+    expect(link).toMatch(/^\s*<svg class="coffee"[^>]*aria-hidden="true"/);
     const text = footer.replace(/<[^>]+>/g, "").replace(/\s+/g, " ");
     expect(text).toContain("Source on GitHub · Like this project? Buy me a coffee!");
   });
