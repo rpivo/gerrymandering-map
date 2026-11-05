@@ -10,6 +10,7 @@ from gerry.display import (
     VIEW_SIZE,
     display_crop,
     district_outline,
+    district_points,
     fit_to_view,
     state_map,
     state_points,
@@ -81,6 +82,18 @@ def test_state_map_keeps_shared_borders_identical():
     assert len(shared) >= 3  # the whole bent border, not just its two ends
     width, height = map(int, result["viewBox"].split()[2:])
     assert max(width, height) == VIEW_SIZE
+
+
+class TestDistrictPoints:
+    def test_points_land_on_the_district_outline_drawing(self):
+        # A spike 0.006 degrees (about 670 m) tall: kept at this detail, simplified away at a
+        # coarser one, so a mismatched detail would move the drawing's bounds.
+        spike = Polygon([(-69.5, 45), (-69.4995, 45.006), (-69.499, 45)])
+        shape = box(-70, 44, -69, 45).union(spike)
+        drawn = district_outline(shape, "EPSG:4269", 0.002)
+        placed = district_points(shape, "EPSG:4269", 0.002, [shapely.Point(-70, 45)])
+        assert placed["viewBox"] == drawn["viewBox"]
+        assert tuple(placed["points"][0]) in points(drawn["d"])
 
 
 class TestStatePoints:

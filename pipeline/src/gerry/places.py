@@ -13,6 +13,7 @@ import re
 import zipfile
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 # Each district page lists at most this many places, largest first.
@@ -148,3 +149,33 @@ def place_problems(placed: pd.DataFrame, table: pd.DataFrame, places: pd.DataFra
                 f"{row.pop:,} in the Census"
             )
     return problems
+
+
+def piece_points(placed: pd.DataFrame) -> pd.DataFrame:
+    """Return a point for each part of a place in each district, where its people live.
+
+    Args:
+        placed: Blocks from gerry.population.assign_blocks: district_id, state, place, lon,
+            lat and pop.
+
+    Returns:
+        district_id, state, place, pop (residents of the place in the district), and lon and
+        lat: the point of the block nearest the part's population center. A block's point
+        lies in its district, unlike the center itself, which can fall outside a curved part.
+        Parts with no residents are left out.
+    """
+    blocks = placed[placed["place"].notna() & (placed["pop"] > 0)].copy()
+    keys = ["district_id", "state", "place"]
+    blocks["wlon"], blocks["wlat"] = blocks["lon"] * blocks["pop"], blocks["lat"] * blocks["pop"]
+    sums = blocks.groupby(keys, sort=True)[["pop", "wlon", "wlat"]].sum()
+    centers = (sums[["wlon", "wlat"]].div(sums["pop"], axis=0)).rename(
+        columns={"wlon": "clon", "wlat": "clat"}
+    )
+    blocks = blocks.join(centers, on=keys)
+    # Degrees of longitude shrink toward the poles; scale them so "nearest" is about right.
+    scale = np.cos(np.radians(blocks["clat"]))
+    dx, dy = (blocks["lon"] - blocks["clon"]) * scale, blocks["lat"] - blocks["clat"]
+    blocks["dist"] = dx**2 + dy**2
+    nearest = blocks.sort_values("dist", kind="stable").groupby(keys, sort=True).head(1)
+    out = nearest.set_index(keys)[["lon", "lat"]].join(sums["pop"]).reset_index()
+    return out[[*keys, "pop", "lon", "lat"]].astype({"pop": int}).reset_index(drop=True)

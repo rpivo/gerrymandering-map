@@ -23,7 +23,14 @@ from pathlib import Path
 import geopandas as gpd
 import pandas as pd
 
-from gerry.display import display_crop, district_outline, state_map, state_points, us_map
+from gerry.display import (
+    display_crop,
+    district_outline,
+    district_points,
+    state_map,
+    state_points,
+    us_map,
+)
 from gerry.fairness import MIN_DISTRICTS
 from gerry.fetch import CENSUS_CD119
 from gerry.places import MAX_PLACES, map_label
@@ -162,14 +169,8 @@ def _state_cities(rows: gpd.GeoDataFrame, places: pd.DataFrame) -> dict:
     candidates = places.sort_values(["pop", "name"], ascending=[False, True])
     points = gpd.points_from_xy(candidates["lon"], candidates["lat"], crs="EPSG:4269")
     placed = state_points(rows, STATE_DETAIL, list(points.to_crs(rows.crs)))
-    width, height = map(int, placed["viewBox"].split()[2:])
-    cities = [
-        {"name": map_label(name, kind), "pop": int(pop), "x": x, "y": y}
-        for name, kind, pop, (x, y) in zip(candidates["name"], candidates["kind"],
-                                           candidates["pop"], placed["points"], strict=True)
-        if 0 <= x <= width and 0 <= y <= height
-    ]  # fmt: skip
-    return {"viewBox": placed["viewBox"], "cities": cities[:MAX_CITIES]}
+    labels = [map_label(n, k) for n, k in zip(candidates["name"], candidates["kind"], strict=True)]
+    return _placed_on(placed, labels, list(candidates["pop"]), MAX_CITIES)
 
 
 def write_cities_json(districts: gpd.GeoDataFrame, places: pd.DataFrame, path: Path) -> None:
@@ -190,6 +191,52 @@ def write_cities_json(districts: gpd.GeoDataFrame, places: pd.DataFrame, path: P
             for state, rows in shown.groupby("state")
         },
     }
+    _write_json(data, path)
+
+
+# Each district's largest places, offered to the site for its page outline.
+MAX_DISTRICT_CITIES = 20
+
+
+def _placed_on(drawing: dict, names: list[str], pops: list[int], limit: int) -> dict:
+    """Return a drawing's view box and up to limit named points that land on it."""
+    width, height = map(int, drawing["viewBox"].split()[2:])
+    cities = [
+        {"name": name, "pop": int(pop), "x": x, "y": y}
+        for name, pop, (x, y) in zip(names, pops, drawing["points"], strict=True)
+        if 0 <= x <= width and 0 <= y <= height
+    ]
+    return {"viewBox": drawing["viewBox"], "cities": cities[:limit]}
+
+
+def write_district_cities_json(
+    districts: gpd.GeoDataFrame, pieces: pd.DataFrame, places: pd.DataFrame, path: Path
+) -> None:
+    """Write site/src/data/district-cities.json: each district's largest places, on its outline.
+
+    Args:
+        districts: The built districts, as for write_shapes_json.
+        pieces: From gerry.places.piece_points: each place's part of each district, with a point.
+        places: Every place, with state, place, name and kind (gerry.places.read_pl_places).
+        path: Where to write it.
+    """
+    shown, _ = _displayed(districts)
+    named = pieces.merge(places[["state", "place", "name", "kind"]], on=["state", "place"])
+    named = named.sort_values(["pop", "name"], ascending=[False, True])
+    data = {
+        "description": f"Each district's {MAX_DISTRICT_CITIES} largest 2020 Census places by "
+        "residents in the district, as points on its page outline in shapes.json, each at the "
+        "block nearest the population center of the place's part of the district. Generated "
+        "by `python -m gerry population`; do not edit by hand.",
+        "districts": {},
+    }
+    for district, geometry in zip(shown["district_id"], shown.geometry, strict=True):
+        mine = named[named["district_id"] == district]
+        points = gpd.points_from_xy(mine["lon"], mine["lat"], crs="EPSG:4269").to_crs(shown.crs)
+        drawing = district_points(geometry, shown.crs, PAGE_DETAIL, list(points))
+        labels = [map_label(n, k) for n, k in zip(mine["name"], mine["kind"], strict=True)]
+        data["districts"][district] = _placed_on(drawing, labels, list(mine["pop"]),
+                                                 MAX_DISTRICT_CITIES)  # fmt: skip
     _write_json(data, path)
 
 

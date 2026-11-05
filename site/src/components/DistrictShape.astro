@@ -1,27 +1,55 @@
 ---
+import type { CityTier } from "../lib/cities";
 import type { Outline } from "../lib/data";
+import CityMarks from "./CityMarks.astro";
 
 interface Props {
   outline: Outline;
   /** Omit inside a link that already names the district, so screen readers don't say it twice. */
   label?: string;
   class?: string;
+  /** City marks for a district page's large outline (districtCityTiers); cards have none. */
+  cities?: CityTier[];
 }
 
-const { outline, label, class: className } = Astro.props;
+const { outline, label, class: className, cities } = Astro.props;
 ---
 
-<svg
-  class:list={["district-shape", className]}
-  viewBox={outline.viewBox}
-  role={label ? "img" : undefined}
-  aria-label={label}
-  aria-hidden={label ? undefined : "true"}
->
-  <path d={outline.d} fill-rule="evenodd"></path>
-</svg>
+{
+  cities ? (
+    <div class="shape-frame">
+      <svg
+        class:list={["district-shape", className]}
+        viewBox={outline.viewBox}
+        role={label ? "img" : undefined}
+        aria-label={label}
+        aria-hidden={label ? undefined : "true"}
+      >
+        <path d={outline.d} fill-rule="evenodd" />
+        <CityMarks tiers={cities} name="district" />
+      </svg>
+    </div>
+  ) : (
+    <svg
+      class:list={["district-shape", className]}
+      viewBox={outline.viewBox}
+      role={label ? "img" : undefined}
+      aria-label={label}
+      aria-hidden={label ? undefined : "true"}
+    >
+      <path d={outline.d} fill-rule="evenodd" />
+    </svg>
+  )
+}
 
 <style>
+  /* A size container, so city marks can switch sets with the outline's drawn width. */
+  .shape-frame {
+    container-type: inline-size;
+    width: 100%;
+    height: 100%;
+  }
+
   .district-shape {
     display: block;
     width: 100%;

@@ -110,11 +110,34 @@ def district_outline(geometry: BaseGeometry, crs, detail: float) -> dict[str, st
         crs: Its coordinate reference system.
         detail: Simplification as a share of the district's longer side (smaller is finer).
     """
-    shape = local_projection(geometry, crs)(geometry)
+    _, to_view, shape, (width, height) = _district_frame(geometry, crs, detail)
+    fitted = affinity.affine_transform(shape, to_view)
+    return {"viewBox": f"0 0 {width} {height}", "d": svg_path(fitted)}
+
+
+def _district_frame(geometry: BaseGeometry, crs, detail: float):
+    """Project and simplify one district as district_outline draws it.
+
+    Returns:
+        The projection, the view matrix, the projected shape and the view box size.
+    """
+    project = local_projection(geometry, crs)
+    shape = project(geometry)
     tolerance = _tolerance(shape, detail)
     shape = shapely.simplify(_visible_parts(shape, tolerance), tolerance, preserve_topology=True)
-    (fitted,), (width, height) = fit_to_view([shape])
-    return {"viewBox": f"0 0 {width} {height}", "d": svg_path(fitted)}
+    matrix, box_size = _fit_matrix([shape], VIEW_SIZE)
+    return project, matrix, shape, box_size
+
+
+def district_points(geometry: BaseGeometry, crs, detail: float, points: list[BaseGeometry]) -> dict:
+    """Return points placed on district_outline's drawing of the same district and detail.
+
+    Returns:
+        {"viewBox": "0 0 w h", "points": [[x, y], ...]} in view coordinates (whole numbers,
+        y down), in the order given.
+    """
+    project, to_view, _, box_size = _district_frame(geometry, crs, detail)
+    return _points_in_view(points, project, to_view, box_size)
 
 
 def state_map(districts, detail: float) -> dict:
@@ -162,12 +185,8 @@ def state_points(districts, detail: float, points: list[BaseGeometry]) -> dict:
         {"viewBox": "0 0 w h", "points": [[x, y], ...]} in view coordinates (whole numbers,
         y down), in the order given. A point outside the drawing's box falls outside 0..w, 0..h.
     """
-    project, to_view, _, (width, height) = _state_frame(districts, detail)
-    placed = [affinity.affine_transform(project(p), to_view) for p in points]
-    return {
-        "viewBox": f"0 0 {width} {height}",
-        "points": [[round(p.x), round(p.y)] for p in placed],
-    }
+    project, to_view, _, box_size = _state_frame(districts, detail)
+    return _points_in_view(points, project, to_view, box_size)
 
 
 # The US map: the lower 48 in the Census Bureau's Albers projection for the contiguous US,
@@ -233,4 +252,14 @@ def us_map(states: dict[str, BaseGeometry], detail: float) -> dict:
         "viewBox": f"0 0 {width} {height}",
         "paths": {s: svg_path(g) for s, g in zip(names, fitted, strict=True)},
         "labels": {s: _label_point(g) for s, g in zip(names, fitted, strict=True)},
+    }
+
+
+def _points_in_view(points, project, to_view, box_size: tuple[int, int]) -> dict:
+    """Project points and scale them into a drawing's view, rounded to whole units."""
+    placed = [affinity.affine_transform(project(p), to_view) for p in points]
+    width, height = box_size
+    return {
+        "viewBox": f"0 0 {width} {height}",
+        "points": [[round(p.x), round(p.y)] for p in placed],
     }

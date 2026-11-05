@@ -41,3 +41,14 @@ describe("a district page's places", () => {
     expect(section).toContain('href="/methodology#places"');
   });
 });
+
+describe("a district page's outline", () => {
+  it("marks the district's own cities, apart from the state map's marks", async () => {
+    const html = await render("LA-02");
+    const top = html.slice(0, html.indexOf('id="state-heading"'));
+    expect(top).toMatch(/class="cities district-tier-0/);
+    expect(top).toContain(">New Orleans</text>");
+    // The state map below keeps its own tiers.
+    expect(html.slice(html.indexOf('id="state-heading"'))).toMatch(/class="cities state-tier-0/);
+  });
+});

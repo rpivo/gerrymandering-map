@@ -25,6 +25,11 @@ describe("the methodology page", () => {
     expect(text).toContain("internal point");
   });
 
+  it("says how district outlines place a dot for a split city", () => {
+    expect(text).toContain("Each district page's outline marks the district's own largest places");
+    expect(text).toContain("gets a dot in each part");
+  });
+
   it("has a fairness section the state pages can link to", () => {
     expect(html).toMatch(/<h2[^>]*id="fairness"/);
   });
