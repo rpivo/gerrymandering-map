@@ -53,3 +53,18 @@ def test_official_district_results_add_up_to_their_reports_totals(name, state, h
     assert {r["state"] for r in rows} == {state}
     assert sum(int(r["harris"]) for r in rows) == harris
     assert sum(int(r["trump"]) for r in rows) == trump
+
+
+def test_fairness_json_scores_every_state_it_can():
+    import json
+
+    from gerry.states import STATES
+
+    data = json.loads((REPO_ROOT / "site" / "src" / "data" / "fairness.json").read_text())
+    status = {r["state"]: r["status"] for r in data["states"]}
+    assert set(status) == {s.usps for s in STATES}
+    # A 4+ seat state with an unchanged map should always have vote data to score.
+    assert [s for s, v in status.items() if v == "no_vote_data"] == []
+    awaiting = sorted(s for s, v in status.items() if v == "awaiting_2026_results")
+    assert awaiting == ["AL", "CA", "FL", "LA", "OH", "TN", "UT"]
+    assert status["TX"] == status["NC"] == "scored"
