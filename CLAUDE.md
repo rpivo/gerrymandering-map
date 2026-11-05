@@ -78,8 +78,8 @@ The site is a neutral reference tool. Scores describe shape, not intent.
 - No function may exceed 100 lines. This applies to Python, TypeScript, and the script parts of Astro components. If a function would be longer, break it into smaller named functions.
 - Keep the pipeline and the site separate. The site reads only exported JSON, never raw data, and never runs Python.
 - Use TypeScript strict mode in `site/`, and type hints in `pipeline/`.
-- Pages must work at phone width, in light and dark mode, and by keyboard.
-- Prefer build-time work over browser JavaScript. Only search, sort and filter need client-side code.
+- Pages must work at phone width, in light and dark mode, and by keyboard. Light is the default whatever the device prefers; the header's "Dark mode" toggle switches and remembers it (`site/src/lib/theme.ts`).
+- Prefer build-time work over browser JavaScript. Only search, sort and filter, and the light/dark toggle, need client-side code. The toggle's two small scripts are inline (one in the head, so a saved dark choice applies before the page draws) and the site works without them.
 
 ## Commands
 

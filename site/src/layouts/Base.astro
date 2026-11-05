@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import { ogImagePath, SITE_URL } from "../lib/og";
+import { applySavedTheme, setupThemeToggle } from "../lib/theme";
 
 interface Props {
   title: string;
@@ -11,6 +12,9 @@ interface Props {
 
 const { title, description, path } = Astro.props;
 const image = `${SITE_URL}${ogImagePath(path ?? "/")}`;
+// Written out as inline scripts: the first must run before the page draws (no light flash).
+const savedTheme = `(${applySavedTheme.toString()})(document.documentElement, () => window.localStorage);`;
+const themeToggle = `(${setupThemeToggle.toString()})(document.documentElement, document.querySelector(".theme-toggle"), () => window.localStorage);`;
 ---
 
 <!doctype html>
@@ -31,12 +35,14 @@ const image = `${SITE_URL}${ogImagePath(path ?? "/")}`;
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={description} />
     <meta name="twitter:card" content="summary_large_image" />
+    <script is:inline set:html={savedTheme} />
   </head>
   <body>
     <header class="site-header">
       <a class="site-name" href="/">Gerrymandering Map</a>
       <nav aria-label="Main">
         <a href="/methodology">How scores work</a>
+        <button type="button" class="theme-toggle" aria-pressed="false" hidden>Dark mode</button>
       </nav>
     </header>
     <slot />
@@ -46,6 +52,7 @@ const image = `${SITE_URL}${ogImagePath(path ?? "/")}`;
         <a href="https://github.com/rpivo/gerrymandering-map">Source on GitHub</a>
       </p>
     </footer>
+    <script is:inline set:html={themeToggle} />
   </body>
 </html>
 
@@ -59,13 +66,41 @@ const image = `${SITE_URL}${ogImagePath(path ?? "/")}`;
 
   .site-header {
     display: flex;
-    gap: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
     align-items: baseline;
     justify-content: space-between;
     border-bottom: 1px solid var(--border);
   }
 
+  nav {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    white-space: nowrap;
+  }
+
+  .theme-toggle {
+    font: inherit;
+    font-size: 0.9rem;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.2rem 0.75rem;
+    cursor: pointer;
+  }
+
+  .theme-toggle[hidden] {
+    display: none;
+  }
+
+  .theme-toggle[aria-pressed="true"] {
+    border-color: var(--accent);
+  }
+
   .site-name {
+    white-space: nowrap;
     color: var(--text);
     font-weight: 700;
     text-decoration: none;

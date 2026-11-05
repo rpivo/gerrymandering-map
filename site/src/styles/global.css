@@ -1,6 +1,7 @@
-/* Color tokens. Every color on the site comes from here, in light and dark. */
+/* Color tokens. Every color on the site comes from here, in light and dark. Light is the
+   default whatever the device prefers; the header toggle sets data-theme="dark" (lib/theme.ts). */
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   --bg: #fbfaf7;
   --surface: #ffffff;
   --text: #1c1b19;
@@ -23,27 +24,26 @@
   --on-band-very-irregular: #ffffff;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #141413;
-    --surface: #1d1d1b;
-    --text: #ecebe6;
-    --text-muted: #a6a39b;
-    --border: #34332f;
-    --accent: #8eaaff;
-    --shape: #a9b8d6;
-    --shape-muted: #3a3935;
-    --band-very-compact: #24314d;
-    --band-compact: #2f4573;
-    --band-middle: #45629f;
-    --band-irregular: #6f8fd0;
-    --band-very-irregular: #a9c0f0;
-    --on-band-very-compact: #ecebe6;
-    --on-band-compact: #ecebe6;
-    --on-band-middle: #ecebe6;
-    --on-band-irregular: #0d1730;
-    --on-band-very-irregular: #0d1730;
-  }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #141413;
+  --surface: #1d1d1b;
+  --text: #ecebe6;
+  --text-muted: #a6a39b;
+  --border: #34332f;
+  --accent: #8eaaff;
+  --shape: #a9b8d6;
+  --shape-muted: #3a3935;
+  --band-very-compact: #24314d;
+  --band-compact: #2f4573;
+  --band-middle: #45629f;
+  --band-irregular: #6f8fd0;
+  --band-very-irregular: #a9c0f0;
+  --on-band-very-compact: #ecebe6;
+  --on-band-compact: #ecebe6;
+  --on-band-middle: #ecebe6;
+  --on-band-irregular: #0d1730;
+  --on-band-very-irregular: #0d1730;
 }
 
 *,
