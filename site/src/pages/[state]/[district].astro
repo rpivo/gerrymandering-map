@@ -7,6 +7,7 @@ import ScoreLegend from "../../components/ScoreLegend.astro";
 import PlacesSection from "../../components/PlacesSection.astro";
 import PopulationNote from "../../components/PopulationNote.astro";
 import StateEdgeNote from "../../components/StateEdgeNote.astro";
+import MapCloseups from "../../components/MapCloseups.astro";
 import StateMapSvg from "../../components/StateMapSvg.astro";
 import Base from "../../layouts/Base.astro";
 import { adjacent, districts, getState, outline, rankedCount, shapeNote, type District } from "../../lib/data";
@@ -108,6 +109,7 @@ const ranked = district.rank_national !== null;
       <h2 id="state-heading">Where it sits in {state.name}</h2>
       <StateMapSvg state={state.state} stateName={state.name} highlight={district.id} />
       {!state.at_large && <ScoreLegend />}
+      <MapCloseups state={state.state} stateName={state.name} highlight={district.id} />
     </section>
 
     <nav class="pager" aria-label="Other districts in this state">

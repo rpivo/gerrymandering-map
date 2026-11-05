@@ -1,0 +1,201 @@
+---
+import { districtsInState, getState } from "../lib/data";
+import { districtPath } from "../lib/districts";
+import { scoreBand } from "../lib/format";
+import { getPopulation } from "../lib/population";
+import { pathBounds, tipPlacement, tooltipLines } from "../lib/tooltip";
+
+interface Props {
+  state: string;
+  /** The drawing: a state map, or one of its close-ups. */
+  viewBox: string;
+  paths: Record<string, string>;
+  label: string;
+  highlight?: string | undefined;
+  /** Prefix for the shapes' IDs, so two drawings of the same districts on a page don't clash. */
+  idPrefix: string;
+  /** "map": at most 32rem tall, as wide as its shape allows. "fill": as wide as its container. */
+  size?: "map" | "fill";
+}
+
+const { state, viewBox, paths, label, highlight, idPrefix, size = "map" } = Astro.props;
+const info = getState(state);
+const rows = districtsInState(state)
+  .filter((d) => paths[d.id])
+  .map((d) => {
+    const path = paths[d.id] ?? "";
+    return {
+      district: d,
+      shape: `${idPrefix}shape-${d.id}`,
+      band: d.irregularity === null ? "unranked" : `band-${scoreBand(d.irregularity).key}`,
+      tip: tooltipLines(d, info, getPopulation(d.id).majority),
+      place: tipPlacement(pathBounds(path), viewBox),
+      path,
+    };
+  });
+const [, , width, height] = viewBox.split(/\s+/).map(Number) as [number, number, number, number];
+// The frame matches the drawing's shape exactly, so a tooltip's percent position lands on its district.
+// It's also a size container, so city marks can switch sets with the map's drawn width.
+const widthRule = size === "map" ? `min(100%, calc(32rem * ${width / height}))` : "100%";
+const frameStyle = `aspect-ratio: ${width} / ${height}; width: ${widthRule}; container-type: inline-size`;
+// CSS can't pass a hovered link's ID to its tooltip, so each district gets its own selector.
+const showTips = `${rows
+  .map(({ district }) => `.map-frame:has(a[data-tip="${district.id}"]:hover) .map-tip[data-tip="${district.id}"]`)
+  .join(",\n")} { display: block; }`;
+---
+
+<div class="map-frame" style={frameStyle}>
+<svg class="state-map" viewBox={viewBox} role="img" aria-label={label}>
+  <defs>
+    {rows.map(({ shape, path }) => <path id={shape} d={path} fill-rule="evenodd" />)}
+  </defs>
+  {/* SVG has no z-index, so all fills go first and the links (which draw only the hover outline) on top. */}
+  {rows.map(({ shape, band }) => <use href={`#${shape}`} class:list={["fill", band]} />)}
+  {
+    rows.map(({ district, shape }) => (
+      <a href={districtPath(district.id)} tabindex="-1" data-tip={district.id}>
+        {district.id === highlight && <use href={`#${shape}`} class="halo" />}
+        <use href={`#${shape}`} class:list={["outline", { current: district.id === highlight }]} />
+      </a>
+    ))
+  }
+  <slot />
+</svg>
+  {
+    rows.map(({ district, tip, place }) => (
+      <div
+        class:list={["map-tip", place.side, place.align]}
+        data-tip={district.id}
+        aria-hidden="true"
+        style={`--x: ${place.x.toFixed(2)}%; --y: ${place.y.toFixed(2)}%`}
+      >
+        <p class="tip-heading">{tip.heading}</p>
+        {tip.lines.map((line) => <p>{line}</p>)}
+        {tip.notes.length > 0 && <ul>{tip.notes.map((note) => <li>{note}</li>)}</ul>}
+      </div>
+    ))
+  }
+</div>
+<style is:inline set:html={showTips} />
+
+<style>
+  .map-frame {
+    position: relative;
+    margin-inline: auto;
+  }
+
+  .state-map {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .map-tip {
+    --tx: -50%;
+    --ty: 0;
+    position: absolute;
+    top: var(--y);
+    left: var(--x);
+    z-index: 1;
+    /* display: none, not visibility: hidden, so hidden tooltips near the sides don't widen the page. */
+    display: none;
+    pointer-events: none;
+    width: max-content;
+    max-width: min(17rem, 80vw);
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
+    font-size: 0.85rem;
+    line-height: 1.35;
+    transform: translate(var(--tx), var(--ty));
+  }
+
+  .map-tip.above {
+    --ty: calc(-100% - 0.5rem);
+  }
+
+  .map-tip.below {
+    --ty: 0.5rem;
+  }
+
+  .map-tip.over {
+    --ty: -50%;
+  }
+
+  .map-tip.start {
+    --tx: 0;
+  }
+
+  .map-tip.end {
+    --tx: -100%;
+  }
+
+  /* On a narrow screen a tooltip anchored at its district could run off the side, so it spans the map. */
+  @media (max-width: 40rem) {
+    .map-tip,
+    .map-tip.start,
+    .map-tip.end {
+      --tx: 0;
+      left: 0;
+      right: 0;
+      width: auto;
+      max-width: none;
+    }
+  }
+
+  .map-tip p,
+  .map-tip ul {
+    margin: 0;
+  }
+
+  .map-tip .tip-heading {
+    font-weight: 700;
+  }
+
+  .map-tip ul {
+    margin-top: 0.35rem;
+    padding: 0.35rem 0 0;
+    border-top: 1px solid var(--border);
+    list-style: none;
+    color: var(--text-muted);
+  }
+
+  .fill {
+    fill: var(--band, var(--shape-muted));
+    stroke: var(--bg);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .outline {
+    fill: none;
+    stroke: none;
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+    pointer-events: fill;
+  }
+
+  a:hover .outline,
+  a:focus-visible .outline {
+    stroke: var(--text);
+  }
+
+  /* On a district page every district keeps its score color, so the district itself gets a
+     heavier outline that's always shown, over a halo in the page color so it shows on any band,
+     even a dark red one next to a neighbor in the same band. */
+  .outline.current {
+    stroke: var(--text);
+    stroke-width: 2.5;
+  }
+
+  .halo {
+    fill: none;
+    stroke: var(--bg);
+    stroke-width: 6;
+    vector-effect: non-scaling-stroke;
+    pointer-events: none;
+  }
+</style>

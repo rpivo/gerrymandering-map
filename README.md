@@ -101,6 +101,10 @@ The site opens in light mode for everyone, whatever their device prefers. A sun 
 
 Hovering a district on a state map shows a tooltip beside it: the irregularity score, how many districts it's less compact than, its rank in the state, and short notes where they apply (10% or more of its border on the state's edge, majority-minority, new lines for 2026). It uses no JavaScript. Every tooltip is built into the page, placed next to its district at build time (`site/src/lib/tooltip.ts`), and shown with CSS while that district is hovered. On narrow screens a tooltip spans the map's width. Tooltips are hidden from screen readers, since the districts table on the same page has the same information.
 
+### Close-ups
+
+Where a state map draws districts too small to see (Los Angeles, New York City, Houston and 15 more states), the state page shows close-ups below the map: each area is outlined with dashes on the map and redrawn larger, with the same colors, links and tooltips. The pipeline finds the areas and draws them (`closeups` in `shapes.json`); `site/src/lib/closeups.ts` names each after the largest city in it, and `site/src/components/MapCloseups.astro` draws them with the same drawing as the state map (`DistrictMap.astro`). A district page shows the closest close-up its district lies wholly inside, with the district outlined. The methodology page explains when an area gets one.
+
 ### Link previews
 
 Every page has a 1200 by 630 preview image for social sites and chat apps: one per district, one per state, and one for the home and methodology pages (the 404 page uses the home image). They're drawn as SVG in `site/src/lib/og.ts` and turned into PNGs at build time by `@resvg/resvg-js` in `site/src/pages/og/[...image].png.ts`, so they land in `dist/og/` (about 9 MB). Text uses the Inter font committed in `site/src/assets/fonts/` (SIL Open Font License, in `OFL.txt` there) with system fonts turned off, so the images look the same on every machine; the build stops if the font can't load. Preview tags need absolute URLs, so the site's address is `SITE_URL` in `og.ts`: change it if the domain changes.

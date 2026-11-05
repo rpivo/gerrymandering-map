@@ -2,6 +2,7 @@
 import FairnessSection from "../../components/FairnessSection.astro";
 import ScoreBadge from "../../components/ScoreBadge.astro";
 import ScoreLegend from "../../components/ScoreLegend.astro";
+import MapCloseups from "../../components/MapCloseups.astro";
 import StateMapSvg from "../../components/StateMapSvg.astro";
 import Base from "../../layouts/Base.astro";
 import { districtsInState, states, type StateInfo } from "../../lib/data";
@@ -40,6 +41,7 @@ const drawnBy: Record<string, string> = {
         <StateMapSvg state={state.state} stateName={state.name} />
         {!state.at_large && <ScoreLegend />}
         {!state.at_large && <p class="hint">Select a district for details.</p>}
+        <MapCloseups state={state.state} stateName={state.name} />
       </section>
 
       <section class="facts" aria-labelledby="map-in-effect">
