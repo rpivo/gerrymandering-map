@@ -40,6 +40,16 @@ describe("MapCloseups", () => {
     }
   });
 
+  it("marks cities in each close-up, with width rules of its own", async () => {
+    const html = await container.renderToString(MapCloseups, { props: { state: "CA", stateName: "California" } });
+    figures(html).forEach((panel, i) => {
+      expect(panel).toMatch(new RegExp(`<g class="cities closeup-${i}-tier-0"`));
+      expect(panel).toMatch(/<text\b[^>]*class="city-label"/);
+    });
+    expect(html).toContain("svg .cities.closeup-3-tier-0 { display: inline; }");
+    expect(html).not.toContain("state-tier");
+  });
+
   it("draws the close-ups that enlarge least across the whole width", async () => {
     const html = await container.renderToString(MapCloseups, { props: { state: "CA", stateName: "California" } });
     expect(figures(html).map((f) => /class="[^"]*\bwide\b/.test(f.slice(0, f.indexOf(">"))))).toEqual([

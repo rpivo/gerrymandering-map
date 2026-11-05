@@ -253,7 +253,7 @@ export function districtCityTiers(id: string): CityTier[] {
  * @param name - The map's tier class prefix, so two maps on one page keep their rules apart.
  * @returns One rule per line.
  */
-export function cityTierCss(tiers: CityTier[], name: "state" | "district"): string {
+export function cityTierCss(tiers: CityTier[], name: string): string {
   return tiers
     .map((t, i) => {
       // More specific than CityMarks' scoped hide rule (.cities plus Astro's scoping
@@ -266,4 +266,32 @@ export function cityTierCss(tiers: CityTier[], name: "state" | "district"): stri
       return query ? `@container ${query} { ${show} }` : show;
     })
     .join("\n");
+}
+
+/**
+ * Return a close-up's city marks for each range of widths it can be drawn at, as cityTiers does.
+ *
+ * The state map's candidate places inside the close-up are moved into its own units, so a
+ * close-up can mark cities too close together to mark on the state map.
+ *
+ * @param state - Two-letter state code.
+ * @param closeup - The close-up.
+ * @param closeup.mapBox - Its box in the state map's units.
+ * @param closeup.viewBox - Its own drawing's viewBox.
+ * @returns Tiers narrowest first; the widest has max null.
+ */
+export function closeupCityTiers(state: string, closeup: { mapBox: number[]; viewBox: string }): CityTier[] {
+  const entry = data.states[state];
+  if (!entry) throw new Error(`No cities for ${state}`);
+  const [x0, y0, x1, y1] = closeup.mapBox as [number, number, number, number];
+  const scale = 1000 / Math.max(x1 - x0, y1 - y0);
+  const [, , width, height] = closeup.viewBox.split(/\s+/).map(Number) as [number, number, number, number];
+  // State map points are whole units, so a dot here is within half a unit times the scale of
+  // its spot: a few pixels at most, at the largest enlargement.
+  const cities = entry.cities
+    .map((c) => ({ ...c, x: (c.x - x0) * scale, y: (c.y - y0) * scale }))
+    .filter((c) => c.x >= 0 && c.y >= 0 && c.x <= width && c.y <= height);
+  const viewBox = `0 0 ${width} ${height}`;
+  // Close-ups are drawn like state maps: at most 32rem tall.
+  return buildTiers({ viewBox, cities }, viewBox, width, (MAX_MAP_HEIGHT * width) / height, STATE_TIERS);
 }

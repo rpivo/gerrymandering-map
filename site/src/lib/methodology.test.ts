@@ -36,6 +36,7 @@ describe("the methodology page", () => {
     expect(text).toContain("redrawn from the detailed district lines");
     expect(text).toContain("a close-up of its own");
     expect(text).toContain("Scores always use each district's full shape");
+    expect(text).toContain("Close-ups mark the largest places in them the same way as state maps");
   });
 
   it("has a fairness section the state pages can link to", () => {

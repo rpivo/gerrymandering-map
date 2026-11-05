@@ -103,7 +103,7 @@ Hovering a district on a state map shows a tooltip beside it: the irregularity s
 
 ### Close-ups
 
-Where a state map draws districts too small to see (Los Angeles, New York City, Houston and 15 more states), the state page shows close-ups below the map: each area is outlined with dashes on the map and redrawn larger, with the same colors, links and tooltips. The pipeline finds the areas and draws them (`closeups` in `shapes.json`); `site/src/lib/closeups.ts` names each after the largest city in it, and `site/src/components/MapCloseups.astro` draws them with the same drawing as the state map (`DistrictMap.astro`). A district page shows the closest close-up its district lies wholly inside, with the district outlined. The methodology page explains when an area gets one.
+Where a state map draws districts too small to see (Los Angeles, New York City, Houston and 15 more states), the state page shows close-ups below the map: each area is outlined with dashes on the map and redrawn larger, with the same colors, links and tooltips, and its own city marks (`closeupCityTiers` in `site/src/lib/cities.ts`, from the state's candidate places in `cities.json`). The pipeline finds the areas and draws them (`closeups` in `shapes.json`); `site/src/lib/closeups.ts` names each after the largest city in it, and `site/src/components/MapCloseups.astro` draws them with the same drawing as the state map (`DistrictMap.astro`). A district page shows the closest close-up its district lies wholly inside, with the district outlined. The methodology page explains when an area gets one.
 
 ### Link previews
 

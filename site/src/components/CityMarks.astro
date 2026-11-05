@@ -3,8 +3,8 @@ import { cityTierCss, dotRadius, labelText, type CityTier } from "../lib/cities"
 
 interface Props {
   tiers: CityTier[];
-  /** Which map this is, so two maps on one page keep their tier rules apart. */
-  name: "state" | "district";
+  /** Which map this is ("state", "district", "closeup-0"), so maps on one page keep their tier rules apart. */
+  name: string;
 }
 
 const { tiers, name } = Astro.props;
