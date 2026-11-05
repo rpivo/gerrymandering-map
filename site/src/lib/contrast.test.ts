@@ -1,13 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import css from "../styles/global.css?raw";
-
-/** Read the custom properties declared in the first `:root { ... }` block after `start`. */
-function tokens(start: number): Record<string, string> {
-  const open = css.indexOf(":root {", start);
-  const body = css.slice(open, css.indexOf("}", open));
-  return Object.fromEntries([...body.matchAll(/--([\w-]+):\s*(#[0-9a-f]{6})/gi)].map((m) => [m[1], m[2]]));
-}
+import { darkTokens, lightTokens } from "./tokens";
 
 /** WCAG relative luminance of a #rrggbb color. */
 function luminance(hex: string): number {
@@ -24,8 +17,8 @@ function contrast(a: string, b: string): number {
   return (hi + 0.05) / (lo + 0.05);
 }
 
-const light = tokens(0);
-const dark = { ...light, ...tokens(css.indexOf("prefers-color-scheme: dark")) };
+const light = lightTokens();
+const dark = darkTokens();
 const bands = ["very-compact", "compact", "middle", "irregular", "very-irregular"];
 
 describe.each([
