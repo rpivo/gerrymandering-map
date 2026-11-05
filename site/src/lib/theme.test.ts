@@ -68,7 +68,6 @@ describe("applySavedTheme", () => {
 
   it("can run as an inline script: it uses nothing from outside itself", () => {
     const root = { dataset: {} as Record<string, string | undefined> };
-    // eslint-disable-next-line @typescript-eslint/no-implied-eval -- the same thing the page does
     new Function("root", "storage", `(${applySavedTheme.toString()})(root, storage)`)(root, () =>
       memoryStorage({ theme: "dark" }),
     );
