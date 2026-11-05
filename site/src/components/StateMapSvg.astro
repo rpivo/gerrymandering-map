@@ -1,5 +1,5 @@
 ---
-import { cityTiers, dotRadius, labelOffset } from "../lib/cities";
+import { cityTiers, dotRadius, labelText } from "../lib/cities";
 import { districtsInState, getState, stateMap } from "../lib/data";
 import { districtPath } from "../lib/districts";
 import { scoreBand } from "../lib/format";
@@ -73,19 +73,17 @@ const round = (n: number) => Math.round(n * 10) / 10;
   {
     tiers.map((tier, i) => (
       <g class={`cities tier-${i}`} aria-hidden="true" pointer-events="none" font-size={round(tier.fontSize)}>
-        {tier.marks.map((m) => (
-          <>
-            <circle class="city-dot" cx={m.x} cy={m.y} r={round(dotRadius(tier.fontSize))} />
-            <text
-              class="city-label"
-              x={round(m.anchor === "start" ? m.x + labelOffset(tier.fontSize) : m.x - labelOffset(tier.fontSize))}
-              y={m.y}
-              text-anchor={m.anchor}
-            >
-              {m.name}
-            </text>
-          </>
-        ))}
+        {tier.marks.map((m) => {
+          const text = labelText(m, tier.fontSize);
+          return (
+            <>
+              <circle class="city-dot" cx={m.x} cy={m.y} r={round(dotRadius(tier.fontSize))} />
+              <text class="city-label" x={round(text.x)} y={round(text.y)} text-anchor={text.anchor}>
+                {m.name}
+              </text>
+            </>
+          );
+        })}
       </g>
     ))
   }
