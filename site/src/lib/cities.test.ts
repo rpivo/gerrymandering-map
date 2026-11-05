@@ -1,7 +1,19 @@
 import { describe, expect, it } from "vitest";
 
 import { districts, outline, states } from "./data";
-import { cityTierCss, cityTiers, districtCityTiers, labelBox, labelText, placeCities, type City, type CityMark } from "./cities";
+import { closeups } from "./closeups";
+import {
+  cityTierCss,
+  cityTiers,
+  closeupCityTiers,
+  districtCityTiers,
+  labelBox,
+  labelText,
+  placeCities,
+  type City,
+  type CityMark,
+  type CityTier,
+} from "./cities";
 
 const VIEW = "0 0 1000 500";
 const FONT = 20;
@@ -254,5 +266,67 @@ describe("cityTiers", () => {
     // California's map is capped at 32rem tall, so it's never wider than 512 x 862/1000 pixels.
     expect(cityTiers("CA").every((t) => t.min < 512 * 0.862)).toBe(true);
     expect(cityTiers("TN").length).toBeGreaterThan(cityTiers("CA").length);
+  });
+});
+
+function clashes(tier: CityTier): boolean {
+  const boxes = tier.marks.map((m) => labelBox(m, tier.fontSize));
+  return boxes.some(
+    (box, i) =>
+      boxes.some((other, j) => i < j && overlaps(box, other)) ||
+      tier.marks.some((m, j) => i !== j && overlaps(box, [m.x - 1, m.y - 1, m.x + 1, m.y + 1])),
+  );
+}
+
+describe("closeupCityTiers", () => {
+  const all = states.flatMap((s) => closeups(s.state).map((c) => ({ state: s.state, c })));
+
+  function losAngeles() {
+    const [la, central] = closeups("CA");
+    if (!la || !central) throw new Error("California has no Los Angeles close-ups");
+    return { la, central };
+  }
+
+  it("marks Los Angeles and its neighbors in the Los Angeles close-ups", () => {
+    const { la, central } = losAngeles();
+    for (const c of [la, central]) {
+      for (const tier of closeupCityTiers("CA", c)) {
+        expect(tier.marks.map((m) => m.name)).toContain("Los Angeles");
+      }
+    }
+    const widest = closeupCityTiers("CA", la).at(-1)?.marks.map((m) => m.name) ?? [];
+    expect(widest).toEqual(expect.arrayContaining(["Los Angeles", "Long Beach", "Anaheim"]));
+  });
+
+  it("puts a city where the close-up draws the same spot", () => {
+    const { la } = losAngeles();
+    const [x0, y0] = la.mapBox;
+    const city = cityTiers("CA").at(-1)?.marks.find((m) => m.name === "Los Angeles");
+    const mark = closeupCityTiers("CA", la).at(-1)?.marks.find((m) => m.name === "Los Angeles");
+    expect(mark?.x).toBeCloseTo(((city?.x ?? 0) - x0) * la.zoom, 5);
+    expect(mark?.y).toBeCloseTo(((city?.y ?? 0) - y0) * la.zoom, 5);
+  });
+
+  it("marks at least one city in every close-up at every width, with no labels overlapping", () => {
+    expect(all).toHaveLength(31); // anchor: every close-up
+    expect(all.filter(({ state, c }) => closeupCityTiers(state, c).length === 0).map(({ c }) => c.name)).toEqual([]);
+    const empty = all.flatMap(({ state, c }) =>
+      closeupCityTiers(state, c)
+        .filter((t) => t.marks.length === 0)
+        .map((t) => `${c.name}@${t.min}`),
+    );
+    expect(empty).toEqual([]);
+    const clashing = all.filter(({ state, c }) => closeupCityTiers(state, c).some(clashes)).map(({ c }) => c.name);
+    expect(clashing).toEqual([]);
+  });
+
+  it("only marks cities inside the close-up", () => {
+    const outside = all.flatMap(({ state, c }) => {
+      const [, , w, h] = c.viewBox.split(" ").map(Number) as [number, number, number, number];
+      return closeupCityTiers(state, c).flatMap((t) =>
+        t.marks.filter((m) => m.x < 0 || m.y < 0 || m.x > w || m.y > h).map((m) => `${c.name}: ${m.name}`),
+      );
+    });
+    expect(outside).toEqual([]);
   });
 });

@@ -1,5 +1,7 @@
 ---
+import { closeupCityTiers } from "../lib/cities";
 import { closeupFor, closeups } from "../lib/closeups";
+import CityMarks from "./CityMarks.astro";
 import DistrictMap from "./DistrictMap.astro";
 
 interface Props {
@@ -42,6 +44,7 @@ const nestedBoxes = (c: (typeof all)[number]) =>
               {nestedBoxes(c).map(([x0, y0, x1, y1]) => (
                 <rect class="closeup-box" x={x0} y={y0} width={x1 - x0} height={y1 - y0} />
               ))}
+              <CityMarks tiers={closeupCityTiers(state, c)} name={`closeup-${i}`} />
             </DistrictMap>
             <figcaption>{c.name}, enlarged {times(c.zoom)}</figcaption>
           </figure>
