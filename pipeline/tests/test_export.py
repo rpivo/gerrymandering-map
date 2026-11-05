@@ -112,6 +112,28 @@ def test_shapes_json_has_card_and_page_outlines_and_state_maps(tmp_path):
     assert set(data["states"]["ME"]["paths"]) == {"ME-01", "ME-02"}
 
 
+def test_shapes_json_gives_each_state_map_its_closeups(tmp_path):
+    import geopandas as gpd
+    import shapely
+    from shapely.geometry import box
+
+    # Kansas has two 1 km districts in a 200 km state; Wyoming has one big district.
+    tiny = [box(-99.01, 40.99, -99.0, 41.0), box(-99.0, 40.99, -98.99, 41.0)]
+    rest = box(-100, 40, -98, 42).difference(shapely.union_all(tiny))
+    districts = gpd.GeoDataFrame(
+        {"district_id": ["KS-01", "KS-02", "KS-03", "WY-AL"], "state": ["KS", "KS", "KS", "WY"]},
+        geometry=[rest, *tiny, box(-110, 41, -104, 45)],
+        crs="EPSG:4269",
+    )
+    path = tmp_path / "shapes.json"
+    write_shapes_json(districts, path)
+    states = json.loads(path.read_text())["states"]
+    [closeup] = states["KS"]["closeups"]
+    assert set(closeup) == {"box", "viewBox", "paths"}
+    assert {"KS-02", "KS-03"} <= set(closeup["paths"])
+    assert states["WY"]["closeups"] == []
+
+
 def test_shapes_json_crops_hawaii_and_notes_it(tmp_path):
     import geopandas as gpd
     from shapely.geometry import MultiPolygon, box
