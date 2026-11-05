@@ -68,6 +68,41 @@ describe("StateMapSvg hover outline", () => {
   });
 });
 
+describe("StateMapSvg city marks", () => {
+  async function tennessee(): Promise<string> {
+    return container.renderToString(StateMapSvg, { props: { state: "TN", stateName: "Tennessee" } });
+  }
+
+  it("draws city marks on top of the districts, without taking hovers or clicks from them", async () => {
+    const html = await tennessee();
+    const groups = [...html.matchAll(/<g\b[^>]*class="cities tier-\d[^"]*"[^>]*>/g)];
+    // Anchor: Tennessee's wide map is drawn at every width tier.
+    expect(groups.length).toBeGreaterThanOrEqual(4);
+    const lastLink = html.lastIndexOf("</a>");
+    expect(groups.every((g) => g.index > lastLink)).toBe(true);
+    expect(groups.every(([g]) => g.includes('pointer-events="none"'))).toBe(true);
+    // The map is one labeled image; the marks add nothing a screen reader should read twice.
+    expect(groups.every(([g]) => g.includes('aria-hidden="true"'))).toBe(true);
+  });
+
+  it("labels the state's big cities with a dot each", async () => {
+    const html = await tennessee();
+    const widest = html.slice(html.lastIndexOf('class="cities tier-'));
+    const labels = [...widest.matchAll(/<text\b[^>]*>([^<]+)<\/text>/g)].map((m) => m[1]);
+    expect(labels).toEqual(expect.arrayContaining(["Nashville", "Memphis", "Knoxville", "Chattanooga"]));
+    expect(widest.match(/<circle\b/g)?.length).toBe(labels.length);
+  });
+
+  it("shows one tier at a time, picked by how wide the map is drawn", async () => {
+    const html = await tennessee();
+    expect(html).toMatch(/class="map-frame"[^>]*style="[^"]*container-type: inline-size/);
+    expect(html).toMatch(/@container \(max-width: 399\.98px\) \{ \.map-frame \.tier-0 \{ display: inline; \} \}/);
+    expect(html).toMatch(
+      /@container \(min-width: 400px\) and \(max-width: 519\.98px\) \{ \.map-frame \.tier-1 \{ display: inline; \} \}/,
+    );
+  });
+});
+
 describe("StateMapSvg tooltips", () => {
   it("has one hidden tooltip per district, out of the accessibility tree", async () => {
     const html = await container.renderToString(StateMapSvg, { props: { state: "TX", stateName: "Texas" } });

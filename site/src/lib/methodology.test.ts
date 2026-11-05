@@ -20,6 +20,11 @@ describe("the methodology page", () => {
     expect(text).toContain("all of its 2020 residents");
   });
 
+  it("says which cities the state maps mark, and where the points come from", () => {
+    expect(text).toContain("State maps mark the largest places");
+    expect(text).toContain("internal point");
+  });
+
   it("has a fairness section the state pages can link to", () => {
     expect(html).toMatch(/<h2[^>]*id="fairness"/);
   });

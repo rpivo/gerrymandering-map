@@ -24,6 +24,7 @@ from gerry.blocks import assemble_districts, read_block_assignment, read_blocks
 from gerry.boundaries import load_districts, load_state_outlines
 from gerry.calibrate import calibrate
 from gerry.export import (
+    write_cities_json,
     write_districts_json,
     write_fairness_json,
     write_places_json,
@@ -283,8 +284,12 @@ def fairness(repo_root: Path) -> int:
 
 
 def _population_tables(districts: gpd.GeoDataFrame, raw: Path, manifest: Path):
-    """Place every state's 2020 blocks; return population, place counts and place problems."""
-    tables, place_tables, problems = [], [], []
+    """Place every state's 2020 blocks.
+
+    Returns:
+        Population per district, place counts per district, every place, and place problems.
+    """
+    tables, place_tables, all_places, problems = [], [], [], []
     for state in STATES:
         pl_zip = fetch(pl_source(state.usps), raw, manifest)
         blocks = read_pl_blocks(pl_zip)
@@ -295,10 +300,12 @@ def _population_tables(districts: gpd.GeoDataFrame, raw: Path, manifest: Path):
         found = district_places(placed, places)
         tables.append(district_population(placed))
         place_tables.append(found)
+        all_places.append(places)
         problems += place_problems(placed, found, places)
     return (
         pd.concat(tables, ignore_index=True),
         pd.concat(place_tables, ignore_index=True),
+        pd.concat(all_places, ignore_index=True),
         problems,
     )
 
@@ -312,7 +319,7 @@ def population(repo_root: Path) -> int:
         return 1
     districts = gpd.read_file(built).to_crs("EPSG:4269")
     raw, manifest = repo_root / "data" / "raw", repo_root / "data" / "sources" / "sources.csv"
-    table, places, problems = _population_tables(districts, raw, manifest)
+    table, places, all_places, problems = _population_tables(districts, raw, manifest)
     out = build / "population-by-district.csv"
     table.to_csv(out, index=False)
     places.to_csv(build / "places-by-district.csv", index=False)
@@ -328,7 +335,8 @@ def population(repo_root: Path) -> int:
     site = repo_root / "site" / "src" / "data"
     write_population_json(table, site / "population.json")
     write_places_json(places, table[["district_id", "pop"]], site / "places.json")
-    print(f"Wrote {(site / 'population.json').relative_to(repo_root)} and places.json")
+    write_cities_json(districts, all_places, site / "cities.json")
+    print(f"Wrote {(site / 'population.json').relative_to(repo_root)}, places.json and cities.json")
     return 0
 
 

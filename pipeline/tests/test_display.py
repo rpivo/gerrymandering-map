@@ -12,6 +12,7 @@ from gerry.display import (
     district_outline,
     fit_to_view,
     state_map,
+    state_points,
     svg_path,
     us_map,
 )
@@ -80,6 +81,30 @@ def test_state_map_keeps_shared_borders_identical():
     assert len(shared) >= 3  # the whole bent border, not just its two ends
     width, height = map(int, result["viewBox"].split()[2:])
     assert max(width, height) == VIEW_SIZE
+
+
+class TestStatePoints:
+    @pytest.fixture
+    def districts(self):
+        return gpd.GeoDataFrame(
+            {"district_id": ["ME-01", "ME-02"], "state": "ME"},
+            geometry=[box(-70, 44, -69, 45), box(-69, 44, -68, 45)],
+            crs="EPSG:4269",
+        )
+
+    def test_points_land_where_the_map_draws_the_same_spot(self, districts):
+        drawn = state_map(districts, detail=0.001)
+        placed = state_points(districts, 0.001, [shapely.Point(-69, 44), shapely.Point(-70, 45)])
+        assert placed["viewBox"] == drawn["viewBox"]
+        # The shared border's south end, and ME-01's northwest corner, are both path vertices.
+        vertices = points(drawn["paths"]["ME-01"])
+        assert tuple(placed["points"][0]) in vertices
+        assert tuple(placed["points"][1]) in vertices
+
+    def test_a_point_between_two_corners_lands_between_them(self, districts):
+        width, height = map(int, state_map(districts, 0.001)["viewBox"].split()[2:])
+        ((x, y),) = state_points(districts, 0.001, [shapely.Point(-69, 44.5)])["points"]
+        assert x == pytest.approx(width / 2, abs=2) and y == pytest.approx(height / 2, abs=2)
 
 
 def test_pieces_too_small_to_see_are_left_off_coarse_outlines():

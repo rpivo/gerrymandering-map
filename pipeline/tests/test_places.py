@@ -7,6 +7,7 @@ from gerry.export import places_records
 from gerry.places import (
     MAX_PLACES,
     district_places,
+    map_label,
     place_name_and_kind,
     place_problems,
     read_pl_places,
@@ -18,13 +19,20 @@ SUMLEV, LOGRECNO, GEOCODE, PLACE, BASENAME, NAME, POP100, LAT, LON = 2, 7, 9, 29
 
 
 def geo_row(
-    sumlev: str, logrecno: str, place: str, pop: int, basename: str = "", name: str = ""
+    sumlev: str,
+    logrecno: str,
+    place: str,
+    pop: int,
+    basename: str = "",
+    name: str = "",
+    lat: str = "+30.0",
+    lon: str = "-91.0",
 ) -> str:
     fields = [""] * 97
     fields[0], fields[1] = "PLST", "LA"
     fields[SUMLEV], fields[LOGRECNO], fields[GEOCODE] = sumlev, logrecno, f"22{logrecno}"
     fields[PLACE], fields[BASENAME], fields[NAME] = place, basename, name
-    fields[POP100], fields[LAT], fields[LON] = str(pop), "+30.0", "-91.0"
+    fields[POP100], fields[LAT], fields[LON] = str(pop), lat, lon
     return "|".join(fields)
 
 
@@ -45,17 +53,33 @@ def write_zip(tmp_path, rows: list[str]):
 
 
 class TestReadPlaces:
-    def test_reads_each_place_with_its_name_type_and_population(self, tmp_path):
+    def test_reads_each_place_with_its_name_type_population_and_point(self, tmp_path):
         path = write_zip(tmp_path, [
             geo_row("040", "0000001", "", 4657757),
-            geo_row("160", "0000002", "00100", 11186, "Abbeville", "Abbeville city"),
-            geo_row("160", "0000003", "50115", 143507, "Metairie", "Metairie CDP"),
+            geo_row("160", "0000002", "00100", 11186, "Abbeville", "Abbeville city",
+                    "+29.9751", "-092.1343"),
+            geo_row("160", "0000003", "50115", 143507, "Metairie", "Metairie CDP",
+                    "+29.9977", "-090.1780"),
             geo_row("750", "0000004", "00100", 20),
         ])  # fmt: skip
         places = read_pl_places(path)
         assert places.to_dict("records") == [
-            {"place": "00100", "name": "Abbeville", "kind": "city", "pop": 11186},
-            {"place": "50115", "name": "Metairie", "kind": "community", "pop": 143507},
+            {
+                "place": "00100",
+                "name": "Abbeville",
+                "kind": "city",
+                "pop": 11186,
+                "lat": 29.9751,
+                "lon": -92.1343,
+            },
+            {
+                "place": "50115",
+                "name": "Metairie",
+                "kind": "community",
+                "pop": 143507,
+                "lat": 29.9977,
+                "lon": -90.178,
+            },
         ]
 
     def test_blocks_carry_their_place_code_or_none(self, tmp_path):
@@ -172,3 +196,22 @@ class TestPlacesRecords:
         empty = district_places(placed_blocks().iloc[:0], places_table())
         records = places_records(empty, pd.DataFrame({"district_id": ["AK-AL"], "pop": [733391]}))
         assert records == [{"id": "AK-AL", "places": [], "more": 0, "in_places": 0.0}]
+
+
+@pytest.mark.parametrize(
+    ("name", "kind", "expected"),
+    [
+        ("Nashville-Davidson", "metropolitan government", "Nashville"),
+        ("Louisville/Jefferson County", "metro government", "Louisville"),
+        ("Lexington-Fayette", "urban county", "Lexington"),
+        ("Augusta-Richmond County", "consolidated government", "Augusta"),
+        ("Macon-Bibb County", "", "Macon"),
+        ("Lynchburg, Moore County", "metropolitan government", "Lynchburg"),
+        # Ordinary hyphenated and slashed names stay whole.
+        ("Winston-Salem", "city", "Winston-Salem"),
+        ("Wilkes-Barre", "city", "Wilkes-Barre"),
+        ("Urban Honolulu", "community", "Urban Honolulu"),
+    ],
+)
+def test_map_label_drops_the_county_from_consolidated_city_names(name, kind, expected):
+    assert map_label(name, kind) == expected
