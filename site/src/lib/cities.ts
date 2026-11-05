@@ -189,7 +189,8 @@ export function cityTiers(state: string): CityTier[] {
   const widest = (MAX_MAP_HEIGHT * width) / height;
   const mins = TIER_MINS.filter((min) => min < widest);
   return mins.map((min, i) => {
-    const ref = min === 0 ? 320 : min;
+    // A tall state's map can be narrower than a tier's lower end, so size its labels for that.
+    const ref = Math.min(min === 0 ? 320 : min, widest);
     const fontSize = (LABEL_PX * width) / ref;
     return {
       min,
@@ -199,4 +200,23 @@ export function cityTiers(state: string): CityTier[] {
       marks: placeCities(entry.cities, entry.viewBox, fontSize, MAX_MARKS),
     };
   });
+}
+
+/**
+ * Return the CSS that shows each tier's marks only at its range of map widths.
+ *
+ * @param tiers - From cityTiers.
+ * @returns One rule per line.
+ */
+export function cityTierCss(tiers: CityTier[]): string {
+  return tiers
+    .map((t, i) => {
+      const show = `.map-frame .tier-${i} { display: inline; }`;
+      const range = [t.min > 0 && `(min-width: ${t.min}px)`, t.max !== null && `(max-width: ${t.max - 0.02}px)`];
+      const query = range.filter(Boolean).join(" and ");
+      // A map drawn at only one size has one tier covering every width: an empty
+      // "@container { }" is invalid CSS and browsers drop it, so that tier shows unconditionally.
+      return query ? `@container ${query} { ${show} }` : show;
+    })
+    .join("\n");
 }

@@ -1,5 +1,5 @@
 ---
-import { cityTiers, dotRadius, labelText } from "../lib/cities";
+import { cityTierCss, cityTiers, dotRadius, labelText } from "../lib/cities";
 import { districtsInState, getState, stateMap } from "../lib/data";
 import { districtPath } from "../lib/districts";
 import { scoreBand } from "../lib/format";
@@ -36,12 +36,7 @@ const showTips = `${rows
 // City labels are sized in map units, so each set fits without overlaps across its range of
 // widths. Container queries show the set for the width the map is drawn at.
 const tiers = cityTiers(state);
-const showCities = tiers
-  .map((t, i) => {
-    const range = [t.min > 0 && `(min-width: ${t.min}px)`, t.max !== null && `(max-width: ${t.max - 0.02}px)`];
-    return `@container ${range.filter(Boolean).join(" and ")} { .map-frame .tier-${i} { display: inline; } }`;
-  })
-  .join("\n");
+const showCities = cityTierCss(tiers);
 const round = (n: number) => Math.round(n * 10) / 10;
 ---
 
