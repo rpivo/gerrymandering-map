@@ -60,14 +60,15 @@ export interface Outline {
   d: string;
 }
 
-/** A state's districts drawn together: one viewBox, a path per district. */
+/** A state's districts drawn together: one viewBox, a path per district, and a note if part is left out. */
 export interface StateMap {
   viewBox: string;
   paths: Record<string, string>;
+  note?: string;
 }
 
 interface ShapesFile {
-  districts: Record<string, { card: Outline; page: Outline }>;
+  districts: Record<string, { card: Outline; page: Outline; note?: string }>;
   states: Record<string, StateMap>;
 }
 
@@ -135,6 +136,19 @@ export function outline(id: string, kind: "card" | "page"): Outline {
     throw new Error(`Unknown district: ${id}`);
   }
   return entry[kind];
+}
+
+/**
+ * Say what a district's drawings leave out, if anything.
+ * @param id - A district ID.
+ * @returns A sentence such as "The Northwestern Hawaiian Islands, part of District 2, are not shown.", or null.
+ */
+export function shapeNote(id: string): string | null {
+  const entry = shapes.districts[id];
+  if (!entry) {
+    throw new Error(`Unknown district: ${id}`);
+  }
+  return entry.note ?? null;
 }
 
 /**

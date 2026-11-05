@@ -16,6 +16,30 @@ from gerry.metrics import local_projection
 
 VIEW_SIZE = 1000
 
+# Areas some states' drawings are cut to (west, south, east, north in degrees), with the note
+# shown beside them. HI-02 reaches 1,900 km west to Kure Atoll through the small, nearly
+# uninhabited Northwestern Hawaiian Islands, which would shrink the main islands to a corner.
+DISPLAY_CROPS = {
+    "HI": (
+        shapely.box(-161.0, 18.5, -154.5, 22.5),
+        "The Northwestern Hawaiian Islands, part of District 2, are not shown.",
+    ),
+}
+
+
+def display_crop(state: str, geometry: BaseGeometry) -> tuple[BaseGeometry, str | None]:
+    """Return a shape cut to what its drawings show, with a note if anything was left out.
+
+    Display only: scores are always measured on the full shape. The geometry is in
+    NAD83 degrees (EPSG:4269).
+    """
+    if state not in DISPLAY_CROPS:
+        return geometry, None
+    area, note = DISPLAY_CROPS[state]
+    if geometry.difference(area).is_empty or not geometry.intersects(area):
+        return geometry, None
+    return geometry.intersection(area), note
+
 
 def _ring_path(coords) -> str:
     """Return one closed subpath for a ring, dropping points that round to the same spot."""

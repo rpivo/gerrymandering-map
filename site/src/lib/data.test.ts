@@ -13,6 +13,16 @@ import {
   states,
 } from "./data";
 
+describe("drawing notes", () => {
+  it("note what Hawaii's drawings leave out, and nothing else", async () => {
+    const { shapeNote } = await import("./data");
+    expect(shapeNote("HI-02")).toBe("The Northwestern Hawaiian Islands, part of District 2, are not shown.");
+    expect(stateMap("HI").note).toBe(shapeNote("HI-02"));
+    expect(districts.filter((d) => shapeNote(d.id) !== null).map((d) => d.id)).toEqual(["HI-02"]);
+    expect(states.filter((s) => stateMap(s.state).note !== undefined).map((s) => s.state)).toEqual(["HI"]);
+  });
+});
+
 describe("the generated data", () => {
   it("has every district and state", () => {
     expect(districts).toHaveLength(435);

@@ -25,6 +25,19 @@ describe("StateMapSvg", () => {
   });
 });
 
+describe("StateMapSvg notes", () => {
+  it("says what a cropped map leaves out", async () => {
+    const html = await container.renderToString(StateMapSvg, { props: { state: "HI", stateName: "Hawaii" } });
+    expect(html).toContain("The Northwestern Hawaiian Islands, part of District 2, are not shown.");
+  });
+
+  it("has no note for a map drawn in full", async () => {
+    const html = await container.renderToString(StateMapSvg, { props: { state: "TX", stateName: "Texas" } });
+    expect(html).toContain("<svg"); // anchor: the map rendered
+    expect(html).not.toContain("not shown");
+  });
+});
+
 describe("DistrictShape", () => {
   it("is a labeled image when given a label", async () => {
     const html = await container.renderToString(DistrictShape, {

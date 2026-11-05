@@ -34,8 +34,15 @@ const rows = districtsInState(state).map((d) => ({
     ))
   }
 </svg>
+{map.note && <p class="map-note">{map.note}</p>}
 
 <style>
+  .map-note {
+    margin: 0.5rem 0 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
   .state-map {
     display: block;
     width: 100%;
