@@ -13,9 +13,9 @@
   /* Irregularity bands, green (very compact) through yellow to red (very irregular). Each band is
      also darker than the last, so red-green color blind readers can still tell them apart by
      lightness (tested in contrast.test.ts). The number is always shown next to the color. */
-  --band-very-compact: #e0f2d6;
-  --band-compact: #b5da94;
-  --band-middle: #dba63a;
+  --band-very-compact: #c5e0b8;
+  --band-compact: #a8cb77;
+  --band-middle: #c79d2a;
   --band-irregular: #d8642b;
   --band-very-irregular: #9c1f28;
   /* Text on each band. Every pair must reach 4.5:1 contrast (tested in contrast.test.ts). */
@@ -37,9 +37,9 @@
   --shape: #a9b8d6;
   --shape-muted: #3a3935;
   /* In dark mode the bands get lighter toward very irregular, so it stands out from the page. */
-  --band-very-compact: #1a3320;
-  --band-compact: #25502a;
-  --band-middle: #835f13;
+  --band-very-compact: #203c25;
+  --band-compact: #2f522c;
+  --band-middle: #846017;
   --band-irregular: #d0682a;
   --band-very-irregular: #ff7466;
   --on-band-very-compact: #ecebe6;
