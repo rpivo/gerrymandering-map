@@ -93,6 +93,7 @@ Run from the repo root. The README describes each one.
 - Score the built map: `make scores` (`python -m gerry scores`), which writes the site's data files in `site/src/data/` (`districts.json`, `shapes.json`, `states.json`). `make data` runs boundaries then scores.
 - Place 2024 presidential votes in districts: `make votes` (`python -m gerry votes`), written to `data/build/president-2024-by-district.csv`. It must pass the Texas check in `data/checks/`.
 - Score partisan fairness per state: `make fairness` (`python -m gerry fairness`), from the votes, written to `data/build/fairness-2024.csv` and the site's `site/src/data/fairness.json`. Positive favors Republicans. Rerun it after `make votes` changes; `make test` checks the committed file still scores every state it can.
+- Add up 2020 voting-age population by race per district: `make population` (`python -m gerry population`), from the Census PL 94-171 files, written to `data/build/population-by-district.csv`. It fails if a district's 2020 population is more than 3% off its state's average.
 - Validate the state map audit: `make audit` (`python -m gerry audit`). `make test` also validates the committed `states.csv` and `sources.csv`.
 - Fix formatting: `make format`
 - PR size against `main`: `make pr-size`

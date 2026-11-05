@@ -281,3 +281,19 @@ def test_fairness_json_is_deterministic_and_described(tmp_path):
     assert "Positive favors Republicans" in data["description"]
     assert "2024 presidential" in data["description"]
     assert "NaN" not in first.decode()
+
+
+@pytest.mark.parametrize(
+    ("source_id", "role"),
+    [
+        ("census-pl94171-2020-48", "population"),
+        ("census-blocks-2020-39", "boundaries"),
+        ("medsl-president-precinct-2024", "votes"),
+        ("tx-planc2333-president-2024-votes", "votes"),
+        ("census-tiger-cd119-2025-04", "calibration"),
+    ],
+)
+def test_source_roles_by_id(source_id, role):
+    from gerry.export import _source_role
+
+    assert _source_role(source_id) == role
