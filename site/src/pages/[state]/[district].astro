@@ -1,5 +1,6 @@
 ---
 import DistrictShape from "../../components/DistrictShape.astro";
+import { districtCityTiers } from "../../lib/cities";
 import MetricRow from "../../components/MetricRow.astro";
 import ScoreBadge from "../../components/ScoreBadge.astro";
 import ScoreLegend from "../../components/ScoreLegend.astro";
@@ -37,7 +38,11 @@ const ranked = district.rank_national !== null;
 
     <div class="top">
       <div class="outline">
-        <DistrictShape outline={outline(district.id, "page")} label={`Outline of ${title}`} />
+        <DistrictShape
+          outline={outline(district.id, "page")}
+          label={`Outline of ${title}`}
+          cities={districtCityTiers(district.id)}
+        />
         {shapeNote(district.id) && <p class="shape-note">{shapeNote(district.id)}</p>}
       </div>
       <section class="summary" aria-labelledby="score-heading">

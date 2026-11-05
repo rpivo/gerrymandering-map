@@ -25,6 +25,7 @@ from gerry.boundaries import load_districts, load_state_outlines
 from gerry.calibrate import calibrate
 from gerry.export import (
     write_cities_json,
+    write_district_cities_json,
     write_districts_json,
     write_fairness_json,
     write_places_json,
@@ -37,7 +38,7 @@ from gerry.export import (
 from gerry.fairness import MIN_DISTRICTS, state_fairness
 from gerry.fetch import CENSUS_CD119, CENSUS_STATES, fetch, read_manifest
 from gerry.generalize import absorb_fragments, simplify_to_census
-from gerry.places import district_places, place_problems, read_pl_places
+from gerry.places import district_places, piece_points, place_problems, read_pl_places
 from gerry.population import (
     assign_blocks,
     district_population,
@@ -287,9 +288,10 @@ def _population_tables(districts: gpd.GeoDataFrame, raw: Path, manifest: Path):
     """Place every state's 2020 blocks.
 
     Returns:
-        Population per district, place counts per district, every place, and place problems.
+        Population per district, place counts per district, every place, each place's part
+        of each district with a point (piece_points), and place problems.
     """
-    tables, place_tables, all_places, problems = [], [], [], []
+    tables, place_tables, all_places, pieces, problems = [], [], [], [], []
     for state in STATES:
         pl_zip = fetch(pl_source(state.usps), raw, manifest)
         blocks = read_pl_blocks(pl_zip)
@@ -301,11 +303,13 @@ def _population_tables(districts: gpd.GeoDataFrame, raw: Path, manifest: Path):
         tables.append(district_population(placed))
         place_tables.append(found)
         all_places.append(places)
+        pieces.append(piece_points(placed))
         problems += place_problems(placed, found, places)
     return (
         pd.concat(tables, ignore_index=True),
         pd.concat(place_tables, ignore_index=True),
         pd.concat(all_places, ignore_index=True),
+        pd.concat(pieces, ignore_index=True),
         problems,
     )
 
@@ -319,7 +323,7 @@ def population(repo_root: Path) -> int:
         return 1
     districts = gpd.read_file(built).to_crs("EPSG:4269")
     raw, manifest = repo_root / "data" / "raw", repo_root / "data" / "sources" / "sources.csv"
-    table, places, all_places, problems = _population_tables(districts, raw, manifest)
+    table, places, all_places, pieces, problems = _population_tables(districts, raw, manifest)
     out = build / "population-by-district.csv"
     table.to_csv(out, index=False)
     places.to_csv(build / "places-by-district.csv", index=False)
@@ -336,7 +340,9 @@ def population(repo_root: Path) -> int:
     write_population_json(table, site / "population.json")
     write_places_json(places, table[["district_id", "pop"]], site / "places.json")
     write_cities_json(districts, all_places, site / "cities.json")
-    print(f"Wrote {(site / 'population.json').relative_to(repo_root)}, places.json and cities.json")
+    write_district_cities_json(districts, pieces, all_places, site / "district-cities.json")
+    print(f"Wrote {(site / 'population.json').relative_to(repo_root)}, places.json, cities.json "
+          "and district-cities.json")  # fmt: skip
     return 0
 
 

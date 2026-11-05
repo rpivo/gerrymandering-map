@@ -1,0 +1,58 @@
+---
+import { cityTierCss, dotRadius, labelText, type CityTier } from "../lib/cities";
+
+interface Props {
+  tiers: CityTier[];
+  /** Which map this is, so two maps on one page keep their tier rules apart. */
+  name: "state" | "district";
+}
+
+const { tiers, name } = Astro.props;
+// Labels are sized in map units, so each tier's marks fit without overlaps across its range of
+// widths. Container queries (on the nearest ancestor with container-type) pick the tier.
+const showTiers = cityTierCss(tiers, name);
+const round = (n: number) => Math.round(n * 10) / 10;
+---
+
+{
+  tiers.map((tier, i) => (
+    <g class={`cities ${name}-tier-${i}`} aria-hidden="true" pointer-events="none" font-size={round(tier.fontSize)}>
+      {tier.marks.map((m) => {
+        const text = labelText(m, tier.fontSize);
+        return (
+          <>
+            <circle class="city-dot" cx={m.x} cy={m.y} r={round(dotRadius(tier.fontSize))} />
+            <text class="city-label" x={round(text.x)} y={round(text.y)} text-anchor={text.anchor}>
+              {m.name}
+            </text>
+          </>
+        );
+      })}
+    </g>
+  ))
+}
+<style is:inline set:html={showTiers} />
+
+<style>
+  .cities {
+    display: none;
+  }
+
+  .city-dot {
+    fill: var(--text);
+    stroke: var(--bg);
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+  }
+
+  /* A halo in the page color keeps a label readable over any map color. */
+  .city-label {
+    fill: var(--text);
+    stroke: var(--bg);
+    stroke-width: 0.25em;
+    stroke-linejoin: round;
+    paint-order: stroke;
+    dominant-baseline: central;
+    font-weight: 600;
+  }
+</style>

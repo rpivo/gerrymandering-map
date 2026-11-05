@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { states } from "./data";
-import { cityTierCss, cityTiers, labelBox, labelText, placeCities, type City, type CityMark } from "./cities";
+import { districts, outline, states } from "./data";
+import { cityTierCss, cityTiers, districtCityTiers, labelBox, labelText, placeCities, type City, type CityMark } from "./cities";
 
 const VIEW = "0 0 1000 500";
 const FONT = 20;
@@ -21,6 +21,11 @@ describe("placeCities", () => {
     expect(placeCities([city("Austin", 400, 250)], VIEW, FONT, 8)).toEqual([
       { name: "Austin", x: 400, y: 250, side: "right" },
     ]);
+  });
+
+  it("keeps labels inside a viewBox that doesn't start at 0", () => {
+    // A label to the right of x = 60 runs past 100; on the left it fits from -100.
+    expect(placeCities([city("El Paso", 60, 0)], "-100 -50 200 100", FONT, 8)[0]?.side).toBe("left");
   });
 
   it("puts the label on the left when the right would run off the map", () => {
@@ -83,13 +88,82 @@ describe("cityTierCss", () => {
   it("has a valid rule showing every tier of every state", () => {
     const broken = states.flatMap((s) => {
       const tiers = cityTiers(s.state);
-      const rules = cityTierCss(tiers).split("\n");
+      const rules = cityTierCss(tiers, "state").split("\n");
       // One rule per tier, each either unconditional or under a non-empty container query.
-      const valid = /^(@container \((min|max)-width: [\d.]+px\)( and \(max-width: [\d.]+px\))? \{ )?\.map-frame \.tier-\d \{ display: inline; \}( \})?$/;
+      const valid = /^(@container \((min|max)-width: [\d.]+px\)( and \(max-width: [\d.]+px\))? \{ )?svg \.cities\.state-tier-\d \{ display: inline; \}( \})?$/;
       return rules.length === tiers.length && rules.every((r) => valid.test(r)) ? [] : [s.state];
     });
     expect(states).toHaveLength(50); // anchor
     expect(broken).toEqual([]);
+  });
+
+  it("names each map's tiers apart, so a page's two maps don't show each other's tiers", () => {
+    expect(cityTierCss(districtCityTiers("LA-02"), "district")).toContain(".district-tier-0 {");
+  });
+
+  it("outranks the scoped hide rule (.cities plus an attribute) by specificity, not order", () => {
+    // Two classes and an element beat two classes (Astro scopes .cities with an attribute).
+    expect(cityTierCss(cityTiers("TN"), "state")).toMatch(/^@container [^{]+\{ svg \.cities\.state-tier-0 \{/);
+    expect(cityTierCss(districtCityTiers("LA-02"), "district")).not.toContain("state-tier");
+  });
+});
+
+describe("districtCityTiers", () => {
+  it("marks New Orleans on its district's outline", () => {
+    expect(districtCityTiers("LA-02").length).toBeGreaterThanOrEqual(2); // anchor
+    for (const tier of districtCityTiers("LA-02")) {
+      expect(tier.marks[0]?.name).toBe("New Orleans");
+    }
+  });
+
+  it("marks at least one city on every district at every width", () => {
+    expect(districts).toHaveLength(435); // anchor: real data
+    expect(districts.filter((d) => districtCityTiers(d.id).length === 0)).toEqual([]);
+    const empty = districts.flatMap((d) =>
+      districtCityTiers(d.id)
+        .filter((t) => t.marks.length === 0)
+        .map((t) => `${d.id}@${t.min}`),
+    );
+    expect(empty).toEqual([]);
+  });
+
+  it("never overlaps two labels, or a label and a dot, on any district at any width", () => {
+    let marked = 0;
+    const clashes: string[] = [];
+    for (const d of districts) {
+      for (const tier of districtCityTiers(d.id)) {
+        marked += tier.marks.length;
+        const boxes = tier.marks.map((m) => labelBox(m, tier.fontSize));
+        boxes.forEach((box, i) =>
+          tier.marks.forEach((m, j) => {
+            if (i !== j && overlaps(box, [m.x - 1, m.y - 1, m.x + 1, m.y + 1])) clashes.push(d.id);
+            if (i < j && overlaps(box, boxes[j] ?? [])) clashes.push(d.id);
+          }),
+        );
+      }
+    }
+    expect(marked).toBeGreaterThan(2000); // anchor
+    expect(clashes).toEqual([]);
+  });
+
+  it("lets labels use the whole square box around a thin district, not just its strip", () => {
+    // FL-25 is a coastal strip 203 units wide in a 1000-unit square.
+    for (const tier of districtCityTiers("FL-25")) expect(tier.marks.length).toBeGreaterThanOrEqual(5);
+  });
+
+  it("sizes labels for the outline's square box, whose side spans 1000 map units", () => {
+    // Anchor: some districts are taller than wide, where the longer side is the height.
+    const tall = districts.filter((d) => {
+      const [, , w, h] = outline(d.id, "page").viewBox.split(" ").map(Number) as [number, number, number, number];
+      return h > w;
+    });
+    expect(tall.length).toBeGreaterThan(50);
+    const off = districts.flatMap((d) =>
+      districtCityTiers(d.id)
+        .filter((t) => Math.abs(t.fontSize - (11 * 1000) / t.ref) > 1e-6)
+        .map(() => d.id),
+    );
+    expect(off).toEqual([]);
   });
 });
 

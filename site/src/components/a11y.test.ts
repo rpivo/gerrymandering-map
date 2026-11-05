@@ -7,7 +7,8 @@ import ScoreBadge from "./ScoreBadge.astro";
 import PopulationNote from "./PopulationNote.astro";
 import StateEdgeNote from "./StateEdgeNote.astro";
 import StateMapSvg from "./StateMapSvg.astro";
-import { getDistrict, getState } from "../lib/data";
+import { districtCityTiers } from "../lib/cities";
+import { getDistrict, getState, outline } from "../lib/data";
 
 let container: AstroContainer;
 
@@ -75,7 +76,7 @@ describe("StateMapSvg city marks", () => {
 
   it("draws city marks on top of the districts, without taking hovers or clicks from them", async () => {
     const html = await tennessee();
-    const groups = [...html.matchAll(/<g\b[^>]*class="cities tier-\d[^"]*"[^>]*>/g)];
+    const groups = [...html.matchAll(/<g\b[^>]*class="cities state-tier-\d[^"]*"[^>]*>/g)];
     // Anchor: Tennessee's wide map is drawn at every width tier.
     expect(groups.length).toBeGreaterThanOrEqual(4);
     const lastLink = html.lastIndexOf("</a>");
@@ -87,7 +88,7 @@ describe("StateMapSvg city marks", () => {
 
   it("labels the state's big cities with a dot each", async () => {
     const html = await tennessee();
-    const widest = html.slice(html.lastIndexOf('class="cities tier-'));
+    const widest = html.slice(html.lastIndexOf('class="cities state-tier-'));
     const labels = [...widest.matchAll(/<text\b[^>]*>([^<]+)<\/text>/g)].map((m) => m[1]);
     expect(labels).toEqual(expect.arrayContaining(["Nashville", "Memphis", "Knoxville", "Chattanooga"]));
     expect(widest.match(/<circle\b/g)?.length).toBe(labels.length);
@@ -96,9 +97,9 @@ describe("StateMapSvg city marks", () => {
   it("shows one tier at a time, picked by how wide the map is drawn", async () => {
     const html = await tennessee();
     expect(html).toMatch(/class="map-frame"[^>]*style="[^"]*container-type: inline-size/);
-    expect(html).toMatch(/@container \(max-width: 399\.98px\) \{ \.map-frame \.tier-0 \{ display: inline; \} \}/);
+    expect(html).toMatch(/@container \(max-width: 399\.98px\) \{ svg \.cities\.state-tier-0 \{ display: inline; \} \}/);
     expect(html).toMatch(
-      /@container \(min-width: 400px\) and \(max-width: 519\.98px\) \{ \.map-frame \.tier-1 \{ display: inline; \} \}/,
+      /@container \(min-width: 400px\) and \(max-width: 519\.98px\) \{ svg \.cities\.state-tier-1 \{ display: inline; \} \}/,
     );
   });
 });
@@ -107,8 +108,8 @@ describe("StateMapSvg city marks on a map drawn at one size", () => {
   it("always shows the one set of marks, with no container query to fail", async () => {
     // New Jersey's map is never drawn wider than about 269px, so it has a single tier.
     const html = await container.renderToString(StateMapSvg, { props: { state: "NJ", stateName: "New Jersey" } });
-    expect(html.match(/class="cities tier-\d/g)).toEqual(['class="cities tier-0']);
-    expect(html).toContain(".map-frame .tier-0 { display: inline; }");
+    expect(html.match(/class="cities state-tier-\d/g)).toEqual(['class="cities state-tier-0']);
+    expect(html).toContain("svg .cities.state-tier-0 { display: inline; }");
     expect(html).not.toMatch(/@container\s*\{/);
   });
 });
@@ -159,6 +160,25 @@ describe("StateMapSvg notes", () => {
     const html = await container.renderToString(StateMapSvg, { props: { state: "TX", stateName: "Texas" } });
     expect(html).toContain("<svg"); // anchor: the map rendered
     expect(html).not.toContain("not shown");
+  });
+});
+
+describe("DistrictShape city marks", () => {
+  it("marks the district's cities when given them, in a box that switches by width", async () => {
+    const html = await container.renderToString(DistrictShape, {
+      props: { outline: outline("LA-02", "page"), label: "Outline", cities: districtCityTiers("LA-02") },
+    });
+    const svg = html.slice(html.indexOf("<svg"), html.indexOf("</svg>"));
+    expect(svg).toMatch(/<g\b[^>]*class="cities district-tier-0[^"]*"[^>]*aria-hidden="true"/);
+    expect(svg).toContain(">New Orleans</text>");
+    expect(html).toMatch(/class="[^"]*\bshape-frame\b[^"]*"/);
+    expect(html).toContain("svg .cities.district-tier-0 { display: inline; }");
+  });
+
+  it("marks nothing on a card's small outline", async () => {
+    const html = await container.renderToString(DistrictShape, { props: { outline: outline("LA-02", "card") } });
+    expect(html).toContain("<path"); // anchor: the shape rendered
+    expect(html).not.toContain("cities");
   });
 });
 

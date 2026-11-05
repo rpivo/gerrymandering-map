@@ -215,3 +215,39 @@ class TestPlacesRecords:
 )
 def test_map_label_drops_the_county_from_consolidated_city_names(name, kind, expected):
     assert map_label(name, kind) == expected
+
+
+def piece_blocks(*rows: tuple) -> pd.DataFrame:
+    return pd.DataFrame(rows, columns=["district_id", "state", "place", "lon", "lat", "pop"])
+
+
+class TestPiecePoints:
+    def test_puts_each_part_of_a_place_at_a_block_near_its_population_center(self):
+        from gerry.places import piece_points
+
+        placed = piece_blocks(
+            ("LA-01", "LA", "00100", -90.0, 30.0, 1),
+            ("LA-01", "LA", "00100", -89.0, 30.0, 2),
+            ("LA-01", "LA", "00100", -88.0, 30.0, 1),
+            ("LA-02", "LA", "00100", -85.0, 31.0, 5),
+            ("LA-02", "LA", None, -84.0, 31.0, 50),  # outside any place
+            ("LA-02", "LA", "00200", -83.0, 31.0, 0),  # nobody lives here
+        )
+        pieces = piece_points(placed)
+        assert pieces.to_dict("records") == [
+            {"district_id": "LA-01", "state": "LA", "place": "00100", "pop": 4, "lon": -89.0,
+             "lat": 30.0},
+            {"district_id": "LA-02", "state": "LA", "place": "00100", "pop": 5, "lon": -85.0,
+             "lat": 31.0},
+        ]  # fmt: skip
+
+    def test_never_puts_the_point_in_the_empty_middle_of_a_crescent(self):
+        from gerry.places import piece_points
+
+        # The population center (-89, 30) is between the blocks, possibly outside the district.
+        placed = piece_blocks(
+            ("LA-01", "LA", "00100", -90.0, 30.0, 3),
+            ("LA-01", "LA", "00100", -88.0, 30.0, 3),
+        )
+        (point,) = piece_points(placed)[["lon", "lat"]].itertuples(index=False)
+        assert tuple(point) in {(-90.0, 30.0), (-88.0, 30.0)}

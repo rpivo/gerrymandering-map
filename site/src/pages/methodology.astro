@@ -150,6 +150,12 @@ const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
       smaller map, such as on a phone, can mark fewer. A city that shares one government with its county is
       labeled by the city's name alone, such as Nashville for Nashville-Davidson.
     </p>
+    <p>
+      Each district page's outline marks the district's own largest places the same way, ranked
+      by how many of their residents live in the district. A place split between districts gets
+      a dot in each part, at the census block nearest where that part's residents live on
+      average, so the dot always falls inside the district.
+    </p>
 
     <h2>Which map</h2>
     <p>

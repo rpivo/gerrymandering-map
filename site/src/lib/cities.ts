@@ -1,4 +1,5 @@
 import citiesFile from "../data/cities.json";
+import districtCitiesFile from "../data/district-cities.json";
 
 /** One of a state's largest places, as a point on its state map (viewBox units). */
 export interface City {
@@ -30,19 +31,34 @@ export interface CityTier {
   marks: CityMark[];
 }
 
-interface CitiesFile {
-  states: Record<string, { viewBox: string; cities: City[] }>;
+interface Marked {
+  viewBox: string;
+  cities: City[];
 }
 
-const data = citiesFile as CitiesFile;
+const data = citiesFile as { states: Record<string, Marked> };
+const districtData = districtCitiesFile as { districts: Record<string, Marked> };
 
 /** Labels are this many CSS pixels tall on a map drawn at its tier's ref width. */
 export const LABEL_PX = 11;
 /** Marks per map at most, so the map stays readable. */
 export const MAX_MARKS = 10;
-// Map widths (CSS pixels) where the marks change. Labels scale with the map, so each tier's
-// labels are 11 to about 14 pixels; a phone-width map is 290 to 400.
-const TIER_MINS = [0, 400, 520, 680, 880];
+// Map widths (CSS pixels) where the marks change, and the width each tier's label size is set
+// for. Labels scale with the map, so each tier's labels are 11 to about 14 pixels.
+// A state map on a phone is 290 to 400 wide.
+const STATE_TIERS = [
+  { min: 0, ref: 320 },
+  { min: 400, ref: 400 },
+  { min: 520, ref: 520 },
+  { min: 680, ref: 680 },
+  { min: 880, ref: 880 },
+];
+// A district page's outline is a square about 250 (small phone) to 446 pixels wide.
+const DISTRICT_TIERS = [
+  { min: 0, ref: 260 },
+  { min: 300, ref: 300 },
+  { min: 380, ref: 380 },
+];
 // State maps are capped at 32rem tall (StateMapSvg), so a tall state is never drawn wide.
 const MAX_MAP_HEIGHT = 512;
 
@@ -129,20 +145,20 @@ function dotBox(city: { x: number; y: number }, fontSize: number): number[] {
  * Pick which cities to mark on a map, largest first, so no label covers another label or a dot.
  *
  * @param cities - Candidates, largest first.
- * @param viewBox - The map's "0 0 w h"; labels must fit inside it.
+ * @param viewBox - The area labels must fit inside, as an SVG viewBox ("x y w h").
  * @param fontSize - Label size in viewBox units.
  * @param max - Marks at most.
  * @returns The marks, largest city first. A city whose label fits on no side, or whose dot is
  *   right beside a bigger marked city's, is left out.
  */
 export function placeCities(cities: City[], viewBox: string, fontSize: number, max: number): CityMark[] {
-  const [, , width, height] = viewBox.split(/\s+/).map(Number) as [number, number, number, number];
+  const [minX, minY, width, height] = viewBox.split(/\s+/).map(Number) as [number, number, number, number];
   const pad = PADDING * fontSize;
   const marks: CityMark[] = [];
   const taken: number[][] = [];
   const inside = (b: number[]) => {
     const [left, top, right, bottom] = b as [number, number, number, number];
-    return left >= 0 && top >= 0 && right <= width && bottom <= height;
+    return left >= minX && top >= minY && right <= minX + width && bottom <= minY + height;
   };
   const fits = (label: number[]) =>
     inside(label) &&
@@ -173,6 +189,28 @@ export function placeCities(cities: City[], viewBox: string, fontSize: number, m
   return marks;
 }
 
+function buildTiers(
+  entry: Marked,
+  bounds: string,
+  unitsAcross: number,
+  widest: number,
+  tiers: { min: number; ref: number }[],
+): CityTier[] {
+  const shown = tiers.filter((t) => t.min < widest);
+  return shown.map((t, i) => {
+    // A map can be narrower than a tier's ref, so size its labels for its own width.
+    const ref = Math.min(t.ref, widest);
+    const fontSize = (LABEL_PX * unitsAcross) / ref;
+    return {
+      min: t.min,
+      max: shown[i + 1]?.min ?? null,
+      ref,
+      fontSize,
+      marks: placeCities(entry.cities, bounds, fontSize, MAX_MARKS),
+    };
+  });
+}
+
 /**
  * Return a state map's city marks for each range of widths it can be drawn at.
  *
@@ -186,32 +224,41 @@ export function cityTiers(state: string): CityTier[] {
   const entry = data.states[state];
   if (!entry) throw new Error(`No cities for ${state}`);
   const [, , width, height] = entry.viewBox.split(/\s+/).map(Number) as [number, number, number, number];
-  const widest = (MAX_MAP_HEIGHT * width) / height;
-  const mins = TIER_MINS.filter((min) => min < widest);
-  return mins.map((min, i) => {
-    // A tall state's map can be narrower than a tier's lower end, so size its labels for that.
-    const ref = Math.min(min === 0 ? 320 : min, widest);
-    const fontSize = (LABEL_PX * width) / ref;
-    return {
-      min,
-      max: mins[i + 1] ?? null,
-      ref,
-      fontSize,
-      marks: placeCities(entry.cities, entry.viewBox, fontSize, MAX_MARKS),
-    };
-  });
+  return buildTiers(entry, entry.viewBox, width, (MAX_MAP_HEIGHT * width) / height, STATE_TIERS);
+}
+
+/**
+ * Return a district page outline's city marks for each range of box widths, as cityTiers does.
+ *
+ * The outline is drawn centered in a square box, so the box's width spans the drawing's longer
+ * side, which is 1000 units, and labels may run into the margins beside a thin drawing.
+ *
+ * @param id - District ID, such as "LA-02".
+ * @returns Tiers narrowest first; the widest has max null.
+ */
+export function districtCityTiers(id: string): CityTier[] {
+  const entry = districtData.districts[id];
+  if (!entry) throw new Error(`No cities for ${id}`);
+  const [, , width, height] = entry.viewBox.split(/\s+/).map(Number) as [number, number, number, number];
+  // The drawing is centered in the square, so labels may use the margins beside a thin one.
+  const side = Math.max(width, height);
+  const square = `${(width - side) / 2} ${(height - side) / 2} ${side} ${side}`;
+  return buildTiers(entry, square, side, Infinity, DISTRICT_TIERS);
 }
 
 /**
  * Return the CSS that shows each tier's marks only at its range of map widths.
  *
- * @param tiers - From cityTiers.
+ * @param tiers - From cityTiers or districtCityTiers.
+ * @param name - The map's tier class prefix, so two maps on one page keep their rules apart.
  * @returns One rule per line.
  */
-export function cityTierCss(tiers: CityTier[]): string {
+export function cityTierCss(tiers: CityTier[], name: "state" | "district"): string {
   return tiers
     .map((t, i) => {
-      const show = `.map-frame .tier-${i} { display: inline; }`;
+      // More specific than CityMarks' scoped hide rule (.cities plus Astro's scoping
+      // attribute), so it wins wherever the browser puts either rule.
+      const show = `svg .cities.${name}-tier-${i} { display: inline; }`;
       const range = [t.min > 0 && `(min-width: ${t.min}px)`, t.max !== null && `(max-width: ${t.max - 0.02}px)`];
       const query = range.filter(Boolean).join(" and ");
       // A map drawn at only one size has one tier covering every width: an empty
