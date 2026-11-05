@@ -346,3 +346,129 @@ def test_state_quality_doesnt_flag_catch_all_rows_split_by_county_patterns():
         ],
     )
     assert state_quality(out).set_index("state").loc["XX", "big_row_pct"] == 0
+
+
+KC_HEADER = (
+    "Precinct,Race,LegislativeDistrict,CountyCouncil,CongressionalDistrict,CounterGroup,"
+    "CounterType,SumOfCount\n"
+)
+PRES_RACE = "President and Vice President of the United States" * 2
+
+
+def test_read_king_county_places_each_precinct_in_its_listed_district(tmp_path):
+    from gerry.votes import read_king_county
+
+    path = tmp_path / "kc.csv"
+    path.write_text(
+        KC_HEADER
+        + f"SEA 37-1,{PRES_RACE},37,2,9,Total,Kamala D. Harris / Tim Walz,300\n"
+        + f"SEA 37-1,{PRES_RACE},37,2,9,Total,Donald J. Trump / JD Vance,100\n"
+        + f"SEA 37-1,{PRES_RACE},37,2,9,Total,Registered Voters,999\n"
+        + f"SEA 37-1,{PRES_RACE},37,2,9,Total,Jill Stein / Rudolph Ware,7\n"
+        + "SEA 37-1,Congressional District No. 9 United States Representative,37,2,9,Total,"
+        + "Adam Smith,250\n"
+        + f"KEN 33-2,{PRES_RACE},33,5,8,Total,Kamala D. Harris / Tim Walz,40\n"
+        + f"KEN 33-2,{PRES_RACE},33,5,8,Total,Donald J. Trump / JD Vance,60\n"
+    )
+    two, weights = read_king_county(path)
+    rows = two.merge(weights, on=["state_po", "county_fips", "jurisdiction_fips", "precinct"])
+    got = {r.precinct: (r.district, r.dem, r.rep, r.weight) for r in rows.itertuples()}
+    assert got == {"KC SEA 37-1": (9, 300, 100, 1.0), "KC KEN 33-2": (8, 40, 60, 1.0)}
+    assert set(rows["county_fips"]) == {"53033"} and set(rows["state_po"]) == {"WA"}
+
+
+def test_replace_county_swaps_a_countys_rows_for_better_ones():
+    from gerry.votes import replace_county
+
+    old_two = two_party_by_precinct(
+        returns(
+            [
+                ("WA", "53033", "9917", "TOTAL", "DEMOCRAT", 50, ""),
+                ("WA", "53061", "S1", "TOTAL", "DEMOCRAT", 5, ""),
+            ]
+        )
+    )
+    old_w = district_weights(
+        returns(
+            [
+                ("WA", "53033", "9917", "TOTAL", "DEMOCRAT", 1, "007"),
+                ("WA", "53061", "S1", "TOTAL", "DEMOCRAT", 1, "002"),
+            ]
+        )
+    )
+    new_two = two_party_by_precinct(returns([("WA", "53033", "KC A", "TOTAL", "DEMOCRAT", 50, "")]))
+    new_w = district_weights(returns([("WA", "53033", "KC A", "TOTAL", "DEMOCRAT", 1, "009")]))
+    two, w = replace_county(old_two, old_w, new_two, new_w)
+    assert sorted(two["precinct"]) == ["KC A", "S1"]
+    assert sorted(w["precinct"]) == ["KC A", "S1"]
+
+
+def test_calibrate_to_county_totals_scales_each_party_to_the_official_count():
+    from gerry.votes import calibrate_to_county_totals
+
+    two = two_party_by_precinct(
+        returns(
+            [
+                ("NJ", "34021", "A", "TOTAL", "DEMOCRAT", 30, ""),
+                ("NJ", "34021", "A", "TOTAL", "REPUBLICAN", 10, ""),
+                ("NJ", "34021", "B", "TOTAL", "DEMOCRAT", 10, ""),
+                ("NJ", "34021", "B", "TOTAL", "REPUBLICAN", 10, ""),
+                ("NJ", "34003", "C", "TOTAL", "DEMOCRAT", 5, ""),
+                ("NY", "36001", "D", "TOTAL", "DEMOCRAT", 7, ""),
+            ]
+        )
+    )
+    official = pd.DataFrame(
+        {
+            "state": ["NJ", "NJ"],
+            "county_fips": ["34021", "34003"],
+            "harris": [80, 5],
+            "trump": [30, 0],
+        }
+    )
+    out = calibrate_to_county_totals(two, official).set_index("precinct")
+    assert (out.loc["A", "dem"], out.loc["A", "rep"]) == (60, 15)
+    assert (out.loc["B", "dem"], out.loc["B", "rep"]) == (20, 15)
+    assert out.loc["C", "dem"] == 5
+    assert out.loc["D", "dem"] == 7  # other states untouched
+
+
+def test_calibrate_to_county_totals_fails_for_a_county_with_no_precincts():
+    from gerry.votes import calibrate_to_county_totals
+
+    two = two_party_by_precinct(returns([("NJ", "34021", "A", "TOTAL", "DEMOCRAT", 30, "")]))
+    official = pd.DataFrame(
+        {"state": ["NJ"], "county_fips": ["34999"], "harris": [1], "trump": [1]}
+    )
+    with pytest.raises(ValueError, match="34999"):
+        calibrate_to_county_totals(two, official)
+
+
+def test_assign_matches_town_names_that_differ_only_by_a_municipal_suffix():
+    # Gloucester County, NJ: the President file says "Deptford Twp", the House file "Deptford".
+    out = _assign(
+        [
+            ("NJ", "15", "Deptford Twp", "TOTAL", "DEMOCRAT", 70, ""),
+            ("NJ", "15", "Clayton Boro", "TOTAL", "DEMOCRAT", 30, ""),
+        ],
+        [
+            ("NJ", "15", "Deptford", "TOTAL", "DEMOCRAT", 3, "001"),
+            ("NJ", "15", "Deptford", "TOTAL", "DEMOCRAT", 1, "002"),
+            ("NJ", "15", "Clayton", "TOTAL", "DEMOCRAT", 5, "002"),
+        ],
+    )
+    assert "county" not in set(out["kind"])
+    by = out.groupby("district")["dem"].sum()
+    assert by.to_dict() == {1: 52.5, 2: 47.5}
+
+
+def test_assign_doesnt_guess_between_two_towns_with_the_same_short_name():
+    out = _assign(
+        [("NJ", "15", "Franklin Twp", "TOTAL", "DEMOCRAT", 10, "")],
+        [
+            ("NJ", "15", "Franklin", "TOTAL", "DEMOCRAT", 1, "001"),
+            ("NJ", "15", "Franklin Boro", "TOTAL", "DEMOCRAT", 1, "002"),
+        ],
+    )
+    # Not renamed, so not matched to either district.
+    assert not out["kind"].isin(["exact", "split"]).any()

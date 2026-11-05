@@ -161,15 +161,16 @@ def _source_role(source_id: str) -> str:
     """Return what a source is used for, from its ID prefix."""
     if source_id.startswith("census-tiger-"):
         return "calibration"
-    return "votes" if source_id.startswith("medsl-") else "boundaries"
+    votes = source_id.startswith("medsl-") or source_id.endswith("-votes")
+    return "votes" if votes else "boundaries"
 
 
 def write_sources_json(entries: dict[str, dict[str, str]], path: Path) -> None:
     """Write site/src/data/sources.json from the sources manifest, for the methodology page.
 
     Census TIGER files are used only by `python -m gerry calibrate`, so their role is
-    "calibration"; MIT election files (`medsl-`) supply "votes"; every other source supplies
-    boundaries.
+    "calibration"; MIT election files (`medsl-`) and other results (`-votes`) supply "votes";
+    every other source supplies boundaries.
     """
     sources = [
         {

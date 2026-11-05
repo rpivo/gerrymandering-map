@@ -282,6 +282,16 @@ def write_votes_repo(tmp_path: Path, tx_harris: int) -> Path:
     raw.mkdir()
     (raw / "pres.csv").write_text(pres)
     (raw / "house.csv").write_text(house)
+    (raw / "kc.csv").write_text(
+        "Precinct,Race,LegislativeDistrict,CountyCouncil,CongressionalDistrict,CounterGroup,"
+        "CounterType,SumOfCount\n"
+        "SEA 1,President and Vice President,37,2,1,Total,Kamala D. Harris / Tim Walz,6\n"
+    )
+    votes = tmp_path / "data" / "sources" / "votes"
+    votes.mkdir(parents=True)
+    (votes / "nj-2024-president-by-county.csv").write_text(
+        "state,county_fips,county,harris,trump\n"
+    )
     checks = tmp_path / "data" / "checks"
     checks.mkdir(parents=True)
     (checks / "tx-planc2193-president-2024.csv").write_text(
@@ -293,6 +303,8 @@ def write_votes_repo(tmp_path: Path, tx_harris: int) -> Path:
 
 def fake_votes_fetch(raw: Path):
     def fetch(source, *_args, **_kwargs):
+        if "king-county" in source.id:
+            return raw / "kc.csv"
         return raw / ("pres.csv" if "president" in source.id else "house.csv")
 
     return fetch
@@ -306,7 +318,8 @@ def test_votes_writes_unchanged_states_and_checks_texas(tmp_path, monkeypatch, c
     # Texas redrew for 2026, so its 2024-map results are only used for the check.
     # Wyoming has one at-large seat: no lines, nothing to place.
     assert out["state"].unique().tolist() == ["WA"]
-    assert out[["district", "dem", "rep"]].values.tolist() == [[1, 60, 40], [2, 120, 40]]
+    # King County's one precinct (6 Harris votes, district 1) joins WA's other precincts.
+    assert out[["district", "dem", "rep"]].values.tolist() == [[1, 66, 40], [2, 120, 40]]
     printed = capsys.readouterr().out
     assert "Texas check passed" in printed
     assert "WY" not in printed
