@@ -31,6 +31,7 @@ from gerry.export import (
     write_shapes_json,
     write_sources_json,
     write_states_json,
+    write_us_map_json,
 )
 from gerry.fairness import MIN_DISTRICTS, state_fairness
 from gerry.fetch import CENSUS_CD119, CENSUS_STATES, fetch, read_manifest
@@ -175,6 +176,7 @@ def scores(repo_root: Path) -> int:
     site_data = repo_root / "site" / "src" / "data"
     write_districts_json(table, site_data / "districts.json")
     write_shapes_json(districts, site_data / "shapes.json")
+    write_us_map_json(land, site_data / "us-map.json")
     write_states_json(read_state_audit(data / "sources" / "states.csv"), site_data / "states.json")
     write_sources_json(read_manifest(data / "sources" / "sources.csv"), site_data / "sources.json")
     table.to_csv(built.parent / "scores.csv", index=False)
@@ -184,7 +186,10 @@ def scores(repo_root: Path) -> int:
     )
     top = ", ".join(f"{r.district_id} ({r.irregularity})" for r in ranked.head(10).itertuples())
     print(f"Most irregular: {top}")
-    print("Wrote site/src/data/ (districts, shapes, states, sources) and data/build/scores.csv")
+    print(
+        "Wrote site/src/data/ (districts, shapes, us-map, states, sources) "
+        "and data/build/scores.csv"
+    )
     return 0
 
 

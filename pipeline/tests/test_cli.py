@@ -237,6 +237,8 @@ def test_scores_writes_site_json_and_csv(valid_districts, monkeypatch, tmp_path,
     site_data = tmp_path / "site" / "src" / "data"
     shapes = json.loads((site_data / "shapes.json").read_text())
     assert len(shapes["districts"]) == 435 and len(shapes["states"]) == 50
+    us = json.loads((site_data / "us-map.json").read_text())
+    assert len(us["paths"]) == 50 and len(us["labels"]) == 50
     assert json.loads((site_data / "states.json").read_text())["count"] == 50
     data = json.loads((tmp_path / "site" / "src" / "data" / "districts.json").read_text())
     assert data["count"] == 435

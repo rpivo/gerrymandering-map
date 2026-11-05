@@ -1,7 +1,7 @@
 ---
 import DistrictShape from "../components/DistrictShape.astro";
 import ScoreBadge from "../components/ScoreBadge.astro";
-import StateTiles from "../components/StateTiles.astro";
+import UsMap from "../components/UsMap.astro";
 import Base from "../layouts/Base.astro";
 import { districts, getState, outline, rankedCount, states } from "../lib/data";
 import { districtPath } from "../lib/districts";
@@ -35,7 +35,7 @@ const cards = sortCards(
       make a district irregular for good reasons.
     </p>
 
-    <StateTiles />
+    <UsMap />
 
     <form class="controls" role="search" aria-label="Find districts">
       <label>

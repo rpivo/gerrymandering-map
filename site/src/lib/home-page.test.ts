@@ -10,21 +10,36 @@ beforeAll(async () => {
   html = await container.renderToString(Home);
 });
 
-describe("the home page's state links", () => {
-  const nav = () => {
-    const start = html.search(/<nav\b[^>]*aria-label="States"/);
-    return start < 0 ? "" : html.slice(start, html.indexOf("</nav>", start));
-  };
+const nav = () => {
+  const start = html.search(/<nav\b[^>]*aria-label="States"/);
+  return start < 0 ? "" : html.slice(start, html.indexOf("</nav>", start));
+};
 
-  it("links straight to every state page, one click from the home page", () => {
-    const links = nav().match(/<a\b[^>]*href="\/[a-z]{2}"/g) ?? [];
-    expect(links).toHaveLength(50);
-    expect(nav()).toMatch(/<a\b[^>]*href="\/tx"/);
+// The links a keyboard or screen reader reaches: everything not taken out of the tab order.
+const stateLinks = () => (nav().match(/<a\b[^>]*>/g) ?? []).filter((a) => !a.includes('tabindex="-1"'));
+
+describe("the home page's US map", () => {
+  it("links straight to every state page from its shape, one click from the home page", () => {
+    const shapes = nav().match(/<a\b[^>]*href="\/[a-z]{2}"[^>]*>\s*<title>[^<]+<\/title>\s*<path\b/g) ?? [];
+    expect(shapes).toHaveLength(50);
+    expect(stateLinks()).toHaveLength(50);
   });
 
   it("names each state in full for screen readers and on hover", () => {
     expect(nav()).toMatch(/<a\b[^>]*href="\/tx"[^>]*aria-label="Texas"|<a\b[^>]*aria-label="Texas"[^>]*href="\/tx"/);
-    expect(nav()).toMatch(/title="Texas"/);
+    expect(nav()).toContain("<title>Texas</title>");
+  });
+
+  it("labels the states that are big enough, on the map", () => {
+    expect(nav()).toMatch(/<text\b[^>]*>TX<\/text>/);
+  });
+
+  it("gives the small northeastern states labeled boxes beside the map, outside the tab order", () => {
+    for (const state of ["vt", "nh", "ma", "ri", "ct", "nj", "de", "md"]) {
+      const boxes = nav().match(new RegExp(`<a\\b[^>]*href="/${state}"[^>]*class="callout"[^>]*>`, "g")) ?? [];
+      expect(boxes, state).toHaveLength(1);
+      expect(boxes[0]).toContain('tabindex="-1"');
+    }
   });
 
   it("comes before the district search, so it's near the top", () => {

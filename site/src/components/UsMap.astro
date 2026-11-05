@@ -1,0 +1,106 @@
+---
+import { states } from "../lib/data";
+import { CALLOUT_STATES, callouts, usMap } from "../lib/us-map";
+
+const map = usMap();
+const [, , mapWidth = 0, mapHeight = 0] = map.viewBox.split(" ").map(Number);
+const boxes = callouts(map);
+const viewBox = `0 0 ${mapWidth + 90} ${mapHeight}`;
+const statePath = (usps: string) => `/${usps.toLowerCase()}`;
+---
+
+<nav class="us-map" aria-label="States">
+  <h2>Go to a state</h2>
+  <svg viewBox={viewBox}>
+    {
+      states.map((s) => {
+        const [x, y] = map.labels[s.state] ?? [0, 0];
+        return (
+          <a href={statePath(s.state)} aria-label={s.name}>
+            <title>{s.name}</title>
+            <path d={map.paths[s.state] ?? ""} fill-rule="evenodd" />
+            {!CALLOUT_STATES.includes(s.state) && (
+              <text x={x} y={y}>
+                {s.state}
+              </text>
+            )}
+          </a>
+        );
+      })
+    }
+    {
+      boxes.map((b) => (
+        <a href={statePath(b.state)} class="callout" tabindex="-1" aria-hidden="true">
+          <line x1={b.from[0]} y1={b.from[1]} x2={b.x} y2={b.y} />
+          <rect x={b.x} y={b.y - 13} width="64" height="26" rx="4" />
+          <text x={b.x + 32} y={b.y}>
+            {b.state}
+          </text>
+        </a>
+      ))
+    }
+  </svg>
+</nav>
+
+<style>
+  .us-map {
+    margin: 1.5rem 0;
+  }
+
+  h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1rem;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    max-width: 44rem;
+  }
+
+  path,
+  rect {
+    fill: var(--shape-muted);
+    stroke: var(--bg);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  text {
+    fill: var(--text);
+    font-size: 15px;
+    font-weight: 600;
+    text-anchor: middle;
+    dominant-baseline: central;
+    pointer-events: none;
+  }
+
+  /* The map shrinks to a third of its size on a phone, so labels need bigger map units there. */
+  @media (max-width: 40rem) {
+    text {
+      font-size: 22px;
+    }
+  }
+
+  line {
+    stroke: var(--text-muted);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  a:hover path,
+  a:focus-visible path,
+  a:hover rect {
+    fill: var(--accent);
+  }
+
+  a:hover text,
+  a:focus-visible text {
+    fill: var(--bg);
+  }
+
+  a:focus-visible path {
+    stroke: var(--text);
+    stroke-width: 2;
+  }
+</style>
