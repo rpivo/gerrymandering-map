@@ -270,7 +270,7 @@ def _points_in_view(points, project, to_view, box_size: tuple[int, int]) -> dict
     }
 
 
-# Close-ups: squares of a state map shown enlarged beside it, where districts are drawn too small
+# Close-ups: boxes of a state map shown enlarged beside it, where districts are drawn too small
 # to see or click. Sizes are in view units (VIEW_SIZE on the map's longer side).
 # A district is too small when its widest inner circle has a radius under 8 pixels on a map
 # drawn 512 pixels on its longer side, as a state page draws a tall state on a desktop screen.
@@ -279,12 +279,14 @@ CLOSEUP_SMALL_RADIUS = 8 * VIEW_SIZE / 512
 CLOSEUP_GAP = 60
 # Space around a cluster, as a share of its size, so its edges aren't on the frame.
 CLOSEUP_PADDING = 0.15
-# The smallest square, so a close-up enlarges at most 8 times...
+# A close-up is at most twice as wide as tall, or tall as wide.
+CLOSEUP_MAX_ASPECT = 2
+# The smallest side, so a close-up enlarges at most 8 times...
 CLOSEUP_MIN_SIDE = VIEW_SIZE / 8
-# ...and the largest, since enlarging under 2 times isn't worth a second map.
+# ...and the largest longer side, since enlarging under 2 times isn't worth a second map.
 CLOSEUP_MAX_SIDE = VIEW_SIZE / 2
 # A close-up whose districts are still too small gets close-ups of its own (one level deep).
-# Its tiny districts can spread wider (greater Los Angeles), so a square up to 0.6 of it is
+# Its tiny districts can spread wider (greater Los Angeles), so a box up to 0.6 of it is
 # kept: 1.7 times larger again.
 CLOSEUP_NESTED_MAX_SIDE = 0.6 * VIEW_SIZE
 
@@ -295,15 +297,25 @@ def _inner_radius(shape: BaseGeometry) -> float:
     return polylabel(largest, tolerance=0.5).distance(largest.boundary)
 
 
-def _square_around(cluster: BaseGeometry, size: tuple[int, int]) -> tuple[float, ...]:
-    """Return a padded square centered on a cluster, moved (or cut) to stay inside the map."""
+def _box_around(cluster: BaseGeometry, size: tuple[int, int]) -> tuple[float, ...]:
+    """Return a padded box centered on a cluster, moved (or cut) to stay inside the map.
+
+    It follows the cluster's shape, but each side is at least CLOSEUP_MIN_SIDE and at least
+    1 / CLOSEUP_MAX_ASPECT of the other, so a wide cluster gets a wide box, not a square
+    that's mostly empty.
+    """
     minx, miny, maxx, maxy = cluster.bounds
-    side = max(max(maxx - minx, maxy - miny) * (1 + 2 * CLOSEUP_PADDING), CLOSEUP_MIN_SIDE)
-    square = []
-    for low, high, extent in ((minx, maxx, size[0]), (miny, maxy, size[1])):
+    padded = [(maxx - minx) * (1 + 2 * CLOSEUP_PADDING), (maxy - miny) * (1 + 2 * CLOSEUP_PADDING)]
+    longest = max(*padded, CLOSEUP_MIN_SIDE)
+    box = []
+    for low, high, extent, side in (
+        (minx, maxx, size[0], padded[0]),
+        (miny, maxy, size[1], padded[1]),
+    ):
+        side = max(side, CLOSEUP_MIN_SIDE, longest / CLOSEUP_MAX_ASPECT)
         start = min(max((low + high - side) / 2, 0), max(extent - side, 0))
-        square.append((start, min(start + side, extent)))
-    (x0, x1), (y0, y1) = square
+        box.append((start, min(start + side, extent)))
+    (x0, x1), (y0, y1) = box
     return x0, y0, x1, y1
 
 
@@ -312,40 +324,41 @@ def closeup_boxes(
     size: tuple[int, int],
     max_side: float = CLOSEUP_MAX_SIDE,
 ) -> list[tuple[float, ...]]:
-    """Return the squares of a drawing to show enlarged, so its smallest districts can be seen.
+    """Return the boxes of a drawing to show enlarged, so its smallest districts can be seen.
 
     Args:
         shapes: The districts as drawn, in view units (as state_map draws them). Only these
             can count as small; the rest of the drawing doesn't matter here.
         size: The drawing's (width, height) in view units.
-        max_side: The largest square worth enlarging, in view units.
+        max_side: The longest side worth enlarging, in view units.
 
     Returns:
-        (x0, y0, x1, y1) boxes in view units, inside the drawing, largest first. Each is square
-        unless the drawing's edge cuts it, and none overlap.
+        (x0, y0, x1, y1) boxes in view units, inside the drawing, largest first. None overlap.
     """
-    small = [s for s in shapes if not s.is_empty and _inner_radius(s) < CLOSEUP_SMALL_RADIUS]
+    # Each district's largest piece: the part measured, so far-off islands don't stretch a box.
+    pieces = [max(shapely.get_parts(s), key=lambda p: p.area) for s in shapes if not s.is_empty]
+    small = [p for p in pieces if _inner_radius(p) < CLOSEUP_SMALL_RADIUS]
     if not small:
         return []
     near = shapely.union_all([s.buffer(CLOSEUP_GAP / 2) for s in small])
     clusters = [
         shapely.union_all([s for s in small if s.intersects(b)]) for b in shapely.get_parts(near)
     ]
-    # Merge clusters until no two squares overlap. Squares only grow as clusters merge, so
+    # Merge clusters until no two boxes overlap. Boxes only grow as clusters merge, so
     # this always ends.
     merged = True
     while merged:
         merged = False
         for i in range(len(clusters)):
             for j in range(i + 1, len(clusters)):
-                a, b = (shapely.box(*_square_around(clusters[k], size)) for k in (i, j))
+                a, b = (shapely.box(*_box_around(clusters[k], size)) for k in (i, j))
                 if a.intersection(b).area > 0:
                     clusters[i] = clusters[i].union(clusters.pop(j))
                     merged = True
                     break
             if merged:
                 break
-    boxes = [_square_around(c, size) for c in clusters]
+    boxes = [_box_around(c, size) for c in clusters]
     boxes = [b for b in boxes if max(b[2] - b[0], b[3] - b[1]) <= max_side]
     return sorted(boxes, key=lambda b: (-(b[2] - b[0]) * (b[3] - b[1]), b[0], b[1]))
 
@@ -365,7 +378,7 @@ def _to_projected(box: tuple[float, ...], to_view: list[float]) -> BaseGeometry:
 
 
 def _draw_closeup(ids, full: list[BaseGeometry], area: BaseGeometry, detail: float):
-    """Draw the full-detail districts cut to a square (projected meters), fitted to its view.
+    """Draw the full-detail districts cut to a box (projected meters), fitted to its view.
 
     Returns:
         The drawn districts' IDs, their shapes in view units, the view matrix and its size.
@@ -391,10 +404,10 @@ def _closeup_record(box, ids, fitted, size, parent: int | None) -> dict:
 
 
 def state_closeups(districts, detail: float) -> list[dict]:
-    """Return a state map's close-ups: its squares with small districts, redrawn enlarged.
+    """Return a state map's close-ups: its boxes with small districts, redrawn enlarged.
 
-    Each close-up is drawn from the full-detail districts cut to its square, simplified at
-    detail times the square's side, so it's as sharp as the state map is. A close-up whose
+    Each close-up is drawn from the full-detail districts cut to its box, simplified at
+    detail times the box's longer side, so it's as sharp as the state map is. A close-up whose
     districts are still too small to see gets close-ups of its own, one level deep. Only
     districts wholly inside it count there: one cut by its edge is bigger than it looks.
 
@@ -404,8 +417,8 @@ def state_closeups(districts, detail: float) -> list[dict]:
 
     Returns:
         [{"box": [x0, y0, x1, y1], "viewBox": "0 0 w h", "paths": {district_id: path}}], where box
-        is the square in state_map's view units (to two decimal places) and the close-up's view
-        maps it to VIEW_SIZE on its longer side. Only districts inside the square are drawn.
+        is the box in state_map's view units (to two decimal places) and the close-up's view
+        maps it to VIEW_SIZE on its longer side. Only districts inside the box are drawn.
         A nested close-up follows its parent and has "parent": the parent's index, and its box
         is in the parent's view units.
     """
