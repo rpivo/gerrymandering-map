@@ -6,7 +6,7 @@ import PopulationNote from "../../components/PopulationNote.astro";
 import StateEdgeNote from "../../components/StateEdgeNote.astro";
 import StateMapSvg from "../../components/StateMapSvg.astro";
 import Base from "../../layouts/Base.astro";
-import { adjacent, districts, getState, outline, rankedCount, type District } from "../../lib/data";
+import { adjacent, districts, getState, outline, rankedCount, shapeNote, type District } from "../../lib/data";
 import { districtPath } from "../../lib/districts";
 import { districtTitle, lessCompactThan, ordinal } from "../../lib/format";
 
@@ -36,6 +36,7 @@ const ranked = district.rank_national !== null;
     <div class="top">
       <div class="outline">
         <DistrictShape outline={outline(district.id, "page")} label={`Outline of ${title}`} />
+        {shapeNote(district.id) && <p class="shape-note">{shapeNote(district.id)}</p>}
       </div>
       <section class="summary" aria-labelledby="score-heading">
         <h2 id="score-heading" class="visually-hidden">Score</h2>
@@ -107,6 +108,12 @@ const ranked = district.rank_national !== null;
 </Base>
 
 <style>
+  .shape-note {
+    margin: 0.5rem 0 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
   main {
     max-width: 64rem;
     margin: 0 auto;

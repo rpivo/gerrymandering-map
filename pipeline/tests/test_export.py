@@ -112,6 +112,30 @@ def test_shapes_json_has_card_and_page_outlines_and_state_maps(tmp_path):
     assert set(data["states"]["ME"]["paths"]) == {"ME-01", "ME-02"}
 
 
+def test_shapes_json_crops_hawaii_and_notes_it(tmp_path):
+    import geopandas as gpd
+    from shapely.geometry import MultiPolygon, box
+
+    oahu, big_island, kure = (box(-158.3, 21.25, -157.6, 21.7), box(-156.0, 19.0, -155.0, 20.2),
+                              box(-178.4, 28.35, -178.3, 28.45))  # fmt: skip
+    districts = gpd.GeoDataFrame(
+        {"district_id": ["HI-01", "HI-02"], "state": ["HI", "HI"]},
+        geometry=[oahu, MultiPolygon([big_island, kure])],
+        crs="EPSG:4269",
+    )
+    path = tmp_path / "shapes.json"
+    write_shapes_json(districts, path)
+    data = json.loads(path.read_text())
+    note = "The Northwestern Hawaiian Islands, part of District 2, are not shown."
+    assert data["states"]["HI"]["note"] == note
+    assert data["districts"]["HI-02"]["note"] == note
+    assert "note" not in data["districts"]["HI-01"]
+    # Without Kure the drawing is nearly as tall as wide (874 of 1000), not a wide strip of
+    # ocean (527 of 1000 with it).
+    width, height = map(int, data["states"]["HI"]["viewBox"].split()[2:])
+    assert height > 0.8 * width
+
+
 def test_state_records_join_names_seats_and_the_audit():
     from test_state_audit import row
 

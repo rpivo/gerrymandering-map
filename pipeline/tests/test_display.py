@@ -6,7 +6,14 @@ import shapely
 from shapely.geometry import MultiPolygon, Polygon, box
 from test_metrics import square_in_lonlat
 
-from gerry.display import VIEW_SIZE, district_outline, fit_to_view, state_map, svg_path
+from gerry.display import (
+    VIEW_SIZE,
+    display_crop,
+    district_outline,
+    fit_to_view,
+    state_map,
+    svg_path,
+)
 
 
 def points(path: str) -> list[tuple[int, int]]:
@@ -82,3 +89,26 @@ def test_pieces_too_small_to_see_are_left_off_coarse_outlines():
     fine = district_outline(district, "EPSG:4269", detail=0.001)  # 50 m tolerance
     assert coarse["d"].count("M") == 1
     assert fine["d"].count("M") == 2
+
+
+# Hawaii's 2nd district: the Big Island plus the Northwestern Hawaiian Islands out to Kure Atoll.
+BIG_ISLAND = box(-156.0, 19.0, -155.0, 20.2)
+KURE = box(-178.4, 28.35, -178.3, 28.45)
+
+
+class TestDisplayCrop:
+    def test_hawaii_drawings_leave_out_the_northwestern_islands_and_say_so(self):
+        shape, note = display_crop("HI", MultiPolygon([BIG_ISLAND, KURE]))
+        assert shape.equals(BIG_ISLAND)
+        assert note == "The Northwestern Hawaiian Islands, part of District 2, are not shown."
+
+    def test_a_hawaii_shape_on_the_main_islands_is_untouched(self):
+        oahu = box(-158.3, 21.25, -157.6, 21.7)
+        assert display_crop("HI", oahu) == (oahu, None)
+
+    def test_a_shape_wholly_outside_the_area_is_never_cut_to_nothing(self):
+        assert display_crop("HI", KURE) == (KURE, None)
+
+    def test_other_states_are_untouched(self):
+        aleutians = MultiPolygon([box(-179, 51, -178, 52), box(-150, 60, -149, 61)])
+        assert display_crop("AK", aleutians) == (aleutians, None)
