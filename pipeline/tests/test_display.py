@@ -274,6 +274,31 @@ class TestCloseupBoxes:
             and (y0 + y1) / 2 == pytest.approx(400)
         )
 
+    def test_a_wide_cluster_gets_a_wide_box_up_to_twice_as_wide_as_tall(self):
+        # 200 by 20, padded to 260 by 26: drawn 260 by 130, not a 260 square that's mostly empty.
+        [(x0, y0, x1, y1)] = closeup_boxes(
+            [box(400 + 20 * i, 400, 420 + 20 * i, 420) for i in range(10)], self.SIZE
+        )
+        assert (x1 - x0, y1 - y0) == pytest.approx((260, 130))
+        assert ((x0 + x1) / 2, (y0 + y1) / 2) == pytest.approx((500, 410))
+
+    def test_a_box_follows_its_cluster_between_square_and_twice_as_wide(self):
+        tiny = [
+            box(400 + 10 * i, 400 + 10 * j, 410 + 10 * i, 410 + 10 * j)
+            for i in range(20)
+            for j in range(15)
+        ]
+        [(x0, y0, x1, y1)] = closeup_boxes(tiny, self.SIZE)
+        assert (x1 - x0, y1 - y0) == pytest.approx((260, 195))
+
+    def test_a_box_goes_around_a_districts_main_piece_not_its_far_islands(self):
+        # A small district with a speck of an island far away (like Catalina, part of a Los
+        # Angeles district): the box is for the part that's hard to see.
+        district = MultiPolygon([box(400, 400, 410, 410), box(700, 700, 702, 702)])
+        [(x0, y0, x1, y1)] = closeup_boxes([district], self.SIZE)
+        assert (x1 - x0, y1 - y0) == pytest.approx((CLOSEUP_MIN_SIDE, CLOSEUP_MIN_SIDE))
+        assert ((x0 + x1) / 2, (y0 + y1) / 2) == pytest.approx((405, 405))
+
     def test_far_apart_clusters_get_their_own_squares(self):
         a, b = box(100, 100, 110, 110), box(800, 600, 810, 610)
         boxes = closeup_boxes([a, b], self.SIZE)
