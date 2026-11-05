@@ -1,6 +1,7 @@
 {
   "name": "gerrymandering-map-site",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "packageManager": "pnpm@10.27.0",
   "engines": {

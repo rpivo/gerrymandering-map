@@ -96,4 +96,6 @@ To check a deploy locally without uploading: `cd site && pnpm build && pnpm exec
 
 ## License
 
-Not chosen yet.
+- **Code:** MIT License, in [`LICENSE`](LICENSE).
+- **Data the project produces** (scores, ranks, simplified shapes, the state map audit and the preview images): Creative Commons Attribution 4.0 (CC BY 4.0), in [`LICENSE-DATA.md`](LICENSE-DATA.md), which also says how to credit it.
+- **Source boundaries** keep their own terms: Census files are public domain, and each state file's license is in `data/sources/sources.csv`. The Inter font is under the SIL Open Font License.
