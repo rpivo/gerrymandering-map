@@ -3,6 +3,7 @@ name = "gerry"
 version = "0.1.0"
 description = "Data pipeline for gerrymandering-map: district boundaries, compactness scores, JSON export."
 requires-python = ">=3.13,<3.14"
+license = "MIT"
 dependencies = [
     "geopandas>=1.2.0",
     "httpx>=0.28.1",
