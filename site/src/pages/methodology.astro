@@ -6,6 +6,10 @@ import { sourceNote } from "../lib/format";
 
 const boundarySources = sources.filter((s) => s.role === "boundaries");
 const voteSources = sources.filter((s) => s.role === "votes");
+// The 50 state redistricting files share one credit, linked to the Census folder that holds them.
+const populationSources = sources.filter((s) => s.role === "population");
+const populationFolder = populationSources[0]?.url.replace(/[^/]+\/[^/]+$/, "") ?? "";
+const populationDownloaded = populationSources.map((s) => s.downloaded).sort().at(-1) ?? "";
 const calibrationCount = sources.filter((s) => s.role === "calibration").length;
 const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
 ---
@@ -92,6 +96,32 @@ const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
       </li>
     </ul>
 
+    <h2 id="population">Who lives in each district</h2>
+    <p>
+      District pages note when most of a district's voting-age residents (18 and over) belong to
+      minority groups: either one group is over half, or minority groups together are. The
+      Voting Rights Act can require districts like these, so a minority community can elect
+      candidates it prefers, and they can be irregular on purpose. The note doesn't say a
+      district was drawn for that reason, because the site can't know that.
+    </p>
+    <p>
+      The counts come from the 2020 Census redistricting data, the same data the maps were drawn
+      with. Each census block is placed in the district that contains the point the Census marks
+      inside it, and the blocks are added up. Hispanic or Latino residents of any race are one group. The other
+      groups (Black, Asian, American Indian or Alaska Native, and Native Hawaiian or Pacific
+      Islander) count people who aren't Hispanic and who gave that race alone or in combination
+      with another, as Voting Rights Act analyses do, so someone who is Black and white counts as
+      Black. Minority residents are everyone except non-Hispanic white residents.
+    </p>
+    <p>
+      As a check, each district's 2020 population should equal its state's average, since every
+      map in use was drawn to equal populations. Most are within 0.1%, typically a few dozen
+      people. Districts in nine states are off by more, up to 2.3%, because those states adjust
+      the Census counts before drawing maps: eight of them count people in prison at their home
+      addresses rather than at the prison, and Hawaii leaves out military members and students
+      who live elsewhere.
+    </p>
+
     <h2>Which map</h2>
     <p>
       Scores are for the districts used in the November 3, 2026 election. Most come from the U.S.
@@ -176,6 +206,13 @@ const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
           </li>
         ))
       }
+    </ul>
+    <h3>Population</h3>
+    <ul class="sources">
+      <li>
+        <a href={populationFolder}>U.S. Census Bureau</a>: 2020 Census Redistricting Data (PL 94-171),
+        one file for each state. Public domain (U.S. Government work). Downloaded {populationDownloaded}.
+      </li>
     </ul>
     <h3>Votes</h3>
     <ul class="sources">

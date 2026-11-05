@@ -30,6 +30,18 @@ describe("the methodology page", () => {
     expect(text).toContain("100 meters");
   });
 
+  it("explains how population is counted, for the district pages' note", () => {
+    expect(html).toMatch(/<h2[^>]*id="population"/);
+    expect(text).toContain("alone or in combination");
+    expect(text).toContain("prison");
+  });
+
+  it("credits the Census redistricting files once, not 50 times", () => {
+    expect(sources.filter((s) => s.role === "population")).toHaveLength(50); // anchor
+    expect(text.match(/Redistricting Data \(PL 94-171\)/g)).toHaveLength(1);
+    expect(html).toContain('href="https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/"');
+  });
+
   it("credits every vote data source", () => {
     const votes = sources.filter((s) => s.role === "votes");
     expect(votes).toHaveLength(6); // anchor: the loop checks something

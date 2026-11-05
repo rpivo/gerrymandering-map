@@ -25,6 +25,7 @@ from gerry.calibrate import calibrate
 from gerry.export import (
     write_districts_json,
     write_fairness_json,
+    write_population_json,
     write_shapes_json,
     write_sources_json,
     write_states_json,
@@ -291,12 +292,17 @@ def population(repo_root: Path) -> int:
     out = build / "population-by-district.csv"
     table.to_csv(out, index=False)
     problems = population_problems(table)
-    if problems:
-        _print_problems(problems, " in the 2020 population check")
     nearest = table["nearest_pop"].sum() / table["pop"].sum()
     print(f"Placed {table['pop'].sum():,} people in {len(table)} districts "
           f"({nearest:.3%} by nearest district). Wrote {out.relative_to(repo_root)}")  # fmt: skip
-    return 1 if problems else 0
+    if problems:
+        _print_problems(problems, " in the 2020 population check")
+        print("Site data not written.")
+        return 1
+    site_json = repo_root / "site" / "src" / "data" / "population.json"
+    write_population_json(table, site_json)
+    print(f"Wrote {site_json.relative_to(repo_root)}")
+    return 0
 
 
 COMMANDS = {

@@ -4,6 +4,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import DistrictShape from "./DistrictShape.astro";
 import FairnessSection from "./FairnessSection.astro";
 import ScoreBadge from "./ScoreBadge.astro";
+import PopulationNote from "./PopulationNote.astro";
 import StateEdgeNote from "./StateEdgeNote.astro";
 import StateMapSvg from "./StateMapSvg.astro";
 import { getDistrict, getState } from "../lib/data";
@@ -128,6 +129,34 @@ describe("StateEdgeNote", () => {
   });
 
   it("is left off at-large districts, whose shape is the state's shape", async () => {
+    expect((await render("WY-AL")).text).toBe("");
+  });
+});
+
+describe("PopulationNote", () => {
+  const render = async (id: string) => {
+    const html = await container.renderToString(PopulationNote, { props: { id } });
+    const text = html.replace(/<[^>]+>/g, " ").replace(/&#39;/g, "'").replace(/\s+/g, " ").trim();
+    return { html, text };
+  };
+
+  it("names the majority and gives the Voting Rights Act context without claiming intent", async () => {
+    const { html, text } = await render("AL-07");
+    expect(html).toContain('aria-labelledby="population-heading"');
+    expect(text).toContain("Most of this district's voting-age residents are Black (50.4%).");
+    expect(text).toContain("Voting Rights Act");
+    expect(text).toContain("doesn't know whether this one was");
+    expect(text).toContain("2020 Census");
+    expect(html).toContain('href="/methodology#population"');
+    expect(text.toLowerCase()).not.toContain("gerrymander");
+  });
+
+  it("describes a coalition district", async () => {
+    const { text } = await render("NJ-08");
+    expect(text).toMatch(/\(\d+\.\d%\) belong to minority groups\. The largest/);
+  });
+
+  it("is left off a district without a minority majority", async () => {
     expect((await render("WY-AL")).text).toBe("");
   });
 });

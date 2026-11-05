@@ -1,0 +1,34 @@
+---
+import { getPopulation, populationText } from "../lib/population";
+
+interface Props {
+  id: string;
+}
+
+const text = populationText(getPopulation(Astro.props.id));
+---
+
+{
+  text && (
+    <section class="population" aria-labelledby="population-heading">
+      <h2 id="population-heading">Who lives here</h2>
+      <p>
+        {text} The Voting Rights Act can require districts that keep a minority community together
+        so it can elect candidates it prefers, and those districts can be irregular on purpose. A
+        district like this isn't necessarily drawn for that reason, and the site doesn't know whether
+        this one was. Figures are from the 2020 Census. <a href="/methodology#population">How these are counted</a>
+      </p>
+    </section>
+  )
+}
+
+<style>
+  .population h2 {
+    font-size: 1.25rem;
+  }
+
+  .population p {
+    color: var(--text-muted);
+    max-width: 42rem;
+  }
+</style>

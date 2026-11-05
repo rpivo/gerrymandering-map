@@ -297,3 +297,67 @@ def test_source_roles_by_id(source_id, role):
     from gerry.export import _source_role
 
     assert _source_role(source_id) == role
+
+
+def population_table(*rows: tuple) -> pd.DataFrame:
+    columns = ["district_id", "state", "pop", "vap", "hispanic", "nh_white", "nh_black",
+               "nh_aian", "nh_asian", "nh_nhpi", "minority", "nearest_pop"]  # fmt: skip
+    return pd.DataFrame(list(rows), columns=columns)
+
+
+# AL-07: Black majority. TX-35: Hispanic majority. NJ-08: majority-minority only together.
+AL_07 = ("AL-07", "AL", 717_000, 550_000, 22_000, 235_000, 277_200, 4_000, 8_000, 500, 315_000, 0)
+TX_35 = ("TX-35", "TX", 766_000, 590_000, 316_830, 205_000, 60_000, 6_000, 20_000, 900, 385_000, 0)
+NJ_08 = ("NJ-08", "NJ", 775_000, 600_000, 220_000, 250_000, 60_000, 3_000, 75_000, 400, 350_000, 0)
+WY_AL = ("WY-AL", "WY", 576_851, 441_337, 38_153, 370_041, 5_000, 9_000, 5_000, 600, 71_296, 0)
+
+
+def population_by_id(*rows) -> dict[str, dict]:
+    from gerry.export import population_records
+
+    return {r["id"]: r for r in population_records(population_table(*rows))}
+
+
+def test_population_records_give_rounded_voting_age_shares():
+    tx = population_by_id(TX_35)["TX-35"]
+    assert tx == {
+        "id": "TX-35",
+        "vap": 590_000,
+        "hispanic": 0.537,
+        "white": 0.347,
+        "black": 0.102,
+        "aian": 0.01,
+        "asian": 0.034,
+        "nhpi": 0.002,
+        "minority": 0.653,
+        "majority": "hispanic",
+    }
+
+
+def test_population_records_name_the_majority_group_or_coalition():
+    out = population_by_id(AL_07, TX_35, NJ_08, WY_AL)
+    assert {i: r["majority"] for i, r in out.items()} == {
+        "AL-07": "black",
+        "TX-35": "hispanic",
+        "NJ-08": "coalition",
+        "WY-AL": None,
+    }
+
+
+def test_exactly_half_is_not_a_majority():
+    half = ("XX-01", "KS", 2, 1000, 0, 500, 500, 0, 0, 0, 500, 0)
+    assert population_by_id(half)["XX-01"]["majority"] is None
+
+
+def test_population_json_is_sorted_deterministic_and_described(tmp_path):
+    from gerry.export import write_population_json
+
+    path = tmp_path / "population.json"
+    write_population_json(population_table(WY_AL, AL_07), path)
+    first = path.read_bytes()
+    write_population_json(population_table(AL_07, WY_AL), path)
+    assert path.read_bytes() == first
+    data = json.loads(first)
+    assert [r["id"] for r in data["districts"]] == ["AL-07", "WY-AL"]
+    assert data["count"] == 2
+    assert "2020 Census" in data["description"]
