@@ -25,11 +25,20 @@ const rows = districtsInState(state).map((d) => ({
   role="img"
   aria-label={highlight ? `${highlight} highlighted on a map of ${stateName}` : `Map of ${stateName}'s districts`}
 >
+  <defs>
+    {rows.map(({ district, path }) => <path id={`shape-${district.id}`} d={path} fill-rule="evenodd" />)}
+  </defs>
+  {/* SVG has no z-index, so all fills go first and the links (which draw only the hover outline) on top. */}
   {
-    rows.map(({ district, path, band, title }) => (
-      <a href={districtPath(district.id)} tabindex="-1" class:list={[band, { current: district.id === highlight }]}>
+    rows.map(({ district, band }) => (
+      <use href={`#shape-${district.id}`} class:list={["fill", band, { current: district.id === highlight }]} />
+    ))
+  }
+  {
+    rows.map(({ district, title }) => (
+      <a href={districtPath(district.id)} tabindex="-1">
         <title>{title}</title>
-        <path d={path} fill-rule="evenodd" />
+        <use href={`#shape-${district.id}`} class="outline" />
       </a>
     ))
   }
@@ -49,24 +58,31 @@ const rows = districtsInState(state).map((d) => ({
     max-height: 32rem;
   }
 
-  path {
+  .fill {
     fill: var(--band, var(--shape-muted));
     stroke: var(--bg);
     stroke-width: 1;
     vector-effect: non-scaling-stroke;
   }
 
-  .has-highlight path {
+  .has-highlight .fill {
     fill: var(--shape-muted);
   }
 
-  .has-highlight .current path {
+  .has-highlight .fill.current {
     fill: var(--accent);
   }
 
-  a:hover path,
-  a:focus-visible path {
-    stroke: var(--text);
+  .outline {
+    fill: none;
+    stroke: none;
     stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+    pointer-events: fill;
+  }
+
+  a:hover .outline,
+  a:focus-visible .outline {
+    stroke: var(--text);
   }
 </style>

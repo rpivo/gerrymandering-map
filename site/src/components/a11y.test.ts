@@ -25,6 +25,31 @@ describe("StateMapSvg", () => {
   });
 });
 
+describe("StateMapSvg hover outline", () => {
+  // SVG has no z-index: later shapes paint over earlier ones. If each link drew its own fill,
+  // a hovered district's outline would be partly covered by neighbors drawn after it.
+  it("draws every district's fill before the first link, so a hover outline is never covered", async () => {
+    const html = await container.renderToString(StateMapSvg, { props: { state: "TX", stateName: "Texas" } });
+    const fills = [...html.matchAll(/<use\b[^>]*class="[^"]*\bfill\b/g)].map((m) => m.index);
+    // Anchor: one fill per Texas district, so an empty match can't pass vacuously.
+    expect(fills).toHaveLength(38);
+    expect(Math.max(...fills)).toBeLessThan(html.indexOf("<a "));
+  });
+
+  it("gives each district one shape, shared by its fill and its link", async () => {
+    const html = await container.renderToString(StateMapSvg, { props: { state: "TX", stateName: "Texas" } });
+    expect(html.match(/<path\b/g)).toHaveLength(38);
+    expect(html.match(/<use\b/g)).toHaveLength(76);
+  });
+
+  it("marks the highlighted district's fill, not just its link", async () => {
+    const html = await container.renderToString(StateMapSvg, {
+      props: { state: "TX", stateName: "Texas", highlight: "TX-25" },
+    });
+    expect(html).toMatch(/<use\b[^>]*href="#shape-TX-25"[^>]*class="[^"]*\bcurrent\b|<use\b[^>]*class="[^"]*\bcurrent\b[^>]*href="#shape-TX-25"/);
+  });
+});
+
 describe("StateMapSvg notes", () => {
   it("says what a cropped map leaves out", async () => {
     const html = await container.renderToString(StateMapSvg, { props: { state: "HI", stateName: "Hawaii" } });
