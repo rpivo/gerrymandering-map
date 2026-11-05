@@ -1,0 +1,81 @@
+---
+import { getPlaces, outsidePlacesText, placeCountText } from "../lib/places";
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+const { places, more, in_places } = getPlaces(id);
+const outside = outsidePlacesText(in_places);
+---
+
+<section class="places" aria-labelledby="places-heading">
+  <h2 id="places-heading">Cities and towns</h2>
+  {
+    places.length > 0 ? (
+      <>
+        <p class="intro">
+          The largest places with people in this district, from the 2020 Census. A place split
+          between districts shows how many of its residents live in this one.
+        </p>
+        <ul>
+          {places.map((p) => (
+            <li>
+              <span class="name">{p.name}</span> {p.kind && <span class="kind">{p.kind}</span>}
+              <span class="count">{placeCountText(p)}</span>
+            </li>
+          ))}
+        </ul>
+      </>
+    ) : (
+      <p class="intro">No city, town or named community has people in this district.</p>
+    )
+  }
+  <p class="more">
+    {more > 0 && <>And {more} smaller {more === 1 ? "place" : "places"}. </>}
+    {outside && <>{outside} </>}
+    <a href="/methodology#places">How places are counted</a>
+  </p>
+</section>
+
+<style>
+  .places h2 {
+    font-size: 1.25rem;
+  }
+
+  .intro,
+  .more {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  ul {
+    margin: 0.75rem 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 0.5rem;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .name {
+    font-weight: 600;
+  }
+
+  .kind {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  .count {
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+  }
+</style>

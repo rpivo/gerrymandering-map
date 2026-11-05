@@ -8,7 +8,8 @@ Commands:
     calibrate   Re-derive the map generalization settings from Census files.
     votes       Place 2024 presidential votes in districts; write data/build/.
     fairness    Score each state's map for partisan fairness from the votes.
-    population  Add up 2020 voting-age population by race per district; write data/build/.
+    population  Add up 2020 voting-age population by race, and people by city or town, per
+                district; write data/build/.
 """
 
 import argparse
@@ -25,6 +26,7 @@ from gerry.calibrate import calibrate
 from gerry.export import (
     write_districts_json,
     write_fairness_json,
+    write_places_json,
     write_population_json,
     write_shapes_json,
     write_sources_json,
@@ -33,6 +35,7 @@ from gerry.export import (
 from gerry.fairness import MIN_DISTRICTS, state_fairness
 from gerry.fetch import CENSUS_CD119, CENSUS_STATES, fetch, read_manifest
 from gerry.generalize import absorb_fragments, simplify_to_census
+from gerry.places import district_places, place_problems, read_pl_places
 from gerry.population import (
     assign_blocks,
     district_population,
@@ -274,8 +277,29 @@ def fairness(repo_root: Path) -> int:
     return 0
 
 
+def _population_tables(districts: gpd.GeoDataFrame, raw: Path, manifest: Path):
+    """Place every state's 2020 blocks; return population, place counts and place problems."""
+    tables, place_tables, problems = [], [], []
+    for state in STATES:
+        pl_zip = fetch(pl_source(state.usps), raw, manifest)
+        blocks = read_pl_blocks(pl_zip)
+        blocks["state"] = state.usps
+        placed = assign_blocks(blocks, districts)
+        places = read_pl_places(pl_zip)
+        places["state"] = state.usps
+        found = district_places(placed, places)
+        tables.append(district_population(placed))
+        place_tables.append(found)
+        problems += place_problems(placed, found, places)
+    return (
+        pd.concat(tables, ignore_index=True),
+        pd.concat(place_tables, ignore_index=True),
+        problems,
+    )
+
+
 def population(repo_root: Path) -> int:
-    """Add up 2020 voting-age population by race in each built district (gerry.population)."""
+    """Add up 2020 population by race, and by city or town, in each built district."""
     build = repo_root / "data" / "build"
     built = build / "districts.gpkg"
     if not built.exists():
@@ -283,25 +307,23 @@ def population(repo_root: Path) -> int:
         return 1
     districts = gpd.read_file(built).to_crs("EPSG:4269")
     raw, manifest = repo_root / "data" / "raw", repo_root / "data" / "sources" / "sources.csv"
-    tables = []
-    for state in STATES:
-        blocks = read_pl_blocks(fetch(pl_source(state.usps), raw, manifest))
-        blocks["state"] = state.usps
-        tables.append(district_population(assign_blocks(blocks, districts)))
-    table = pd.concat(tables, ignore_index=True)
+    table, places, problems = _population_tables(districts, raw, manifest)
     out = build / "population-by-district.csv"
     table.to_csv(out, index=False)
-    problems = population_problems(table)
+    places.to_csv(build / "places-by-district.csv", index=False)
+    problems = population_problems(table) + problems
     nearest = table["nearest_pop"].sum() / table["pop"].sum()
     print(f"Placed {table['pop'].sum():,} people in {len(table)} districts "
-          f"({nearest:.3%} by nearest district). Wrote {out.relative_to(repo_root)}")  # fmt: skip
+          f"({nearest:.3%} by nearest district). Wrote {out.relative_to(repo_root)} "
+          "and places-by-district.csv")  # fmt: skip
     if problems:
         _print_problems(problems, " in the 2020 population check")
         print("Site data not written.")
         return 1
-    site_json = repo_root / "site" / "src" / "data" / "population.json"
-    write_population_json(table, site_json)
-    print(f"Wrote {site_json.relative_to(repo_root)}")
+    site = repo_root / "site" / "src" / "data"
+    write_population_json(table, site / "population.json")
+    write_places_json(places, table[["district_id", "pop"]], site / "places.json")
+    print(f"Wrote {(site / 'population.json').relative_to(repo_root)} and places.json")
     return 0
 
 
@@ -312,7 +334,7 @@ COMMANDS = {
     "calibrate": (calibrate, "Re-derive the settings in gerry.generalize from Census files."),
     "votes": (votes, "Place 2024 presidential votes in districts."),
     "fairness": (fairness, "Score each state's map for partisan fairness."),
-    "population": (population, "Add up 2020 voting-age population by race per district."),
+    "population": (population, "Add up 2020 population by race and by place per district."),
 }
 
 

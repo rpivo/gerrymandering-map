@@ -436,6 +436,49 @@ def test_population_writes_no_site_data_when_a_check_fails(tmp_path, monkeypatch
     assert not (tmp_path / "site/src/data/population.json").exists()
 
 
+def _places_run(tmp_path, monkeypatch, abbeville_pop: int) -> int:
+    from shapely.geometry import box as shape_box
+    from test_places import geo_row, write_zip
+
+    from gerry.states import STATES_BY_USPS
+
+    build = tmp_path / "data" / "build"
+    build.mkdir(parents=True)
+    gpd.GeoDataFrame(
+        {"district_id": ["WY-AL"], "state": ["WY"], "number": [None], "map_source": ["x"]},
+        geometry=[shape_box(-92, 29, -90, 31)],
+        crs="EPSG:4269",
+    ).to_file(build / "districts.gpkg")
+    pl_zip = write_zip(tmp_path, [
+        geo_row("160", "0000001", "00100", abbeville_pop, "Abbeville", "Abbeville city"),
+        geo_row("750", "0000002", "00100", 20),
+        geo_row("750", "0000003", "99999", 5),
+    ])  # fmt: skip
+    monkeypatch.setattr(cli, "fetch", lambda source, raw, manifest: pl_zip)
+    monkeypatch.setattr(cli, "STATES", [STATES_BY_USPS["WY"]])
+    return cli.main(["population", "--repo-root", str(tmp_path)])
+
+
+def test_population_lists_the_places_in_each_district(tmp_path, monkeypatch):
+    assert _places_run(tmp_path, monkeypatch, abbeville_pop=20) == 0
+    site = json.loads((tmp_path / "site/src/data/places.json").read_text())
+    assert site["districts"] == [{
+        "id": "WY-AL",
+        "places": [{"name": "Abbeville", "kind": "city", "pop": 20, "place_pop": 20}],
+        "more": 0,
+        "in_places": 0.8,
+    }]  # fmt: skip
+    table = pd.read_csv(tmp_path / "data/build/places-by-district.csv", dtype={"place": str})
+    assert table[["district_id", "place", "pop"]].values.tolist() == [["WY-AL", "00100", 20]]
+
+
+def test_population_writes_no_site_data_when_places_dont_add_up(tmp_path, monkeypatch, capsys):
+    assert _places_run(tmp_path, monkeypatch, abbeville_pop=21) == 1
+    assert "Abbeville" in capsys.readouterr().out
+    assert not (tmp_path / "site/src/data/places.json").exists()
+    assert not (tmp_path / "site/src/data/population.json").exists()
+
+
 def test_population_asks_for_the_built_map_first(tmp_path, capsys):
     assert cli.main(["population", "--repo-root", str(tmp_path)]) == 1
     assert "make boundaries" in capsys.readouterr().out
