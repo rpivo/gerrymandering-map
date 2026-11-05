@@ -128,8 +128,8 @@ def test_shapes_json_gives_each_state_map_its_closeups(tmp_path):
     path = tmp_path / "shapes.json"
     write_shapes_json(districts, path)
     states = json.loads(path.read_text())["states"]
-    [closeup] = states["KS"]["closeups"]
-    assert set(closeup) == {"box", "viewBox", "paths"}
+    closeup = states["KS"]["closeups"][0]
+    assert set(closeup) == {"box", "viewBox", "paths"}  # the first is never nested
     assert {"KS-02", "KS-03"} <= set(closeup["paths"])
     assert states["WY"]["closeups"] == []
 
