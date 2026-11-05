@@ -77,11 +77,11 @@ describe("applySavedTheme", () => {
 });
 
 describe("setupThemeToggle", () => {
-  it("shows the button and says whether dark mode is on", () => {
+  it("shows the switch and says whether dark mode is on", () => {
     const button = fakeButton();
     setupThemeToggle({ dataset: { theme: "dark" } }, button, () => memoryStorage());
     expect(button.hidden).toBe(false);
-    expect(button.attributes["aria-pressed"]).toBe("true");
+    expect(button.attributes["aria-checked"]).toBe("true");
   });
 
   it("switches and remembers the choice each way", () => {
@@ -89,14 +89,14 @@ describe("setupThemeToggle", () => {
     const button = fakeButton();
     const storage = memoryStorage();
     setupThemeToggle(root, button, () => storage);
-    expect(button.attributes["aria-pressed"]).toBe("false");
+    expect(button.attributes["aria-checked"]).toBe("false");
     button.click();
     expect(root.dataset.theme).toBe("dark");
-    expect(button.attributes["aria-pressed"]).toBe("true");
+    expect(button.attributes["aria-checked"]).toBe("true");
     expect(storage.items[THEME_KEY]).toBe("dark");
     button.click();
     expect(root.dataset.theme).toBeUndefined();
-    expect(button.attributes["aria-pressed"]).toBe("false");
+    expect(button.attributes["aria-checked"]).toBe("false");
     expect(storage.items[THEME_KEY]).toBe("light");
   });
 
@@ -121,7 +121,21 @@ describe("the layout", () => {
     expect(head).toMatch(/<script>[^<]*getItem\("theme"\)/);
     expect(html).toMatch(/<button[^>]*class="theme-toggle"[^>]*hidden/);
     expect(html).toMatch(/<button[^>]*type="button"/);
-    expect(html).toMatch(/<button[^>]*aria-pressed="false"/);
-    expect(html).toContain("Dark mode");
+    expect(html).toMatch(/<button[^>]*role="switch"/);
+    expect(html).toMatch(/<button[^>]*aria-checked="false"/);
+    expect(html).toMatch(/<button[^>]*aria-label="Dark mode"/);
+  });
+
+  it("shows a sun and a moon, hidden from screen readers since the label says it", async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Base, { props: { title: "T", description: "D" } });
+    const start = html.lastIndexOf("<button", html.indexOf('class="theme-toggle"'));
+    const button = html.slice(start, html.indexOf("</button>", start));
+    const icons = button.match(/<svg[^>]*>/g) ?? [];
+    expect(icons).toHaveLength(2);
+    expect(icons.every((svg) => svg.includes('aria-hidden="true"'))).toBe(true);
+    expect(button).toContain('class="icon sun"');
+    expect(button).toContain('class="icon moon"');
+    expect(button.replace(/<[^>]+>/g, "").trim()).toBe(""); // no visible text, just the icons
   });
 });

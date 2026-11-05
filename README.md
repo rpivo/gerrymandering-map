@@ -95,7 +95,7 @@ Preview builds are off because Cloudflare's preview setup (in open beta in Novem
 
 ### Light and dark mode
 
-The site opens in light mode for everyone, whatever their device prefers. A "Dark mode" button in the header switches it and remembers the choice in that browser (`localStorage`). The colors for both modes are in `site/src/styles/global.css` (dark ones under `:root[data-theme="dark"]`), and `site/src/lib/theme.ts` holds the two small inline scripts: one in the page head applies a saved dark choice before the page draws, so it never flashes light, and one runs the button. Without JavaScript the button stays hidden and the site is light. Link preview images are always light.
+The site opens in light mode for everyone, whatever their device prefers. A sun and moon switch in the header (announced to screen readers as a "Dark mode" switch) changes it and remembers the choice in that browser (`localStorage`). The colors for both modes are in `site/src/styles/global.css` (dark ones under `:root[data-theme="dark"]`), and `site/src/lib/theme.ts` holds the two small inline scripts: one in the page head applies a saved dark choice before the page draws, so it never flashes light, and one runs the switch. Without JavaScript the switch stays hidden and the site is light. Link preview images are always light.
 
 ### Link previews
 
