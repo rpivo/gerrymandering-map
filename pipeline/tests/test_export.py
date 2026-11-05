@@ -168,3 +168,109 @@ def test_sources_json_marks_other_results_ending_in_votes_as_votes(tmp_path):
     path = tmp_path / "sources.json"
     write_sources_json({entry["id"]: entry}, path)
     assert json.loads(path.read_text())["sources"][0]["role"] == "votes"
+
+
+def fairness_table(*rows: tuple) -> pd.DataFrame:
+    columns = ["state", "districts", "dem_vote_share", "dem_seats", "efficiency_gap",
+               "mean_median", "declination", "method"]  # fmt: skip
+    return pd.DataFrame(list(rows), columns=columns)
+
+
+AZ = ("AZ", 9, 0.472148992, 3, 0.196312038, 0.005990420, 0.250274538, "precinct join")
+CT = ("CT", 5, 0.573782324, 5, -0.352435350, 0.003201440, math.nan, "precinct join")
+
+
+def fairness_by_state(table, audit) -> dict[str, dict]:
+    from gerry.export import fairness_records
+
+    return {r["state"]: r for r in fairness_records(table, audit)}
+
+
+def test_fairness_records_carry_rounded_scores_and_the_seat_count():
+    from test_state_audit import row
+
+    az = fairness_by_state(fairness_table(AZ), [row("AZ")])["AZ"]
+    assert az == {
+        "state": "AZ",
+        "status": "scored",
+        "districts": 9,
+        "dem_vote_share": 0.4721,
+        "dem_seats": 3,
+        "one_party_won_every_district": False,
+        "efficiency_gap": 0.1963,
+        "mean_median": 0.006,
+        "declination": 0.2503,
+        "method": "precinct join",
+    }
+
+
+def test_a_state_one_party_swept_has_no_declination_and_says_so():
+    from test_state_audit import row
+
+    ct = fairness_by_state(fairness_table(CT), [row("CT")])["CT"]
+    assert ct["one_party_won_every_district"] is True
+    assert ct["declination"] is None
+    assert ct["efficiency_gap"] == -0.3524
+
+
+def test_a_republican_sweep_is_a_sweep_too():
+    from test_state_audit import row
+
+    ar = ("AR", 4, 0.343286, 0, 0.186573, 0.005211, math.nan, "precinct join")
+    assert fairness_by_state(fairness_table(ar), [row("AR")])["AR"]["one_party_won_every_district"]
+
+
+def test_unscored_states_get_the_reason_and_no_scores():
+    from test_state_audit import row
+
+    audit = [
+        row("WY"),
+        row("NH"),
+        row("UT", changed_since_2024="yes", first_used="2026", enacted="2025-11-10"),
+        row("OR"),
+    ]
+    out = fairness_by_state(fairness_table(), audit)
+    assert {s: r["status"] for s, r in out.items()} == {
+        "WY": "at_large",
+        "NH": "too_few_districts",
+        "UT": "awaiting_2026_results",
+        "OR": "no_vote_data",
+    }
+    for record in out.values():
+        assert record["efficiency_gap"] is None and record["dem_seats"] is None
+        assert record["one_party_won_every_district"] is None
+        assert set(record) == set(fairness_by_state(fairness_table(AZ), [row("AZ")])["AZ"])
+
+
+def test_a_scored_redrawn_state_is_scored():
+    from test_state_audit import row
+
+    tx_row = row("TX", changed_since_2024="yes", first_used="2026", enacted="2025-08-29")
+    tx = ("TX", 38, 0.43, 13, 0.194, 0.03, 0.3, "official report")
+    assert fairness_by_state(fairness_table(tx), [tx_row])["TX"]["status"] == "scored"
+
+
+def test_fairness_records_follow_the_audit_order():
+    from test_state_audit import row
+
+    from gerry.export import fairness_records
+
+    records = fairness_records(fairness_table(CT, AZ), [row("AZ"), row("CT"), row("WY")])
+    assert [r["state"] for r in records] == ["AZ", "CT", "WY"]
+
+
+def test_fairness_json_is_deterministic_and_described(tmp_path):
+    from test_state_audit import row
+
+    from gerry.export import write_fairness_json
+
+    path = tmp_path / "fairness.json"
+    write_fairness_json(fairness_table(AZ, CT), [row("AZ"), row("CT")], path)
+    first = path.read_bytes()
+    write_fairness_json(fairness_table(CT, AZ), [row("AZ"), row("CT")], path)
+    assert path.read_bytes() == first
+    data = json.loads(first)
+    assert data["count"] == 2 and len(data["states"]) == 2
+    assert "Positive favors Republicans" in data["description"]
+    assert "2024 presidential" in data["description"]
+    assert "NaN" not in first.decode()

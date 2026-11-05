@@ -356,18 +356,25 @@ def test_votes_refuses_an_official_report_for_a_state_that_kept_its_lines(
 def test_fairness_scores_states_from_the_votes_output(tmp_path, capsys):
     build = tmp_path / "data" / "build"
     build.mkdir(parents=True)
+    sources = tmp_path / "data" / "sources"
+    sources.mkdir()
+    (sources / "states.csv").write_text((cli.REPO_ROOT / "data/sources/states.csv").read_text())
     rows = ["state,district,dem,rep,dem_share,method"]
     rows += [
-        f"AA,{d},{v},{100 - v},{v / 100},precinct join"
-        for d, v in enumerate([90, 45, 45, 45, 45], 1)
+        f"AR,{d},{v},{100 - v},{v / 100},precinct join" for d, v in enumerate([90, 45, 45, 45], 1)
     ]
-    rows += ["BB,1,50,50,0.5,official report"]
+    rows += ["NH,1,50,50,0.5,official report", "NH,2,60,40,0.6,official report"]
     (build / "president-2024-by-district.csv").write_text("\n".join(rows) + "\n")
     assert cli.main(["fairness", "--repo-root", str(tmp_path)]) == 0
     out = pd.read_csv(build / "fairness-2024.csv")
-    assert out["state"].tolist() == ["AA"]
-    assert out.loc[0, "efficiency_gap"] == pytest.approx(0.38)
-    assert "AA" in capsys.readouterr().out
+    assert out["state"].tolist() == ["AR"]
+    site = json.loads((tmp_path / "site/src/data/fairness.json").read_text())
+    by_state = {r["state"]: r for r in site["states"]}
+    assert len(by_state) == 50
+    assert by_state["AR"]["status"] == "scored"
+    assert by_state["AR"]["efficiency_gap"] == pytest.approx(out.loc[0, "efficiency_gap"], abs=1e-4)
+    assert by_state["NH"]["status"] == "too_few_districts"
+    assert "AR" in capsys.readouterr().out
 
 
 def test_fairness_asks_for_the_votes_first(tmp_path, capsys):

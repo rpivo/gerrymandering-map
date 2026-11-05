@@ -23,6 +23,7 @@ from gerry.boundaries import load_districts, load_state_outlines
 from gerry.calibrate import calibrate
 from gerry.export import (
     write_districts_json,
+    write_fairness_json,
     write_shapes_json,
     write_sources_json,
     write_states_json,
@@ -252,13 +253,15 @@ def fairness(repo_root: Path) -> int:
     table = state_fairness(pd.read_csv(votes_csv))
     out = build / "fairness-2024.csv"
     table.to_csv(out, index=False)
+    site_json = repo_root / "site" / "src" / "data" / "fairness.json"
+    write_fairness_json(table, read_state_audit(repo_root / "data/sources/states.csv"), site_json)
     shown = table.sort_values("efficiency_gap", key=abs, ascending=False)
     print(
         f"Scored {len(table)} states with {MIN_DISTRICTS}+ districts. Positive favors Republicans."
     )
     print(shown[["state", "districts", "dem_seats", "efficiency_gap", "mean_median", "declination"]]
           .round(3).to_string(index=False))  # fmt: skip
-    print(f"Wrote {out.relative_to(repo_root)}")
+    print(f"Wrote {out.relative_to(repo_root)} and {site_json.relative_to(repo_root)}")
     return 0
 
 
