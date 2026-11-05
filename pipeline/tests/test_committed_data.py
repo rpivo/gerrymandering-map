@@ -19,3 +19,13 @@ def test_every_manifest_entry_is_complete():
         assert blank == [], f"{source_id} has blank fields: {blank}"
         assert entry["url"].startswith("https://"), source_id
         assert len(entry["sha256"]) == 64, source_id
+
+
+def test_new_jersey_county_totals_add_up_to_the_official_statewide_totals():
+    import csv
+
+    with (SOURCES / "votes" / "nj-2024-president-by-county.csv").open() as f:
+        rows = list(csv.DictReader(f))
+    assert len(rows) == 21
+    assert sum(int(r["harris"]) for r in rows) == 2_220_713
+    assert sum(int(r["trump"]) for r in rows) == 1_968_215

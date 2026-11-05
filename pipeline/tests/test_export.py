@@ -157,3 +157,14 @@ def test_sources_json_marks_election_results_as_votes(tmp_path):
     path = tmp_path / "sources.json"
     write_sources_json({entry["id"]: entry}, path)
     assert json.loads(path.read_text())["sources"][0]["role"] == "votes"
+
+
+def test_sources_json_marks_other_results_ending_in_votes_as_votes(tmp_path):
+    from gerry.export import write_sources_json
+
+    entry = {"id": "wa-king-county-precincts-2024-votes", "url": "https://k/c", "publisher": "KC",
+        "license": "PD", "description": "Precincts", "downloaded": "2026-11-05",
+        "sha256": "d" * 64}  # fmt: skip
+    path = tmp_path / "sources.json"
+    write_sources_json({entry["id"]: entry}, path)
+    assert json.loads(path.read_text())["sources"][0]["role"] == "votes"

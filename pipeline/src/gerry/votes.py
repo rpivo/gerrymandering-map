@@ -5,6 +5,11 @@ uses the same precinct IDs and says which district each precinct voted in, so jo
 places each precinct's presidential votes in its district. This only works where the 2024
 districts were used again in 2026; redrawn states need other sources.
 
+Two states need official data on top: King County, WA is a single county-wide row in MIT's file,
+so the county's own precinct file replaces it; and New Jersey's counts are short in some
+counties (Mercer has no early votes), so each county is scaled to the official totals in
+data/sources/votes/.
+
 Rules, each found in the data (see plans/PLAN.md section 3.3):
 - Count each precinct once: its TOTAL rows if it has them, else the sum of its other modes.
 - Ignore House rows with zero votes (Ohio lists every precinct under all 15 districts) and
@@ -14,6 +19,8 @@ Rules, each found in the data (see plans/PLAN.md section 3.3):
 - A precinct in more than one district is split by its House votes. A big row (a county's mail
   ballots, say) is split the same way, but each district gets its own partisan mix, taken from
   the county's single-district precincts (Missouri, Oklahoma).
+- A precinct whose name differs from the House file's only by a municipal type ("Deptford Twp"
+  and "Deptford", Gloucester County, NJ) takes the House precinct's districts.
 - A precinct with no House votes goes to the state's unopposed district if it has exactly one
   (Oklahoma's 3rd had no race on the ballot), else each party's votes are spread the way that
   party's matched votes are spread across the county's districts.
@@ -33,6 +40,7 @@ COLUMNS = KEY + ["mode", "party_simplified", "votes", "district"]
 # so splitting it gives every district the same partisan mix. The share of votes in such rows
 # says how far to trust a state's district results.
 BIG_ROW_VOTES = 5000
+KING_COUNTY_FIPS = "53033"
 # A town or county total row may differ from the precincts it totals by this share (rounding).
 AGGREGATE_TOLERANCE = 0.01
 
@@ -55,6 +63,19 @@ HOUSE_2024 = Source(
     license="CC0 1.0 (public domain dedication)",
     description=f"U.S. House of Representatives Precinct-Level Returns 2024. Page: {_PAGE}USBYR4",
     filename="HOUSE_precinct_general.csv",
+)
+
+
+KING_COUNTY_2024 = Source(
+    id="wa-king-county-precincts-2024-votes",
+    url="https://data.kingcounty.gov/api/views/uuda-pmuy/rows.csv?accessType=DOWNLOAD",
+    publisher="King County Elections (King County open data)",
+    license="Public domain",
+    description=(
+        "November 2024 General Election Final Precinct Results, with each precinct's "
+        "congressional district. Page: https://data.kingcounty.gov/d/uuda-pmuy"
+    ),
+    filename="November_2024_General_Election_Final_Precinct_Results.csv",
 )
 
 
@@ -172,6 +193,33 @@ def _place_unmatched(
     return pd.concat([a, b], ignore_index=True)
 
 
+_MUNICIPAL_SUFFIX = re.compile(r"\s+(TWP|TOWNSHIP|BORO|BOROUGH|CITY|TOWN|VILLAGE)$")
+
+
+def _town(name: str) -> str:
+    """A precinct name without a trailing municipal type, for loose matching."""
+    return _MUNICIPAL_SUFFIX.sub("", name.strip().upper())
+
+
+def _rename_by_town(two: pd.DataFrame, weights: pd.DataFrame) -> pd.DataFrame:
+    """Give unmatched precincts the House file's name when only the municipal type differs.
+
+    Gloucester County, NJ lists "Deptford Twp" for President and "Deptford" for the House. A
+    match is used only when exactly one House precinct in the county has that short name.
+    """
+    county = ["state_po", "county_fips", "jurisdiction_fips"]
+    house = weights[KEY].drop_duplicates().assign(town=lambda d: d["precinct"].map(_town))
+    unique = house.groupby(county + ["town"]).filter(lambda g: len(g) == 1)
+    unmatched = _unmatched(two, weights).drop(columns="row_votes")
+    unmatched = unmatched.assign(town=unmatched["precinct"].map(_town))
+    hits = unmatched.merge(unique, on=county + ["town"], suffixes=("", "_house"))
+    hits = hits[~hits["precinct_house"].isin(two["precinct"])]
+    hit_keys = pd.MultiIndex.from_frame(hits[KEY])
+    rename = dict(zip(hit_keys, hits["precinct_house"], strict=True))
+    keys = pd.MultiIndex.from_frame(two[KEY])
+    return two.assign(precinct=[rename.get(k, k[3]) for k in keys])
+
+
 def assign_to_districts(
     two: pd.DataFrame, weights: pd.DataFrame, unopposed: dict[str, list[int]]
 ) -> pd.DataFrame:
@@ -181,6 +229,7 @@ def assign_to_districts(
     placed), kind (exact, split, unopposed, county or lost), dem, rep, and row_votes, the
     precinct row's whole two-party vote, for judging how much rests on catch-all rows.
     """
+    two = _rename_by_town(two, weights)
     matched = _matched(two, weights)
     placed = _place_unmatched(_unmatched(two, weights), matched, unopposed)
     out = pd.concat([matched, placed], ignore_index=True)
@@ -282,3 +331,85 @@ def drop_aggregate_rows(df: pd.DataFrame) -> pd.DataFrame:
         return df
     keys = pd.MultiIndex.from_frame(df[KEY])
     return df[~keys.isin(list(drop))].reset_index(drop=True)
+
+
+def read_king_county(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Read King County's own 2024 precinct results (WA).
+
+    MIT's file has King County as one 1.08 million vote row spanning four districts. The
+    county's file has every precinct and the congressional district it's in.
+
+    Returns:
+        Two-party votes per precinct (as `two_party_by_precinct`) and each precinct's district
+        with weight 1 (as `district_weights`), keyed like MIT's rows with state WA, county 53033
+        and precincts prefixed "KC ".
+    """
+    df = pd.read_csv(path, dtype=str, keep_default_na=False)
+    df = df[df["Race"].str.startswith("President and Vice President")]
+    candidate = df["CounterType"].map(_kc_party)
+    df = df.assign(party=candidate, votes=pd.to_numeric(df["SumOfCount"])).dropna(subset=["party"])
+    df = df.assign(
+        state_po="WA", county_fips=KING_COUNTY_FIPS, jurisdiction_fips=KING_COUNTY_FIPS,
+        precinct="KC " + df["Precinct"],
+    )  # fmt: skip
+    two = df.pivot_table(index=KEY, columns="party", values="votes", aggfunc="sum")
+    two = two.reindex(columns=["dem", "rep"]).fillna(0.0).astype(float).reset_index()
+    weights = df[KEY + ["CongressionalDistrict"]].drop_duplicates()
+    weights = weights.rename(columns={"CongressionalDistrict": "district"})
+    weights = weights.assign(district=weights["district"].astype(int), weight=1.0)
+    return two.rename_axis(columns=None), weights.reset_index(drop=True)
+
+
+def _kc_party(candidate: str) -> str | None:
+    """Map King County's candidate labels to dem or rep; None for everyone else."""
+    if candidate.startswith("Kamala D. Harris"):
+        return "dem"
+    return "rep" if candidate.startswith("Donald J. Trump") else None
+
+
+def replace_county(
+    two: pd.DataFrame, weights: pd.DataFrame, new_two: pd.DataFrame, new_weights: pd.DataFrame
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Drop every row of the counties in `new_two` and add the new rows in their place."""
+    counties = new_two[["state_po", "county_fips"]].drop_duplicates().assign(_new=True)
+
+    def keep(df: pd.DataFrame) -> pd.DataFrame:
+        flagged = df.merge(counties, on=["state_po", "county_fips"], how="left")
+        return df[flagged["_new"].isna().to_numpy()]
+
+    return (
+        pd.concat([keep(two), new_two], ignore_index=True),
+        pd.concat([keep(weights), new_weights], ignore_index=True),
+    )
+
+
+def calibrate_to_county_totals(two: pd.DataFrame, official: pd.DataFrame) -> pd.DataFrame:
+    """Scale each listed county's precinct votes, party by party, to its official totals.
+
+    For counties whose precinct data is incomplete (New Jersey's Mercer County has no early
+    votes): the missing votes are assumed to be spread like the county's other votes.
+
+    Args:
+        two: Two-party votes per precinct.
+        official: Columns state, county_fips, harris, trump.
+
+    Raises:
+        ValueError: if a listed county has no precinct votes to scale.
+    """
+    county = ["state_po", "county_fips"]
+    ours = two.groupby(county)[["dem", "rep"]].sum()
+    target = official.rename(columns={"state": "state_po"}).set_index(county)
+    missing = target.index.difference(ours.index)
+    if len(missing):
+        raise ValueError(f"No precinct votes to scale in {', '.join(c for _, c in missing)}.")
+    ours = ours.reindex(target.index).astype(float)
+    factors = pd.DataFrame(
+        {
+            "f_dem": target["harris"].astype(float) / ours["dem"],
+            "f_rep": target["trump"].astype(float) / ours["rep"],
+        }
+    )
+    out = two.merge(factors.reset_index(), on=county, how="left")
+    for party in ("dem", "rep"):
+        out[party] = out[party] * out[f"f_{party}"].fillna(1.0)
+    return out.drop(columns=["f_dem", "f_rep"])

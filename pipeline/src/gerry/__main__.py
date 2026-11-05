@@ -42,14 +42,18 @@ from gerry.states import STATES
 from gerry.validate import validate_districts
 from gerry.votes import (
     HOUSE_2024,
+    KING_COUNTY_2024,
     PRESIDENT_2024,
     assign_to_districts,
+    calibrate_to_county_totals,
     check_reference,
     district_totals,
     district_weights,
     drop_aggregate_rows,
     one_count_per_precinct,
+    read_king_county,
     read_precinct_returns,
+    replace_county,
     state_quality,
     two_party_by_precinct,
     unopposed_districts,
@@ -179,10 +183,14 @@ def _place_president_2024(raw: Path, manifest: Path) -> tuple[pd.DataFrame, pd.D
         drop_aggregate_rows(one_count_per_precinct(read_precinct_returns(fetch(s, raw, manifest))))
         for s in (PRESIDENT_2024, HOUSE_2024)
     )
-    weights = district_weights(house)
-    assigned = assign_to_districts(
-        two_party_by_precinct(pres), weights, unopposed_districts(weights)
-    )
+    two, weights = two_party_by_precinct(pres), district_weights(house)
+    # King County is one county-wide row in MIT's file; its own file has every precinct.
+    king = read_king_county(fetch(KING_COUNTY_2024, raw, manifest))
+    two, weights = replace_county(two, weights, *king)
+    # MIT's New Jersey counts are short in some counties (Mercer has no early votes).
+    nj = manifest.parent / "votes" / "nj-2024-president-by-county.csv"
+    two = calibrate_to_county_totals(two, pd.read_csv(nj, dtype={"county_fips": str}))
+    assigned = assign_to_districts(two, weights, unopposed_districts(weights))
     return district_totals(assigned), state_quality(assigned)
 
 
