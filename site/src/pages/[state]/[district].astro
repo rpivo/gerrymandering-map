@@ -2,6 +2,7 @@
 import DistrictShape from "../../components/DistrictShape.astro";
 import MetricRow from "../../components/MetricRow.astro";
 import ScoreBadge from "../../components/ScoreBadge.astro";
+import PopulationNote from "../../components/PopulationNote.astro";
 import StateEdgeNote from "../../components/StateEdgeNote.astro";
 import StateMapSvg from "../../components/StateMapSvg.astro";
 import Base from "../../layouts/Base.astro";
@@ -79,6 +80,7 @@ const ranked = district.rank_national !== null;
     </section>
 
     <StateEdgeNote district={district} />
+    <PopulationNote id={district.id} />
 
     {
       district.redrawn_2026 && (

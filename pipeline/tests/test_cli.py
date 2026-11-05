@@ -410,6 +410,30 @@ def test_population_places_census_blocks_in_the_built_districts(tmp_path, monkey
     assert table["district_id"].tolist() == ["WY-AL"]
     assert (table.loc[0, "pop"], table.loc[0, "vap"], table.loc[0, "minority"]) == (200, 150, 85)
     assert "WY-AL" not in capsys.readouterr().out  # no problems to report
+    site = json.loads((tmp_path / "site/src/data/population.json").read_text())
+    assert [r["id"] for r in site["districts"]] == ["WY-AL"]
+    assert site["districts"][0]["minority"] == round(85 / 150, 3)
+
+
+def test_population_writes_no_site_data_when_a_check_fails(tmp_path, monkeypatch):
+    from shapely.geometry import box as shape_box
+    from test_population import write_pl_zip
+
+    from gerry.states import STATES_BY_USPS
+
+    build = tmp_path / "data" / "build"
+    build.mkdir(parents=True)
+    # Kansas has 4 districts, so a single one fails the district count check.
+    gpd.GeoDataFrame(
+        {"district_id": ["KS-01"], "state": ["KS"], "number": [1], "map_source": ["x"]},
+        geometry=[shape_box(-106, 41, -105, 42)],
+        crs="EPSG:4269",
+    ).to_file(build / "districts.gpkg")
+    monkeypatch.setattr(cli, "fetch", lambda source, raw, manifest: write_pl_zip(tmp_path))
+    monkeypatch.setattr(cli, "STATES", [STATES_BY_USPS["KS"]])
+    assert cli.main(["population", "--repo-root", str(tmp_path)]) == 1
+    assert (build / "population-by-district.csv").exists()
+    assert not (tmp_path / "site/src/data/population.json").exists()
 
 
 def test_population_asks_for_the_built_map_first(tmp_path, capsys):

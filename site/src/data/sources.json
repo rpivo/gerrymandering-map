@@ -38,6 +38,456 @@
       "role": "boundaries"
     },
     {
+      "id": "census-pl94171-2020-01",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Alabama: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Alabama/al2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-02",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Alaska: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Alaska/ak2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-04",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Arizona: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Arizona/az2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-05",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Arkansas: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Arkansas/ar2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-06",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), California: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/California/ca2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-08",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Colorado: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Colorado/co2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-09",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Connecticut: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Connecticut/ct2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-10",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Delaware: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Delaware/de2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-12",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Florida: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Florida/fl2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-13",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Georgia: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Georgia/ga2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-15",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Hawaii: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Hawaii/hi2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-16",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Idaho: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Idaho/id2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-17",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Illinois: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Illinois/il2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-18",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Indiana: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Indiana/in2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-19",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Iowa: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Iowa/ia2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-20",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Kansas: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Kansas/ks2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-21",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Kentucky: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Kentucky/ky2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-22",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Louisiana: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Louisiana/la2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-23",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Maine: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Maine/me2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-24",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Maryland: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Maryland/md2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-25",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Massachusetts: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Massachusetts/ma2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-26",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Michigan: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Michigan/mi2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-27",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Minnesota: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Minnesota/mn2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-28",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Mississippi: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Mississippi/ms2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-29",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Missouri: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Missouri/mo2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-30",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Montana: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Montana/mt2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-31",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Nebraska: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Nebraska/ne2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-32",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Nevada: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Nevada/nv2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-33",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), New Hampshire: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/New_Hampshire/nh2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-34",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), New Jersey: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/New_Jersey/nj2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-35",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), New Mexico: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/New_Mexico/nm2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-36",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), New York: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/New_York/ny2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-37",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), North Carolina: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/North_Carolina/nc2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-38",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), North Dakota: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/North_Dakota/nd2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-39",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Ohio: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Ohio/oh2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-40",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Oklahoma: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Oklahoma/ok2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-41",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Oregon: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Oregon/or2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-42",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Pennsylvania: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Pennsylvania/pa2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-44",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Rhode Island: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Rhode_Island/ri2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-45",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), South Carolina: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/South_Carolina/sc2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-46",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), South Dakota: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/South_Dakota/sd2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-47",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Tennessee: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Tennessee/tn2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-48",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Texas: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Texas/tx2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-49",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Utah: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Utah/ut2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-50",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Vermont: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Vermont/vt2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-51",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Virginia: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Virginia/va2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-53",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Washington: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Washington/wa2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-54",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), West Virginia: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/West_Virginia/wv2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-55",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Wisconsin: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Wisconsin/wi2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
+      "id": "census-pl94171-2020-56",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 Census Redistricting Data (PL 94-171), Wyoming: population and voting-age population by race and Hispanic origin for every block.",
+      "url": "https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Wyoming/wy2020.pl.zip",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-05",
+      "role": "population"
+    },
+    {
       "id": "census-states-cb-2025-500k",
       "publisher": "U.S. Census Bureau",
       "description": "Cartographic boundary file, states, 2025 edition, 1:500,000, clipped to the shoreline. Used to clip replacement district maps to land.",
