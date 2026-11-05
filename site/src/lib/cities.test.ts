@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { states } from "./data";
-import { cityTiers, labelBox, labelText, placeCities, type City, type CityMark } from "./cities";
+import { cityTierCss, cityTiers, labelBox, labelText, placeCities, type City, type CityMark } from "./cities";
 
 const VIEW = "0 0 1000 500";
 const FONT = 20;
@@ -79,6 +79,20 @@ describe("placeCities", () => {
   });
 });
 
+describe("cityTierCss", () => {
+  it("has a valid rule showing every tier of every state", () => {
+    const broken = states.flatMap((s) => {
+      const tiers = cityTiers(s.state);
+      const rules = cityTierCss(tiers).split("\n");
+      // One rule per tier, each either unconditional or under a non-empty container query.
+      const valid = /^(@container \((min|max)-width: [\d.]+px\)( and \(max-width: [\d.]+px\))? \{ )?\.map-frame \.tier-\d \{ display: inline; \}( \})?$/;
+      return rules.length === tiers.length && rules.every((r) => valid.test(r)) ? [] : [s.state];
+    });
+    expect(states).toHaveLength(50); // anchor
+    expect(broken).toEqual([]);
+  });
+});
+
 describe("cityTiers", () => {
   it("gives every state at least one marked city at every width it can be drawn", () => {
     expect(states).toHaveLength(50); // anchor: real data, so the loop can't pass empty
@@ -153,6 +167,13 @@ describe("cityTiers", () => {
     const tiers = cityTiers("CA");
     const [, , width] = "0 0 862 1000".split(" ").map(Number) as [number, number, number];
     for (const tier of tiers) expect(tier.fontSize).toBeCloseTo((11 * width) / tier.ref, 5);
+  });
+
+  it("sizes labels for the map's own width when it's never drawn as wide as its tier", () => {
+    // New Jersey's map is 525 by 1000 and capped at 512px tall, so it's at most 268.8px wide.
+    const [tier] = cityTiers("NJ");
+    expect(tier?.ref).toBeCloseTo((512 * 525) / 1000, 5);
+    expect(tier?.fontSize).toBeCloseTo((11 * 525) / ((512 * 525) / 1000), 5);
   });
 
   it("skips widths a state's map is never drawn at", () => {

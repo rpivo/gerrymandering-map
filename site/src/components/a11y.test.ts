@@ -103,6 +103,16 @@ describe("StateMapSvg city marks", () => {
   });
 });
 
+describe("StateMapSvg city marks on a map drawn at one size", () => {
+  it("always shows the one set of marks, with no container query to fail", async () => {
+    // New Jersey's map is never drawn wider than about 269px, so it has a single tier.
+    const html = await container.renderToString(StateMapSvg, { props: { state: "NJ", stateName: "New Jersey" } });
+    expect(html.match(/class="cities tier-\d/g)).toEqual(['class="cities tier-0']);
+    expect(html).toContain(".map-frame .tier-0 { display: inline; }");
+    expect(html).not.toMatch(/@container\s*\{/);
+  });
+});
+
 describe("StateMapSvg tooltips", () => {
   it("has one hidden tooltip per district, out of the accessibility tree", async () => {
     const html = await container.renderToString(StateMapSvg, { props: { state: "TX", stateName: "Texas" } });
