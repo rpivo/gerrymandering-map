@@ -45,6 +45,9 @@ const dark = darkTokens();
 const bands = ["very-compact", "compact", "middle", "irregular", "very-irregular"];
 // The smallest lightness difference (L*) between neighboring bands that still reads as a step.
 const MIN_LIGHTNESS_STEP = 7;
+// The palest band must still stand out from the page and from cards, or a very compact district
+// all but disappears into the background.
+const MIN_FROM_BACKGROUND = 10;
 
 describe.each([
   ["light", light],
@@ -68,6 +71,15 @@ describe.each([
     const gaps = steps.slice(1).map((l, i) => away * (l - (steps[i] ?? 0)));
     expect(gaps).toHaveLength(4);
     expect(Math.min(...gaps)).toBeGreaterThanOrEqual(MIN_LIGHTNESS_STEP);
+  });
+
+  it.each(Object.keys(COLOR_BLINDNESS))("every band stands out from the page and cards, with %s vision", (vision) => {
+    for (const background of ["bg", "surface"]) {
+      const page = lightness(t[background] ?? "", vision);
+      const gaps = bands.map((b) => Math.abs(lightness(t[`band-${b}`] ?? "", vision) - page));
+      expect(gaps).toHaveLength(5);
+      expect(Math.min(...gaps)).toBeGreaterThanOrEqual(MIN_FROM_BACKGROUND);
+    }
   });
 
   it("runs from green (very compact) through yellow to red (very irregular)", () => {
