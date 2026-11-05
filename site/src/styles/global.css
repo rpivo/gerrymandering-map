@@ -10,17 +10,19 @@
   --accent: #2f5bd3;
   --shape: #5b6b8a;
   --shape-muted: #d9d6ce;
-  /* Irregularity bands, light to dark on one hue so no band reads as good or bad. */
-  --band-very-compact: #dfe7f5;
-  --band-compact: #b3c5e6;
-  --band-middle: #7f9bd1;
-  --band-irregular: #4c6fb8;
-  --band-very-irregular: #26468f;
+  /* Irregularity bands, green (very compact) through yellow to red (very irregular). Each band is
+     also darker than the last, so red-green color blind readers can still tell them apart by
+     lightness (tested in contrast.test.ts). The number is always shown next to the color. */
+  --band-very-compact: #e0f2d6;
+  --band-compact: #b5da94;
+  --band-middle: #dba63a;
+  --band-irregular: #d8642b;
+  --band-very-irregular: #9c1f28;
   /* Text on each band. Every pair must reach 4.5:1 contrast (tested in contrast.test.ts). */
-  --on-band-very-compact: #10204a;
-  --on-band-compact: #10204a;
-  --on-band-middle: #10204a;
-  --on-band-irregular: #ffffff;
+  --on-band-very-compact: #16301a;
+  --on-band-compact: #16301a;
+  --on-band-middle: #1c1b19;
+  --on-band-irregular: #1c1b19;
   --on-band-very-irregular: #ffffff;
 }
 
@@ -34,16 +36,17 @@
   --accent: #8eaaff;
   --shape: #a9b8d6;
   --shape-muted: #3a3935;
-  --band-very-compact: #24314d;
-  --band-compact: #2f4573;
-  --band-middle: #45629f;
-  --band-irregular: #6f8fd0;
-  --band-very-irregular: #a9c0f0;
+  /* In dark mode the bands get lighter toward very irregular, so it stands out from the page. */
+  --band-very-compact: #1a3320;
+  --band-compact: #25502a;
+  --band-middle: #835f13;
+  --band-irregular: #d0682a;
+  --band-very-irregular: #ff7466;
   --on-band-very-compact: #ecebe6;
   --on-band-compact: #ecebe6;
   --on-band-middle: #ecebe6;
-  --on-band-irregular: #0d1730;
-  --on-band-very-irregular: #0d1730;
+  --on-band-irregular: #141413;
+  --on-band-very-irregular: #141413;
 }
 
 *,
