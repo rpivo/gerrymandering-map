@@ -15,8 +15,12 @@
   --band-middle: #7f9bd1;
   --band-irregular: #4c6fb8;
   --band-very-irregular: #26468f;
-  --band-text-dark: #10204a;
-  --band-text-light: #ffffff;
+  /* Text on each band. Every pair must reach 4.5:1 contrast (tested in contrast.test.ts). */
+  --on-band-very-compact: #10204a;
+  --on-band-compact: #10204a;
+  --on-band-middle: #10204a;
+  --on-band-irregular: #ffffff;
+  --on-band-very-irregular: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -34,8 +38,11 @@
     --band-middle: #45629f;
     --band-irregular: #6f8fd0;
     --band-very-irregular: #a9c0f0;
-    --band-text-dark: #0d1730;
-    --band-text-light: #ecebe6;
+    --on-band-very-compact: #ecebe6;
+    --on-band-compact: #ecebe6;
+    --on-band-middle: #ecebe6;
+    --on-band-irregular: #0d1730;
+    --on-band-very-irregular: #0d1730;
   }
 }
 
@@ -66,16 +73,11 @@ a:focus-visible {
   outline-offset: 2px;
 }
 
-.band-very-compact { --band: var(--band-very-compact); --on-band: var(--band-text-dark); }
-.band-compact { --band: var(--band-compact); --on-band: var(--band-text-dark); }
-.band-middle { --band: var(--band-middle); --on-band: var(--band-text-light); }
-.band-irregular { --band: var(--band-irregular); --on-band: var(--band-text-light); }
-.band-very-irregular { --band: var(--band-very-irregular); --on-band: var(--band-text-light); }
-
-@media (prefers-color-scheme: dark) {
-  .band-middle, .band-irregular, .band-very-irregular { --on-band: var(--band-text-dark); }
-  .band-very-compact, .band-compact { --on-band: var(--band-text-light); }
-}
+.band-very-compact { --band: var(--band-very-compact); --on-band: var(--on-band-very-compact); }
+.band-compact { --band: var(--band-compact); --on-band: var(--on-band-compact); }
+.band-middle { --band: var(--band-middle); --on-band: var(--on-band-middle); }
+.band-irregular { --band: var(--band-irregular); --on-band: var(--on-band-irregular); }
+.band-very-irregular { --band: var(--band-very-irregular); --on-band: var(--on-band-very-irregular); }
 
 .visually-hidden {
   position: absolute;

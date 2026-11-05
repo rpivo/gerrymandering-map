@@ -13,7 +13,8 @@ const band = score === null ? null : scoreBand(score);
 {
   band ? (
     <span class:list={["badge", size, `band-${band.key}`]}>
-      <strong>{score}</strong>
+      <span class="visually-hidden">Irregularity score </span>
+      <strong>{score}</strong>{" "}
       <span class="label">{band.label}</span>
     </span>
   ) : (
