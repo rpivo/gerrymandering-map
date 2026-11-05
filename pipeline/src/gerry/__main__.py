@@ -43,6 +43,7 @@ from gerry.validate import validate_districts
 from gerry.votes import (
     HOUSE_2024,
     KING_COUNTY_2024,
+    OFFICIAL_RESULTS,
     PRESIDENT_2024,
     assign_to_districts,
     calibrate_to_county_totals,
@@ -52,6 +53,7 @@ from gerry.votes import (
     drop_aggregate_rows,
     one_count_per_precinct,
     read_king_county,
+    read_official_results,
     read_precinct_returns,
     replace_county,
     state_quality,
@@ -212,16 +214,24 @@ def votes(repo_root: Path) -> int:
     redrawn = set(changed_states(read_state_audit(data / "sources" / "states.csv"))["yes"])
     # Redrawn states' precincts carry their 2024 districts; at-large states (and DC) have no lines.
     lined = {s.usps for s in STATES if s.seats > 1} - redrawn
+    # An official report replaces the precinct join, which only works on unchanged lines.
+    both = sorted(set(OFFICIAL_RESULTS) & lined)
+    if both:
+        _print_problems([f"{s}: has an official report but kept its 2024 lines." for s in both])
+        return 1
     keep = totals["state"].isin(lined)
+    votes_dir = data / "sources" / "votes"
+    official = [read_official_results(votes_dir / name) for name in OFFICIAL_RESULTS.values()]
     out = data / "build" / "president-2024-by-district.csv"
     out.parent.mkdir(parents=True, exist_ok=True)
-    totals[keep].to_csv(out, index=False)
+    pd.concat([totals[keep], *official], ignore_index=True).to_csv(out, index=False)
     quality = quality[quality["state"].isin(lined)]
     quality.to_csv(out.with_name("president-2024-quality.csv"), index=False)
     shaky = quality[(quality["big_row_pct"] > MAX_BIG_ROW_PCT) | (quality["lost_pct"] > 0)]
     print(
         f"{keep.sum()} districts in {totals[keep]['state'].nunique()} states kept their 2024 lines."
     )
+    print(f"Official reports for redrawn states: {', '.join(OFFICIAL_RESULTS)}.")
     for r in shaky.itertuples():
         print(
             f"Needs a fix: {r.state}, {r.big_row_pct}% in catch-all rows, {r.lost_pct}% unplaced."

@@ -8,7 +8,8 @@ districts were used again in 2026; redrawn states need other sources.
 Two states need official data on top: King County, WA is a single county-wide row in MIT's file,
 so the county's own precinct file replaces it; and New Jersey's counts are short in some
 counties (Mercer has no early votes), so each county is scaled to the official totals in
-data/sources/votes/.
+data/sources/votes/. Redrawn states can't use the join; Texas and North Carolina published
+2024 results on their new maps (`OFFICIAL_RESULTS`).
 
 Rules, each found in the data (see plans/PLAN.md section 3.3):
 - Count each precinct once: its TOTAL rows if it has them, else the sum of its other modes.
@@ -263,7 +264,7 @@ def district_totals(assigned: pd.DataFrame) -> pd.DataFrame:
     placed = assigned[assigned["district"].notna()]
     out = placed.groupby(["state", "district"], as_index=False)[["dem", "rep"]].sum()
     out["dem_share"] = out["dem"] / (out["dem"] + out["rep"])
-    return out
+    return out.assign(method="precinct join")
 
 
 def check_reference(
@@ -413,3 +414,24 @@ def calibrate_to_county_totals(two: pd.DataFrame, official: pd.DataFrame) -> pd.
     for party in ("dem", "rep"):
         out[party] = out[party] * out[f"f_{party}"].fillna(1.0)
     return out.drop(columns=["f_dem", "f_rep"])
+
+
+# Redrawn states whose legislature published 2024 president results on the 2026 map,
+# transcribed in data/sources/votes/ (see its README).
+OFFICIAL_RESULTS = {
+    "TX": "tx-planc2333-president-2024.csv",
+    "NC": "nc-s249-president-2024.csv",
+}
+
+
+def read_official_results(path: Path) -> pd.DataFrame:
+    """Read a transcribed official report of presidential votes by district.
+
+    Returns rows like `district_totals` (state, district, dem, rep, dem_share) plus
+    method "official report".
+    """
+    df = pd.read_csv(path, dtype={"state": str})
+    out = df.rename(columns={"harris": "dem", "trump": "rep"})[["state", "district", "dem", "rep"]]
+    out = out.astype({"district": int, "dem": float, "rep": float})
+    out["dem_share"] = out["dem"] / (out["dem"] + out["rep"])
+    return out.assign(method="official report")
