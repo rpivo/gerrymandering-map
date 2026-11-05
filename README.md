@@ -86,6 +86,10 @@ The Worker's config is `site/wrangler.json`. Build settings in the Cloudflare da
 
 Wrangler is a pinned dev dependency, so deploys use the locked version. Cloudflare reads the Node version from `site/.nvmrc` and the pnpm version from `packageManager` in `site/package.json`. Response headers (security headers, and long-term caching for any Astro asset files) are in `site/public/_headers`, which Workers static assets honor. Astro builds each page as a file (`tx/35.html`), so `/tx/35` is served without a redirect, and unknown addresses get `404.html`.
 
+### Link previews
+
+Every page has a 1200 by 630 preview image for social sites and chat apps: one per district, one per state, and one for the home and methodology pages (the 404 page uses the home image). They're drawn as SVG in `site/src/lib/og.ts` and turned into PNGs at build time by `@resvg/resvg-js` in `site/src/pages/og/[...image].png.ts`, so they land in `dist/og/` (about 9 MB). Text uses the Inter font committed in `site/src/assets/fonts/` (SIL Open Font License, in `OFL.txt` there) with system fonts turned off, so the images look the same on every machine; the build stops if the font can't load. Preview tags need absolute URLs, so the site's address is `SITE_URL` in `og.ts`: change it if the domain changes.
+
 The pipeline doesn't run on Cloudflare: the site builds only from the committed data in `site/src/data/`, so a data change ships by committing regenerated files.
 
 To check a deploy locally without uploading: `cd site && pnpm build && pnpm exec wrangler deploy --dry-run`.
