@@ -27,7 +27,7 @@ const rows = districtsInState(state).map((d) => ({
 >
   {
     rows.map(({ district, path, band, title }) => (
-      <a href={districtPath(district.id)} class:list={[band, { current: district.id === highlight }]}>
+      <a href={districtPath(district.id)} tabindex="-1" class:list={[band, { current: district.id === highlight }]}>
         <title>{title}</title>
         <path d={path} fill-rule="evenodd" />
       </a>

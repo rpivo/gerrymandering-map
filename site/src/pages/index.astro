@@ -75,7 +75,7 @@ const cards = sortCards(
           >
             <a href={districtPath(c.id)}>
               <div class="shape">
-                <DistrictShape outline={outline(c.id, "card")} label={`Outline of ${c.id}`} />
+                <DistrictShape outline={outline(c.id, "card")} />
               </div>
               <span class="id">{c.id}</span>
               <span class="state-name">{c.stateName}</span>

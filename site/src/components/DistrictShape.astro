@@ -3,14 +3,21 @@ import type { Outline } from "../lib/data";
 
 interface Props {
   outline: Outline;
-  label: string;
+  /** Omit inside a link that already names the district, so screen readers don't say it twice. */
+  label?: string;
   class?: string;
 }
 
 const { outline, label, class: className } = Astro.props;
 ---
 
-<svg class:list={["district-shape", className]} viewBox={outline.viewBox} role="img" aria-label={label}>
+<svg
+  class:list={["district-shape", className]}
+  viewBox={outline.viewBox}
+  role={label ? "img" : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : "true"}
+>
   <path d={outline.d} fill-rule="evenodd"></path>
 </svg>
 
