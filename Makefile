@@ -2,7 +2,7 @@
 UV := uv run --project pipeline
 PY_PATHS := pipeline tools
 
-.PHONY: setup lint format test check-functions check pr-size site-dev site-check boundaries audit calibrate scores data
+.PHONY: setup lint format test check-functions check pr-size site-dev site-check boundaries audit calibrate scores data votes
 
 setup:
 	uv sync --project pipeline
@@ -43,6 +43,10 @@ scores:
 
 # Build the map and score it.
 data: boundaries scores
+
+# Place 2024 presidential votes in districts (downloads about 590 MB once). Checks Texas.
+votes:
+	$(UV) python -m gerry votes
 
 # Validate data/sources/states.csv and list states whose 2026 map differs from 2024.
 audit:

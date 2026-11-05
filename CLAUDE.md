@@ -91,6 +91,7 @@ Run from the repo root. The README describes each one.
 - Build and validate the 2026 district map: `make boundaries` (`python -m gerry boundaries`), written to `data/build/districts.gpkg`. Redrawn states are registered in `pipeline/src/gerry/state_maps.py`, and must match the audit.
 - Re-derive the map generalization settings: `make calibrate` (`python -m gerry calibrate`). Rerun it if the Census source files change.
 - Score the built map: `make scores` (`python -m gerry scores`), which writes the site's data files in `site/src/data/` (`districts.json`, `shapes.json`, `states.json`). `make data` runs boundaries then scores.
+- Place 2024 presidential votes in districts: `make votes` (`python -m gerry votes`), written to `data/build/president-2024-by-district.csv`. It must pass the Texas check in `data/checks/`.
 - Validate the state map audit: `make audit` (`python -m gerry audit`). `make test` also validates the committed `states.csv` and `sources.csv`.
 - Fix formatting: `make format`
 - PR size against `main`: `make pr-size`

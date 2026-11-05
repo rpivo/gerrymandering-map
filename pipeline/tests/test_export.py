@@ -146,3 +146,14 @@ def test_sources_json_lists_every_source_with_its_role(tmp_path):
     }
     assert "sha256" not in data["sources"][0]
     assert data["sources"][0]["downloaded"] == "2026-11-04"
+
+
+def test_sources_json_marks_election_results_as_votes(tmp_path):
+    from gerry.export import write_sources_json
+
+    entry = {"id": "medsl-president-precinct-2024", "url": "https://d/v", "publisher": "MIT",
+        "license": "CC0", "description": "President 2024", "downloaded": "2026-11-05",
+        "sha256": "c" * 64}  # fmt: skip
+    path = tmp_path / "sources.json"
+    write_sources_json({entry["id"]: entry}, path)
+    assert json.loads(path.read_text())["sources"][0]["role"] == "votes"

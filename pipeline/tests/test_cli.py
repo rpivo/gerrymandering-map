@@ -254,3 +254,66 @@ def test_scores_writes_site_json_and_csv(valid_districts, monkeypatch, tmp_path,
 def test_scores_needs_the_built_map_first(tmp_path, capsys):
     assert cli.main(["scores", "--repo-root", str(tmp_path)]) == 1
     assert "make boundaries" in capsys.readouterr().out
+
+
+VOTES_HEADER = (
+    "precinct,office,party_simplified,mode,votes,county_fips,jurisdiction_fips,district,state_po\n"
+)
+
+
+def write_votes_repo(tmp_path: Path, tx_harris: int) -> Path:
+    """A repo with tiny precinct files (TX and WA, two districts each) and a TX reference."""
+    pres = (
+        VOTES_HEADER
+        + "".join(
+            f"{st}{d},US PRESIDENT,{party},TOTAL,{v},{c},{c},STATEWIDE,{st}\n"
+            for st, c in (("TX", "48001"), ("WA", "53001"))
+            for d in (1, 2)
+            for party, v in (("DEMOCRAT", 60 * d), ("REPUBLICAN", 40))
+        )
+        + "WY1,US PRESIDENT,DEMOCRAT,TOTAL,9,56001,56001,STATEWIDE,WY\n"
+    )
+    house = VOTES_HEADER + "".join(
+        f"{st}{d},US HOUSE,DEMOCRAT,TOTAL,5,{c},{c},00{d},{st}\n"
+        for st, c in (("TX", "48001"), ("WA", "53001"))
+        for d in (1, 2)
+    )
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    (raw / "pres.csv").write_text(pres)
+    (raw / "house.csv").write_text(house)
+    checks = tmp_path / "data" / "checks"
+    checks.mkdir(parents=True)
+    (checks / "tx-planc2193-president-2024.csv").write_text(
+        f"district,harris,trump\n1,{tx_harris},40\n2,120,40\n"
+    )
+    write_audit(tmp_path, audit_rows(changed=("TX",)))
+    return raw
+
+
+def fake_votes_fetch(raw: Path):
+    def fetch(source, *_args, **_kwargs):
+        return raw / ("pres.csv" if "president" in source.id else "house.csv")
+
+    return fetch
+
+
+def test_votes_writes_unchanged_states_and_checks_texas(tmp_path, monkeypatch, capsys):
+    raw = write_votes_repo(tmp_path, tx_harris=60)
+    monkeypatch.setattr(cli, "fetch", fake_votes_fetch(raw))
+    assert cli.main(["votes", "--repo-root", str(tmp_path)]) == 0
+    out = pd.read_csv(tmp_path / "data" / "build" / "president-2024-by-district.csv")
+    # Texas redrew for 2026, so its 2024-map results are only used for the check.
+    # Wyoming has one at-large seat: no lines, nothing to place.
+    assert out["state"].unique().tolist() == ["WA"]
+    assert out[["district", "dem", "rep"]].values.tolist() == [[1, 60, 40], [2, 120, 40]]
+    printed = capsys.readouterr().out
+    assert "Texas check passed" in printed
+    assert "WY" not in printed
+
+
+def test_votes_fails_when_texas_stops_matching_the_official_report(tmp_path, monkeypatch, capsys):
+    raw = write_votes_repo(tmp_path, tx_harris=10)
+    monkeypatch.setattr(cli, "fetch", fake_votes_fetch(raw))
+    assert cli.main(["votes", "--repo-root", str(tmp_path)]) == 1
+    assert "TX-01" in capsys.readouterr().out
