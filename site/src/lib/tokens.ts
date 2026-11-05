@@ -1,12 +1,13 @@
 import css from "../styles/global.css?raw";
 
 /**
- * Read the #rrggbb custom properties in the first `:root { ... }` block at or after `start`.
+ * Read the #rrggbb custom properties in the first `selector { ... }` block at or after `start`.
  * @param start - Where in global.css to start looking.
+ * @param selector - The block's opening, `:root {` by default.
  * @returns Token name (without the leading --) to color.
  */
-function readRoot(start: number): Record<string, string> {
-  const open = css.indexOf(":root {", start);
+function readRoot(start: number, selector = ":root {"): Record<string, string> {
+  const open = css.indexOf(selector, start);
   if (open < 0) {
     throw new Error("global.css has no :root block where expected.");
   }
@@ -27,5 +28,5 @@ export function lightTokens(): Record<string, string> {
  * @returns Token name (without the leading --) to a #rrggbb color.
  */
 export function darkTokens(): Record<string, string> {
-  return { ...readRoot(0), ...readRoot(css.indexOf("prefers-color-scheme: dark")) };
+  return { ...readRoot(0), ...readRoot(css.indexOf(':root[data-theme="dark"]'), ':root[data-theme="dark"] {') };
 }
