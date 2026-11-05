@@ -4,7 +4,7 @@ A website that lists every US congressional district, shows its shape, and score
 
 The scores describe shape, not intent. An irregular district isn't proof of a gerrymander, and a compact one isn't proof against it.
 
-**Status:** the site is built: a searchable grid of all 435 districts, a page for every district and state (with partisan fairness scores for the 28 states that can be scored so far), and a methodology page. It isn't deployed yet. Run `make site-dev` to see it at http://localhost:4324.
+**Status:** the site is built: a searchable grid of all 435 districts, a page for every district and state (with partisan fairness scores for the 28 states that can be scored so far), and a methodology page. It's live at https://gerrymandering-map.ryanpivovar.workers.dev (see Deploy below). Run `make site-dev` to see it locally at http://localhost:4324.
 
 ## Layout
 
