@@ -7,6 +7,7 @@ Commands:
     scores      Score the built map; write site/src/data/districts.json.
     calibrate   Re-derive the map generalization settings from Census files.
     votes       Place 2024 presidential votes in districts; write data/build/.
+    fairness    Score each state's map for partisan fairness from the votes.
 """
 
 import argparse
@@ -26,6 +27,7 @@ from gerry.export import (
     write_sources_json,
     write_states_json,
 )
+from gerry.fairness import MIN_DISTRICTS, state_fairness
 from gerry.fetch import CENSUS_CD119, CENSUS_STATES, fetch, read_manifest
 from gerry.generalize import absorb_fragments, simplify_to_census
 from gerry.replacement import (
@@ -240,12 +242,33 @@ def votes(repo_root: Path) -> int:
     return 0
 
 
+def fairness(repo_root: Path) -> int:
+    """Score partisan fairness per state from data/build/president-2024-by-district.csv."""
+    build = repo_root / "data" / "build"
+    votes_csv = build / "president-2024-by-district.csv"
+    if not votes_csv.exists():
+        print(f"{votes_csv.relative_to(repo_root)} not found. Run make votes first.")
+        return 1
+    table = state_fairness(pd.read_csv(votes_csv))
+    out = build / "fairness-2024.csv"
+    table.to_csv(out, index=False)
+    shown = table.sort_values("efficiency_gap", key=abs, ascending=False)
+    print(
+        f"Scored {len(table)} states with {MIN_DISTRICTS}+ districts. Positive favors Republicans."
+    )
+    print(shown[["state", "districts", "dem_seats", "efficiency_gap", "mean_median", "declination"]]
+          .round(3).to_string(index=False))  # fmt: skip
+    print(f"Wrote {out.relative_to(repo_root)}")
+    return 0
+
+
 COMMANDS = {
     "boundaries": (boundaries, "Build and validate the 2026 district map."),
     "audit": (audit, "Validate the state map audit and list changed states."),
     "scores": (scores, "Score the built map and write the site's data."),
     "calibrate": (calibrate, "Re-derive the settings in gerry.generalize from Census files."),
     "votes": (votes, "Place 2024 presidential votes in districts."),
+    "fairness": (fairness, "Score each state's map for partisan fairness."),
 }
 
 
