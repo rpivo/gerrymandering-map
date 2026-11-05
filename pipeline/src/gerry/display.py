@@ -8,9 +8,11 @@ whole-number coordinates. Holes and separate pieces are extra subpaths, so the s
 draws paths with `fill-rule="evenodd"`.
 """
 
+import geopandas as gpd
 import shapely
 from shapely import affinity
 from shapely.geometry.base import BaseGeometry
+from shapely.ops import polylabel
 
 from gerry.metrics import local_projection
 
@@ -127,3 +129,69 @@ def state_map(districts, detail: float) -> dict:
     fitted, (width, height) = fit_to_view(shapes)
     paths = {d: svg_path(g) for d, g in zip(districts["district_id"], fitted, strict=True)}
     return {"viewBox": f"0 0 {width} {height}", "paths": paths}
+
+
+# The US map: the lower 48 in the Census Bureau's Albers projection for the contiguous US,
+# with Alaska and Hawaii as insets at the bottom left in their own Albers projections, as most
+# US maps draw them. Alaska is shrunk so it doesn't dwarf the rest.
+_LOWER_48_CRS = "EPSG:5070"
+_INSETS = {"AK": ("EPSG:3338", 0.35), "HI": ("ESRI:102007", 1.0)}
+# Gap between insets, and how far an inset moves down at a time until it clears the mainland,
+# as shares of the lower 48's width.
+_INSET_GAP = 0.02
+
+
+def _to_crs(geometry: BaseGeometry, crs: str) -> BaseGeometry:
+    return gpd.GeoSeries([geometry], crs="EPSG:4269").to_crs(crs).iloc[0]
+
+
+def _place_inset(shape: BaseGeometry, left: float, bottom: float, mainland: BaseGeometry,
+                 step: float) -> BaseGeometry:  # fmt: skip
+    """Move a shape so its box starts at (left, bottom), then down until it clears the mainland."""
+    minx, miny, _, _ = shape.bounds
+    placed = affinity.translate(shape, left - minx, bottom - miny)
+    while placed.intersects(mainland):
+        placed = affinity.translate(placed, 0, -step)
+    return placed
+
+
+def _label_point(shape: BaseGeometry) -> list[int]:
+    """Return a point well inside a shape's largest piece, for its label."""
+    largest = max(shapely.get_parts(shape), key=lambda p: p.area)
+    point = polylabel(largest, tolerance=1.0)
+    return [round(point.x), round(point.y)]
+
+
+def us_map(states: dict[str, BaseGeometry], detail: float) -> dict:
+    """Return the 50 states drawn together as a map of the US, with a label point for each.
+
+    Args:
+        states: {USPS code: outline} in NAD83 degrees (EPSG:4269), such as the Census state
+            file. Hawaii is cut like its state map (display_crop).
+        detail: Simplification as a share of the lower 48's width.
+
+    Returns:
+        {"viewBox": "0 0 w h", "paths": {usps: path}, "labels": {usps: [x, y]}}.
+    """
+    shapes = {s: _to_crs(g, _LOWER_48_CRS) for s, g in states.items() if s not in _INSETS}
+    mainland = shapely.union_all(list(shapes.values()))
+    minx, miny, maxx, _ = mainland.bounds
+    step = _INSET_GAP * (maxx - minx)
+    left = minx
+    for state, (crs, scale) in _INSETS.items():
+        if state not in states:
+            continue
+        shape = _to_crs(display_crop(state, states[state])[0], crs)
+        shape = affinity.scale(shape, scale, scale, origin=(0, 0))
+        shapes[state] = _place_inset(shape, left, miny, mainland, step)
+        left = shapes[state].bounds[2] + step
+    tolerance = detail * (maxx - minx)
+    names = list(shapes)
+    simplified = [_visible_parts(shapes[s], tolerance) for s in names]
+    simplified = list(shapely.coverage_simplify(simplified, tolerance))
+    fitted, (width, height) = fit_to_view(simplified)
+    return {
+        "viewBox": f"0 0 {width} {height}",
+        "paths": {s: svg_path(g) for s, g in zip(names, fitted, strict=True)},
+        "labels": {s: _label_point(g) for s, g in zip(names, fitted, strict=True)},
+    }

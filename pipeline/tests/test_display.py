@@ -13,6 +13,7 @@ from gerry.display import (
     fit_to_view,
     state_map,
     svg_path,
+    us_map,
 )
 
 
@@ -112,3 +113,80 @@ class TestDisplayCrop:
     def test_other_states_are_untouched(self):
         aleutians = MultiPolygon([box(-179, 51, -178, 52), box(-150, 60, -149, 61)])
         assert display_crop("AK", aleutians) == (aleutians, None)
+
+
+# A rough US: boxes in NAD83 degrees where the states are.
+US_BOXES = {
+    "WA": box(-124.7, 45.5, -117.0, 49.0),
+    "CA": box(-124.4, 32.5, -114.1, 42.0),
+    "AZ": box(-114.8, 31.3, -109.0, 37.0),
+    "TX": box(-106.6, 25.8, -93.5, 36.5),
+    "FL": box(-87.6, 24.5, -80.0, 31.0),
+    "ME": box(-71.1, 43.0, -66.9, 47.5),
+    "AK": box(-170.0, 52.0, -141.0, 71.0),
+    # The main islands, plus an island far west, big enough to draw, that the crop leaves out.
+    "HI": MultiPolygon([box(-160.3, 18.9, -154.8, 22.3), box(-178.6, 28.2, -178.0, 28.6)]),
+}
+
+
+def bounds_of(path: str) -> tuple[int, int, int, int]:
+    xs, ys = zip(*points(path), strict=True)
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+def shape_of(path: str):
+    """The drawn shape: one polygon per subpath, in view coordinates."""
+    rings = [points(f"M{ring}") for ring in path.split("M") if ring]
+    return shapely.union_all([Polygon(r) for r in rings])
+
+
+def covered_by_inset(drawn: dict, inset: str) -> list[str]:
+    """The states whose drawn shapes an inset overlaps (sharing an edge isn't overlap)."""
+    shapes = {s: shape_of(p) for s, p in drawn["paths"].items()}
+    return [s for s, g in shapes.items() if s != inset and g.intersection(shapes[inset]).area > 0]
+
+
+@pytest.fixture(scope="module")
+def us():
+    return us_map(US_BOXES, detail=0.002)
+
+
+class TestUsMap:
+    def test_draws_and_labels_every_state_in_one_view(self, us):
+        assert set(us["paths"]) == set(US_BOXES) == set(us["labels"])
+        width, height = (int(n) for n in us["viewBox"].split()[2:])
+        assert width == VIEW_SIZE
+        for x, y in us["labels"].values():
+            assert 0 <= x <= width and 0 <= y <= height
+
+    def test_keeps_the_lower_48_where_they_are_with_north_up(self, us):
+        wa, fl, me, ca = (us["labels"][s] for s in ["WA", "FL", "ME", "CA"])
+        assert wa[0] < fl[0] and wa[1] < fl[1]  # Washington is northwest of Florida
+        assert me[0] > ca[0]
+
+    def test_puts_alaska_and_hawaii_bottom_left_without_covering_any_state(self, us):
+        width, height = (int(n) for n in us["viewBox"].split()[2:])
+        for inset in ["AK", "HI"]:
+            x, y = us["labels"][inset]
+            assert x < width / 2 and y > height / 2
+            assert covered_by_inset(us, inset) == []
+        assert us["labels"]["AK"][0] < us["labels"]["HI"][0]
+
+    def test_shrinks_alaska_to_an_inset(self, us):
+        ak, tx = bounds_of(us["paths"]["AK"]), bounds_of(us["paths"]["TX"])
+        # At true scale Alaska is about twice as wide as Texas.
+        assert ak[2] - ak[0] < tx[2] - tx[0]
+
+    def test_crops_hawaii_like_its_state_map(self, us):
+        hi = bounds_of(us["paths"]["HI"])
+        assert len(re.findall("M", us["paths"]["HI"])) == 1  # only the main islands' box
+        assert hi[2] - hi[0] < 200
+
+    def test_moves_an_inset_down_until_it_clears_the_mainland(self):
+        # A mainland state right where the insets would go, at the bottom left.
+        crowded = {**US_BOXES, "XX": box(-125.0, 24.5, -100.0, 30.0)}
+        drawn = us_map(crowded, detail=0.002)
+        for inset in ["AK", "HI"]:
+            assert covered_by_inset(drawn, inset) == []
+        # Anchor: the crowding state is drawn, so "covers nothing" isn't vacuous.
+        assert shape_of(drawn["paths"]["XX"]).area > 0
