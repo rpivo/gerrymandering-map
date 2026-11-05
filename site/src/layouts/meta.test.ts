@@ -59,12 +59,12 @@ describe("footer", () => {
     expect(text).toContain("How scores work · Source on GitHub");
   });
 
-  it("links to the Ko-fi page where people can support the project", async () => {
+  it("invites people to buy a coffee on the Ko-fi page", async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(Base, { props: { title: "T", description: "D" } });
     const footer = html.slice(html.indexOf("<footer"), html.indexOf("</footer>"));
-    expect(footer).toMatch(/<a href="https:\/\/ko-fi\.com\/rpivovar"[^>]*>Support this project<\/a>/);
+    expect(footer).toMatch(/<a href="https:\/\/ko-fi\.com\/rpivovar"[^>]*>Buy me a coffee!<\/a>/);
     const text = footer.replace(/<[^>]+>/g, "").replace(/\s+/g, " ");
-    expect(text).toContain("Source on GitHub · Support this project");
+    expect(text).toContain("Source on GitHub · Like this project? Buy me a coffee!");
   });
 });
