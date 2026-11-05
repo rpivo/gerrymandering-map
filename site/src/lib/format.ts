@@ -92,3 +92,19 @@ export function sourceNote(description: string, license: string, downloaded: str
   const what = description.replace(/ Page: .*$/, "").replace(/\.$/, "");
   return `${what}. ${license}. Downloaded ${downloaded}.`;
 }
+
+/**
+ * Describe how much of a district's border is the state's own edge.
+ * @param share - Share of the border on the state's edge, 0 to 1.
+ * @returns A sentence with a whole percent (99% at most unless all of it is), or null if it rounds to 0%.
+ */
+export function stateEdgeText(share: number): string | null {
+  let pct = Math.round(share * 100);
+  if (pct === 0) {
+    return null;
+  }
+  if (pct === 100 && share < 1) {
+    pct = 99;
+  }
+  return `${pct}% of this district's border is the state's edge: a coastline, a national border or a state line.`;
+}

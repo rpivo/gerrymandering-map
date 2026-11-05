@@ -1,0 +1,35 @@
+---
+import type { District } from "../lib/data";
+import { stateEdgeText } from "../lib/format";
+
+interface Props {
+  district: District;
+}
+
+const { district } = Astro.props;
+const text = district.at_large ? null : stateEdgeText(district.state_edge_share);
+---
+
+{
+  text && (
+    <section class="edge" aria-labelledby="edge-heading">
+      <h2 id="edge-heading">The state's edge</h2>
+      <p>
+        {text} Mapmakers don't choose those lines. A ragged one, like a coastline or a river, lowers
+        Polsby-Popper. Reock and convex hull count only the state's own land, so water and
+        neighboring states don't count against them. <a href="/methodology#state-edge">More on the state's edge</a>
+      </p>
+    </section>
+  )
+}
+
+<style>
+  .edge h2 {
+    font-size: 1.25rem;
+  }
+
+  .edge p {
+    color: var(--text-muted);
+    max-width: 42rem;
+  }
+</style>

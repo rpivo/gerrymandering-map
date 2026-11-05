@@ -21,6 +21,7 @@ def scores_frame() -> pd.DataFrame:
             "reock": [0.25, 0.5],
             "convex_hull": [0.5, 0.9],
             "schwartzberg": [1 / math.sqrt(0.123456789), 1 / math.sqrt(0.6)],
+            "state_edge_share": [0.41766, 1.0],
             "polsby_popper_pct": [3.4567, float("nan")],
             "reock_pct": [10.0, float("nan")],
             "convex_hull_pct": [5.0, float("nan")],
@@ -44,6 +45,12 @@ def test_records_round_numbers_and_use_null_for_missing_values():
     assert wy["irregularity"] is None
     assert wy["polsby_popper_pct"] is None
     assert wy["polsby_popper"] == 0.6
+
+
+def test_records_carry_the_share_of_the_border_on_the_state_edge():
+    tx, wy = district_records(scores_frame())
+    assert tx["state_edge_share"] == 0.418
+    assert wy["state_edge_share"] == 1.0
 
 
 def test_records_flag_districts_redrawn_for_2026():

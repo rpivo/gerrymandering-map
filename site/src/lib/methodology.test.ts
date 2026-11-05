@@ -25,6 +25,11 @@ describe("the methodology page", () => {
     expect(text).toContain("4 or more districts");
   });
 
+  it("explains the state's edge share the district pages link to", () => {
+    expect(html).toMatch(/<h2[^>]*id="state-edge"/);
+    expect(text).toContain("100 meters");
+  });
+
   it("credits every vote data source", () => {
     const votes = sources.filter((s) => s.role === "votes");
     expect(votes).toHaveLength(6); // anchor: the loop checks something

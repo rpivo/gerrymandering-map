@@ -12,6 +12,7 @@ from gerry.metrics import (
     polsby_popper,
     reock,
     schwartzberg,
+    state_edge_share,
 )
 
 CIRCLE = Point(0, 0).buffer(1, quad_segs=512)
@@ -59,9 +60,15 @@ def square_in_lonlat(lon: float, lat: float, side_m: float = 50_000) -> Polygon:
 
 
 class TestCompactness:
-    def test_returns_all_four_scores_for_a_lonlat_district(self):
+    def test_returns_all_four_scores_and_the_edge_share_for_a_lonlat_district(self):
         scores = compactness(square_in_lonlat(-69.5, 45.0), "EPSG:4269")
-        assert set(scores) == {"polsby_popper", "reock", "convex_hull", "schwartzberg"}
+        assert set(scores) == {
+            "polsby_popper",
+            "reock",
+            "convex_hull",
+            "schwartzberg",
+            "state_edge_share",
+        }
         assert scores["polsby_popper"] == pytest.approx(math.pi / 4, rel=1e-3)
         assert scores["reock"] == pytest.approx(2 / math.pi, rel=1e-3)
 
@@ -124,3 +131,56 @@ class TestMeasuredAgainstLand:
                       (lon + s, lat + 2 * s), (lon, lat + 2 * s)])  # fmt: skip
         land = shapely.box(lon - 1, lat - 1, lon + 1, lat + 1)
         assert compactness(el, "EPSG:4269", land)["convex_hull"] == pytest.approx(3 / 3.5, rel=0.01)
+
+
+class TestStateEdgeShare:
+    """How much of a district's border is the state's edge (coast, national border, state line).
+
+    Exact cases use a 1 m tolerance. With the real tolerance, a border leaving the edge also
+    counts its first stretch inland, up to the tolerance (see the moved-border test).
+    """
+
+    STATE = box(0, 0, 4000, 4000)  # meters
+
+    def share(self, district, outline=None, tolerance=1.0):
+        return state_edge_share(district, self.STATE if outline is None else outline, tolerance)
+
+    def test_inland_district_has_none(self):
+        assert self.share(box(1000, 1000, 2000, 2000)) == 0
+
+    def test_one_side_on_the_edge_is_a_quarter(self):
+        assert self.share(box(0, 1000, 1000, 2000)) == pytest.approx(0.25, abs=0.001)
+
+    def test_a_corner_district_has_half(self):
+        assert self.share(box(0, 0, 1000, 1000)) == pytest.approx(0.5, abs=0.001)
+
+    def test_an_at_large_district_is_all_edge(self):
+        assert self.share(self.STATE) == pytest.approx(1)
+
+    def test_island_pieces_count_their_whole_shore(self):
+        islands = MultiPolygon([box(0, 0, 100, 100), box(300, 0, 400, 100)])
+        assert self.share(islands, islands) == pytest.approx(1)
+
+    def test_a_border_moved_slightly_by_simplifying_still_counts(self):
+        # The west side (1000 m) counts, plus the first 50 m of the top and bottom sides,
+        # which are also within 100 m of the state's edge.
+        district = box(50, 1000, 1000, 2000)
+        assert state_edge_share(district, self.STATE) == pytest.approx(1100 / 3900)
+
+    def test_a_border_farther_than_the_tolerance_does_not(self):
+        assert state_edge_share(box(300, 1000, 1000, 2000), self.STATE) == 0
+
+    def test_compactness_measures_the_edge_in_meters(self):
+        # A 0.1-degree square is narrower than tall at 45 N, so its west side is more than a
+        # quarter of its border in meters. Raw degrees would give exactly 0.25.
+        lon, lat = -69.5, 45.0
+        district = shapely.box(lon, lat, lon + 0.1, lat + 0.1)
+        land = shapely.box(lon, lat - 1, lon + 1, lat + 1)
+        width = math.cos(math.radians(lat + 0.05))
+        expected = 1 / (2 * (1 + width))
+        assert expected > 0.29
+        scores = compactness(district, "EPSG:4269", land)
+        assert scores["state_edge_share"] == pytest.approx(expected, abs=0.01)
+
+    def test_compactness_without_land_has_no_edge_share(self):
+        assert compactness(SQUARE, "EPSG:3857")["state_edge_share"] is None

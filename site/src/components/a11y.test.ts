@@ -4,8 +4,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 import DistrictShape from "./DistrictShape.astro";
 import FairnessSection from "./FairnessSection.astro";
 import ScoreBadge from "./ScoreBadge.astro";
+import StateEdgeNote from "./StateEdgeNote.astro";
 import StateMapSvg from "./StateMapSvg.astro";
-import { getState } from "../lib/data";
+import { getDistrict, getState } from "../lib/data";
 
 let container: AstroContainer;
 
@@ -104,5 +105,29 @@ describe("FairnessSection", () => {
       expect(text.length).toBeGreaterThan(50); // anchor: there is text to check
       expect(text.toLowerCase()).not.toContain("gerrymander");
     }
+  });
+});
+
+describe("StateEdgeNote", () => {
+  const render = async (id: string) => {
+    const html = await container.renderToString(StateEdgeNote, { props: { district: getDistrict(id) } });
+    const text = html.replace(/<[^>]+>/g, " ").replace(/&#39;/g, "'").replace(/\s+/g, " ").trim();
+    return { html, text };
+  };
+
+  it("gives the share and says what it means for the scores", async () => {
+    const { html, text } = await render("TX-23");
+    expect(html).toContain('aria-labelledby="edge-heading"');
+    expect(text).toContain("53% of this district's border is the state's edge");
+    expect(text).toContain("Polsby-Popper");
+    expect(html).toContain('href="/methodology#state-edge"');
+  });
+
+  it("is left off a district drawn entirely by mapmakers", async () => {
+    expect((await render("CO-01")).text).toBe("");
+  });
+
+  it("is left off at-large districts, whose shape is the state's shape", async () => {
+    expect((await render("WY-AL")).text).toBe("");
   });
 });

@@ -66,7 +66,7 @@ These rules apply to every change in this repo. If a request conflicts with one 
 The site is a neutral reference tool. Scores describe shape, not intent.
 
 - Never write "X% gerrymandered" or call a specific district a gerrymander. Write "less compact than X% of districts" or "irregularity score".
-- Every displayed score carries its context: the coastal, VRA, at-large and redrawn-mid-decade notes where they apply, and a link to the methodology page.
+- Every displayed score carries its context: the state-edge (coast, national border or state line), VRA, at-large and redrawn-mid-decade notes where they apply, and a link to the methodology page.
 - Never let color carry meaning alone. Always show the number next to it.
 - Credit every data source on the methodology page.
 - No em dashes in any user-facing copy, in commit messages, or in PR descriptions. Use commas, colons, parentheses, or two sentences instead.
