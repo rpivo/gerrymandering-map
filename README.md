@@ -44,6 +44,7 @@ Run these from the repo root.
 | `make calibrate` | Re-derives the settings that bring state files to the Census level of detail, from Census files for 12 unchanged states |
 | `make scores` | Scores the built map: Polsby-Popper, Reock and convex hull for every district, percentiles among the 429 districts with lines, a 0 to 100 irregularity score and ranks. Writes the site's data to `site/src/data/` (committed: `districts.json` scores, `shapes.json` SVG outlines and state maps, `states.json` state details) and `data/build/scores.csv` |
 | `make data` | `make boundaries` then `make scores` |
+| `make votes` | Places 2024 presidential votes in districts for the states that kept their 2024 lines, from MIT's precinct files (about 590 MB, cached). Checks Texas against the Legislative Council's official report for its 2024 map and stops if they differ. Writes `data/build/president-2024-by-district.csv` and `president-2024-quality.csv`, and lists states that need a fix |
 | `make test` | Runs the Python tests (`pipeline/tests` and `tools/tests`) |
 | `make lint` | Checks Python style and docstrings with ruff, without changing files |
 | `make format` | Fixes Python style and formatting in place |
@@ -55,6 +56,8 @@ Run these from the repo root.
 Raw downloads go in `data/raw/`, which is not committed. Every source is recorded in `data/sources/sources.csv` with its SHA-256 checksum. If a source changes upstream, the pipeline stops rather than quietly using different data.
 
 Current boundaries: the U.S. Census Bureau's 2025 cartographic boundary file for the 119th Congress (1:500,000, clipped to the shoreline). These are the lines used in the 2024 election. Nine states used a different map in the 2026 election (`data/sources/states.csv` records each with a source). For eight of them (Alabama, California, Florida, Louisiana, North Carolina, Tennessee, Texas and Utah) the pipeline downloads the state's official 2026 shapefile and swaps it in. Ohio publishes its map only as a block assignment file, so the pipeline joins it to the Census 2020 block shapes and merges the blocks into districts. Each state's districts are then put on the same footing as the Census districts: clipped to the Census outline of the state (land only), with clipping slivers merged into their neighbors, and internal borders simplified to the Census file's level of detail. Without that last step, the more detailed state files would score about 2% less compact on average for no real reason. `make calibrate` re-derives both settings from the Census Bureau's own full-detail and generalized versions of the same districts. Missouri and Virginia passed new maps that were not used in 2026.
+
+Votes (for the partisan fairness scores, in progress): 2024 presidential results by precinct from the MIT Election Data and Science Lab (CC0). Their House file says which district each precinct voted in, so the two files together give presidential votes by district wherever the 2024 lines were used again in 2026. `pipeline/src/gerry/votes.py` documents the join's rules. `data/checks/` holds published results the pipeline checks itself against (see its README).
 
 ## Scores
 

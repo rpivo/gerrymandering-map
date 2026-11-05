@@ -6,6 +6,7 @@ Commands:
     audit       Validate data/sources/states.csv and list states with new 2026 maps.
     scores      Score the built map; write site/src/data/districts.json.
     calibrate   Re-derive the map generalization settings from Census files.
+    votes       Place 2024 presidential votes in districts; write data/build/.
 """
 
 import argparse
@@ -13,6 +14,7 @@ import sys
 from pathlib import Path
 
 import geopandas as gpd
+import pandas as pd
 from shapely.geometry.base import BaseGeometry
 
 from gerry.blocks import assemble_districts, read_block_assignment, read_blocks
@@ -36,7 +38,21 @@ from gerry.replacement import (
 from gerry.scoring import score_districts
 from gerry.state_audit import changed_states, read_state_audit, validate_state_audit
 from gerry.state_maps import PENDING, STATE_MAPS, BlockAssignmentMap, StateMap, read_state_map
+from gerry.states import STATES
 from gerry.validate import validate_districts
+from gerry.votes import (
+    HOUSE_2024,
+    PRESIDENT_2024,
+    assign_to_districts,
+    check_reference,
+    district_totals,
+    district_weights,
+    one_count_per_precinct,
+    read_precinct_returns,
+    state_quality,
+    two_party_by_precinct,
+    unopposed_districts,
+)
 
 # pipeline/src/gerry/__main__.py -> repo root
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -150,11 +166,65 @@ def scores(repo_root: Path) -> int:
     return 0
 
 
+# The join must reproduce Texas's official 2024 results to within this many points.
+TX_CHECK_TOLERANCE_PTS = 0.1
+# States with more than this share of votes in catch-all rows, or any lost votes, need a fix.
+MAX_BIG_ROW_PCT = 2.0
+
+
+def _place_president_2024(raw: Path, manifest: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Join the MIT precinct files. Returns per-district totals and per-state quality."""
+    pres = one_count_per_precinct(read_precinct_returns(fetch(PRESIDENT_2024, raw, manifest)))
+    house = one_count_per_precinct(read_precinct_returns(fetch(HOUSE_2024, raw, manifest)))
+    weights = district_weights(house)
+    assigned = assign_to_districts(
+        two_party_by_precinct(pres), weights, unopposed_districts(weights)
+    )
+    return district_totals(assigned), state_quality(assigned)
+
+
+def votes(repo_root: Path) -> int:
+    """Place 2024 presidential votes in districts for states that kept their 2024 lines."""
+    data = repo_root / "data"
+    totals, quality = _place_president_2024(data / "raw", data / "sources" / "sources.csv")
+    reference = pd.read_csv(data / "checks" / "tx-planc2193-president-2024.csv")
+    problems = check_reference(totals, "TX", reference, TX_CHECK_TOLERANCE_PTS)
+    if problems:
+        _print_problems(
+            problems, " in the Texas check (2024 map vs the Legislative Council report)"
+        )
+        return 1
+    print(
+        f"Texas check passed: all {len(reference)} districts within "
+        f"{TX_CHECK_TOLERANCE_PTS} points."
+    )
+    redrawn = set(changed_states(read_state_audit(data / "sources" / "states.csv"))["yes"])
+    # Redrawn states' precincts carry their 2024 districts; at-large states (and DC) have no lines.
+    lined = {s.usps for s in STATES if s.seats > 1} - redrawn
+    keep = totals["state"].isin(lined)
+    out = data / "build" / "president-2024-by-district.csv"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    totals[keep].to_csv(out, index=False)
+    quality = quality[quality["state"].isin(lined)]
+    quality.to_csv(out.with_name("president-2024-quality.csv"), index=False)
+    shaky = quality[(quality["big_row_pct"] > MAX_BIG_ROW_PCT) | (quality["lost_pct"] > 0)]
+    print(
+        f"{keep.sum()} districts in {totals[keep]['state'].nunique()} states kept their 2024 lines."
+    )
+    for r in shaky.itertuples():
+        print(
+            f"Needs a fix: {r.state}, {r.big_row_pct}% in catch-all rows, {r.lost_pct}% unplaced."
+        )
+    print(f"Wrote {out.relative_to(repo_root)} and its quality report")
+    return 0
+
+
 COMMANDS = {
     "boundaries": (boundaries, "Build and validate the 2026 district map."),
     "audit": (audit, "Validate the state map audit and list changed states."),
     "scores": (scores, "Score the built map and write the site's data."),
     "calibrate": (calibrate, "Re-derive the settings in gerry.generalize from Census files."),
+    "votes": (votes, "Place 2024 presidential votes in districts."),
 }
 
 
