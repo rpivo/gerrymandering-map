@@ -12,10 +12,6 @@ describe("Cloudflare Worker config", () => {
     expect("main" in config).toBe(false);
   });
 
-  it("has a previews block, which `wrangler preview` requires, so it can be tried again for PR builds", () => {
-    expect(config).toHaveProperty("previews");
-  });
-
   it("sets a compatibility date", () => {
     expect(config.compatibility_date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });

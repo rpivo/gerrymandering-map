@@ -100,4 +100,4 @@ Run from the repo root. The README describes each one.
 - Site lint, typecheck, tests and build: `make site-check`
 - Full rebuild: `make all` (planned)
 
-CI runs `make check` and the PR size check on every PR. Cloudflare Workers Builds deploys `main` to production and gives other branches preview URLs (see the README's Deploy section).
+CI runs `make check` and the PR size check on every PR. Cloudflare Workers Builds deploys `main` to production. Branches and PRs get no preview builds, so check them on the local dev server (see the README's Deploy section).

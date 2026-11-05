@@ -74,7 +74,7 @@ For each measure, a district's percentile is where it falls among the 429 distri
 
 ## Deploy
 
-The site is a Cloudflare Worker that serves the Astro build as static files (no Worker script), connected to this GitHub repo with Workers Builds. Every merge to `main` deploys to production at https://gerrymandering-map.ryanpivovar.workers.dev, and other branches and PRs get preview URLs.
+The site is a Cloudflare Worker that serves the Astro build as static files (no Worker script), connected to this GitHub repo with Workers Builds. Every merge to `main` deploys to production at https://gerrymandering-map.ryanpivovar.workers.dev. Branches and PRs don't get preview builds: check changes on the local dev server (`make site-dev`) instead.
 
 The Worker's config is `site/wrangler.json`. Build settings in the Cloudflare dashboard (Workers & Pages, Create application, Continue with GitHub):
 
@@ -85,10 +85,10 @@ The Worker's config is `site/wrangler.json`. Build settings in the Cloudflare da
 | Root directory | `site` |
 | Build command | `pnpm build` |
 | Deploy command | `pnpm exec wrangler deploy` |
-| Preview command (other branches and PRs, under "Previews Base") | `pnpm exec wrangler versions upload` |
+| Builds for Preview branches (under "Previews Base") | Off |
 | API token | `gerrymandering-map build token` (used only by this project) |
 
-Branches and PRs use `wrangler versions upload`, which uploads a new version with its own preview URL without making it live. The open-beta `wrangler preview` command failed at the asset upload with no detail (it also needs the empty `previews` block in `wrangler.json`, kept so it can be tried again later). Wrangler is a pinned dev dependency, so deploys use the locked version. Cloudflare reads the Node version from `site/.nvmrc` and the pnpm version from `packageManager` in `site/package.json`. Response headers (security headers, and long-term caching for any Astro asset files) are in `site/public/_headers`, which Workers static assets honor. Astro builds each page as a file (`tx/35.html`), so `/tx/35` is served without a redirect, and unknown addresses get `404.html`.
+Preview builds are off because Cloudflare's preview setup (in open beta in November 2026) failed for this static-assets-only Worker: `wrangler preview` stopped at the asset upload, and `wrangler versions upload` reported a Worker name mismatch even though the names match. If they're turned back on, `wrangler preview` also needs an empty `"previews": {}` block in `wrangler.json`. Wrangler is a pinned dev dependency, so deploys use the locked version. Cloudflare reads the Node version from `site/.nvmrc` and the pnpm version from `packageManager` in `site/package.json`. Response headers (security headers, and long-term caching for any Astro asset files) are in `site/public/_headers`, which Workers static assets honor. Astro builds each page as a file (`tx/35.html`), so `/tx/35` is served without a redirect, and unknown addresses get `404.html`.
 
 ### Link previews
 
