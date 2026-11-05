@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { states } from "./data";
-import { cityTiers, labelBox, placeCities, type City, type CityMark } from "./cities";
+import { cityTiers, labelBox, labelText, placeCities, type City, type CityMark } from "./cities";
 
 const VIEW = "0 0 1000 500";
 const FONT = 20;
@@ -19,13 +19,13 @@ function overlaps(a: number[], b: number[]): boolean {
 describe("placeCities", () => {
   it("labels a city to the right of its dot", () => {
     expect(placeCities([city("Austin", 400, 250)], VIEW, FONT, 8)).toEqual([
-      { name: "Austin", x: 400, y: 250, anchor: "start" },
+      { name: "Austin", x: 400, y: 250, side: "right" },
     ]);
   });
 
   it("puts the label on the left when the right would run off the map", () => {
     const [mark] = placeCities([city("El Paso", 990, 250)], VIEW, FONT, 8);
-    expect(mark?.anchor).toBe("end");
+    expect(mark?.side).toBe("left");
   });
 
   it("leaves out a city whose label fits on neither side", () => {
@@ -45,9 +45,32 @@ describe("placeCities", () => {
   });
 
   it("tries the other side before giving up on a crowded city", () => {
-    // Arlington's right side would cover Dallas's label; its left side is clear.
-    const marks = placeCities([city("Dallas", 400, 250), city("Arlington", 390, 268)], VIEW, FONT, 8);
-    expect(marks.find((m) => m.name === "Arlington")?.anchor).toBe("end");
+    // Arlington is far enough from Dallas to mark, but its right side would cover Dallas's label.
+    const marks = placeCities([city("Dallas", 400, 250), city("Arlington", 340, 262)], VIEW, FONT, 8);
+    expect(marks.find((m) => m.name === "Arlington")?.side).toBe("left");
+  });
+
+  it("puts the label above, then below, when neither side fits", () => {
+    // "Midland" is 84 units wide at 20: too wide for either side of a dot in a 120-wide map.
+    expect(placeCities([city("Midland", 60, 100)], "0 0 120 200", FONT, 8)[0]?.side).toBe("above");
+    expect(placeCities([city("Midland", 60, 15)], "0 0 120 200", FONT, 8)[0]?.side).toBe("below");
+  });
+
+  it("puts a label on a side that leaves room for a bigger city still to come", () => {
+    // Dallas's label on the right would cover Fort Worth's dot; on the left it's clear.
+    const marks = placeCities([city("Dallas", 400, 250), city("Fort Worth", 470, 250)], VIEW, FONT, 8);
+    expect(marks.map((m) => [m.name, m.side])).toEqual([["Dallas", "left"], ["Fort Worth", "right"]]);
+  });
+
+  it("skips a suburb right beside a marked city, which adds little as a landmark", () => {
+    // Irving's labels clear Dallas's, but its dot is under 2 label heights from Dallas's.
+    const marks = placeCities(
+      [city("Dallas", 400, 250), city("Irving", 375, 275), city("Waco", 400, 320)],
+      VIEW,
+      FONT,
+      8,
+    );
+    expect(marks.map((m) => m.name)).toEqual(["Dallas", "Waco"]);
   });
 
   it("marks at most max cities, largest first", () => {
@@ -66,6 +89,14 @@ describe("cityTiers", () => {
         .map((t) => `${s.state}@${t.min}`),
     );
     expect(empty).toEqual([]);
+  });
+
+  it("marks 10 cities on every state's map at its widest", () => {
+    const short = states
+      .map((s) => ({ state: s.state, marks: cityTiers(s.state).at(-1)?.marks.length ?? 0 }))
+      .filter((s) => s.marks < 10);
+    expect(states).toHaveLength(50); // anchor
+    expect(short).toEqual([]);
   });
 
   it("never overlaps two labels, or a label and a dot, at any width", () => {
@@ -88,6 +119,26 @@ describe("cityTiers", () => {
     }
     expect(marked).toBeGreaterThan(100); // anchor: plenty of marks were checked
     expect(clashes).toEqual([]);
+  });
+
+  it("marks Michigan's capital and Ann Arbor, rather than Detroit's suburbs", () => {
+    for (const tier of cityTiers("MI")) {
+      const names = tier.marks.map((m) => m.name);
+      expect(names).toEqual(expect.arrayContaining(["Detroit", "Grand Rapids", "Lansing", "Ann Arbor"]));
+      expect(names).not.toContain("Sterling Heights");
+    }
+  });
+
+  it("puts each label's text inside the box it was placed by", () => {
+    for (const side of ["right", "left", "above", "below"] as const) {
+      const mark: CityMark = { name: "Tulsa", x: 500, y: 250, side };
+      const [left, top, right, bottom] = labelBox(mark, FONT) as [number, number, number, number];
+      const text = labelText(mark, FONT);
+      // The text's anchor point is the box's near edge (or middle) on its vertical center.
+      expect(text.y).toBeCloseTo((top + bottom) / 2, 5);
+      const expectedX = { start: left, end: right, middle: (left + right) / 2 }[text.anchor];
+      expect(text.x).toBeCloseTo(expectedX, 5);
+    }
   });
 
   it("marks Tennessee's big cities on a wide map, and the biggest on a phone-sized one", () => {

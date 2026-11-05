@@ -154,7 +154,7 @@ def write_shapes_json(districts: gpd.GeoDataFrame, path: Path) -> None:
 
 
 # Each state map's largest places, offered to the site, which marks as many as fit.
-MAX_CITIES = 20
+MAX_CITIES = 60
 
 
 def _state_cities(rows: gpd.GeoDataFrame, places: pd.DataFrame) -> dict:

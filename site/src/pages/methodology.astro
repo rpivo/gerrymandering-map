@@ -143,9 +143,11 @@ const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
     <p>
       State maps mark the largest places in the state with a dot, as landmarks. Each dot is at the
       Census Bureau's "internal point" for the place, a spot it picks inside the place's borders,
-      which is usually near its middle but not always at its downtown. The biggest places come
-      first, and a place is left off when its label would cover another one, so smaller maps,
-      such as on a phone, mark fewer. A city that shares one government with its county is
+      which is usually near its middle but not always at its downtown. Each map marks up to 10,
+      biggest first. A place is skipped when it sits right next to one already marked, such as
+      a suburb beside its city, so the marks spread across the state, and when its label would
+      cover another one. So a map can skip a big suburb for a smaller city elsewhere, and a
+      smaller map, such as on a phone, can mark fewer. A city that shares one government with its county is
       labeled by the city's name alone, such as Nashville for Nashville-Davidson.
     </p>
 
