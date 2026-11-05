@@ -4,7 +4,8 @@ Everything in `site/src/data/` is generated, committed, and never edited by hand
 
 - `districts.json`: scores for every district.
 - `shapes.json`: SVG outlines for every district (a coarse one for cards, a finer one
-  for its page) and a map of each state's districts.
+  for its page) and a map of each state's districts, with close-ups of its areas where
+  districts are drawn too small to see.
 - `states.json`: each state's name, seats and the 2026 map details from the audit.
 - `population.json`: each district's 2020 voting-age population by race (written by
   `python -m gerry population`).
@@ -27,6 +28,7 @@ from gerry.display import (
     display_crop,
     district_outline,
     district_points,
+    state_closeups,
     state_map,
     state_points,
     us_map,
@@ -130,6 +132,11 @@ def _displayed(districts: gpd.GeoDataFrame) -> tuple[gpd.GeoDataFrame, dict[str,
     return shown, dict(zip(shown["district_id"], (note for _, note in crops), strict=True))
 
 
+def _state_drawing(rows: gpd.GeoDataFrame) -> dict:
+    """Return a state map, with its close-ups (squares drawn enlarged, which may be none)."""
+    return state_map(rows, STATE_DETAIL) | {"closeups": state_closeups(rows, STATE_DETAIL)}
+
+
 def write_shapes_json(districts: gpd.GeoDataFrame, path: Path) -> None:
     """Write site/src/data/shapes.json: district outlines and state maps as SVG paths.
 
@@ -151,7 +158,7 @@ def write_shapes_json(districts: gpd.GeoDataFrame, path: Path) -> None:
         },
         "states": {
             state: _with_note(
-                state_map(rows.sort_values("district_id"), STATE_DETAIL),
+                _state_drawing(rows.sort_values("district_id")),
                 next((notes[d] for d in sorted(rows["district_id"]) if notes[d]), None),
             )
             for state, rows in shown.groupby("state")

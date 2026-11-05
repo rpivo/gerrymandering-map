@@ -1,3 +1,4 @@
+import math
 import re
 
 import geopandas as gpd
@@ -7,11 +8,14 @@ from shapely.geometry import MultiPolygon, Polygon, box
 from test_metrics import square_in_lonlat
 
 from gerry.display import (
+    CLOSEUP_MIN_SIDE,
     VIEW_SIZE,
+    closeup_boxes,
     display_crop,
     district_outline,
     district_points,
     fit_to_view,
+    state_closeups,
     state_map,
     state_points,
     svg_path,
@@ -178,6 +182,14 @@ def shape_of(path: str):
     return shapely.union_all([Polygon(r) for r in rings])
 
 
+def evenodd_shape(path: str):
+    """The drawn shape with fill-rule="evenodd", as the site draws it: holes stay empty."""
+    shape = Polygon()
+    for ring in path.split("M")[1:]:
+        shape = shape.symmetric_difference(Polygon(points(f"M{ring}")))
+    return shape
+
+
 def covered_by_inset(drawn: dict, inset: str) -> list[str]:
     """The states whose drawn shapes an inset overlaps (sharing an edge isn't overlap)."""
     shapes = {s: shape_of(p) for s, p in drawn["paths"].items()}
@@ -228,3 +240,139 @@ class TestUsMap:
             assert covered_by_inset(drawn, inset) == []
         # Anchor: the crowding state is drawn, so "covers nothing" isn't vacuous.
         assert shape_of(drawn["paths"]["XX"]).area > 0
+
+
+class TestCloseupBoxes:
+    """Squares of a state map (view units, 1000 on the longer side) to show enlarged."""
+
+    SIZE = (1000, 800)
+
+    def test_none_when_every_district_is_big_enough_to_see(self):
+        # 100 units across: a tenth of the map, plenty to see, and its square would be small
+        # enough to keep, so only the size check leaves it out.
+        assert closeup_boxes([box(400, 400, 500, 500)], self.SIZE) == []
+
+    def test_one_square_around_a_cluster_of_tiny_districts(self):
+        tiny = [box(400 + 10 * i, 400, 410 + 10 * i, 410) for i in range(3)]
+        [(x0, y0, x1, y1)] = closeup_boxes([box(0, 0, 1000, 800), *tiny], self.SIZE)
+        assert x1 - x0 == pytest.approx(y1 - y0)
+        assert x1 - x0 == pytest.approx(CLOSEUP_MIN_SIDE)  # no closer than the most zoom
+        assert shapely.box(x0, y0, x1, y1).contains(shapely.union_all(tiny))
+
+    def test_a_big_cluster_gets_a_square_padded_around_it(self):
+        tiny = [
+            box(300 + 10 * i, 300 + 10 * j, 310 + 10 * i, 310 + 10 * j)
+            for i in range(20)
+            for j in range(20)
+        ]
+        [(x0, y0, x1, y1)] = closeup_boxes(tiny, self.SIZE)
+        # The 200-unit cluster, padded on every side, centered.
+        assert (
+            x1 - x0 > 200
+            and (x0 + x1) / 2 == pytest.approx(400)
+            and (y0 + y1) / 2 == pytest.approx(400)
+        )
+
+    def test_far_apart_clusters_get_their_own_squares(self):
+        a, b = box(100, 100, 110, 110), box(800, 600, 810, 610)
+        boxes = closeup_boxes([a, b], self.SIZE)
+        assert len(boxes) == 2
+        assert all(any(shapely.box(*bx).contains(t) for bx in boxes) for t in (a, b))
+
+    def test_squares_that_would_overlap_are_merged(self):
+        # 80 apart: separate clusters, but their smallest squares would overlap.
+        a, b = box(400, 400, 410, 410), box(490, 400, 500, 410)
+        [square] = closeup_boxes([a, b], self.SIZE)
+        assert shapely.box(*square).contains(a.union(b))
+
+    def test_a_square_near_the_edge_stays_inside_the_map(self):
+        [(x0, y0, x1, y1)] = closeup_boxes([box(990, 790, 1000, 800)], self.SIZE)
+        assert (x1, y1) == pytest.approx((1000, 800))
+        # Moved in whole, not cut down by the edge.
+        assert (x1 - x0, y1 - y0) == pytest.approx((CLOSEUP_MIN_SIDE, CLOSEUP_MIN_SIDE))
+
+    def test_a_long_thin_district_too_big_to_enlarge_much_is_left_alone(self):
+        # Narrow enough to count as small, but its square would be most of the map.
+        assert closeup_boxes([box(0, 400, 1000, 410)], self.SIZE) == []
+
+
+class TestStateCloseups:
+    @pytest.fixture
+    def districts(self):
+        # A 2-degree state with two 0.01-degree (about 1 km) districts side by side at its middle.
+        tiny = [box(-99.01, 40.99, -99.0, 41.0), box(-99.0, 40.99, -98.99, 41.0)]
+        rest = box(-100, 40, -98, 42).difference(shapely.union_all(tiny))
+        return gpd.GeoDataFrame(
+            {"district_id": ["KS-01", "KS-02", "KS-03"], "state": "KS"},
+            geometry=[rest, *tiny],
+            crs="EPSG:4269",
+        )
+
+    @pytest.fixture
+    def coastal(self, districts):
+        # A strait just north of the tiny districts, so their square's top part is empty.
+        sea = box(-100, 41.0, -98, 41.4)
+        districts.loc[0, "geometry"] = districts.geometry[0].difference(sea)
+        return districts
+
+    @pytest.mark.parametrize("state", ["districts", "coastal"])
+    def test_draws_the_tiny_districts_enlarged_where_the_square_shows_them(self, state, request):
+        districts = request.getfixturevalue(state)
+        main = state_map(districts, 0.002)
+        [closeup] = state_closeups(districts, 0.002)
+        x0, y0, x1, y1 = closeup["box"]
+        width, height = map(int, closeup["viewBox"].split()[2:])
+        assert max(width, height) == VIEW_SIZE
+        zoom = VIEW_SIZE / max(x1 - x0, y1 - y0)
+        assert zoom > 5
+        for district in ("KS-02", "KS-03"):
+            mx0, my0, mx1, my1 = bounds_of(main["paths"][district])
+            cx0, cy0, cx1, cy1 = bounds_of(closeup["paths"][district])
+            # The same spot, moved to the square's corner and scaled up (main-map rounding aside).
+            assert cx0 == pytest.approx((mx0 - x0) * zoom, abs=zoom)
+            assert cy1 == pytest.approx((my1 - y0) * zoom, abs=zoom)
+            assert cx1 - cx0 == pytest.approx((mx1 - mx0) * zoom, abs=2 * zoom)
+
+    def test_draws_the_districts_around_them_cut_to_the_square(self, districts):
+        [closeup] = state_closeups(districts, 0.002)
+        assert set(closeup["paths"]) == {"KS-01", "KS-02", "KS-03"}
+        width, height = map(int, closeup["viewBox"].split()[2:])
+        assert bounds_of(closeup["paths"]["KS-01"]) == (0, 0, width, height)
+
+    def test_keeps_shared_borders_identical(self, districts):
+        [closeup] = state_closeups(districts, 0.002)
+        shared = set(points(closeup["paths"]["KS-02"])) & set(points(closeup["paths"]["KS-03"]))
+        assert len(shared) >= 2
+
+    def test_districts_tile_the_square_without_gaps_or_overlaps(self, districts):
+        # An irregular shared border wiggling up to 200 m either side: some wiggles are kept at the
+        # close-up's detail (about 55 m) and some aren't.
+        wiggle = [0.0016 * math.sin(i * 1.7) + 0.0008 * math.sin(i * 0.37) for i in range(51)]
+        zigzag = [(-99.0 + dx, 40.99 + i * 0.0002) for i, dx in enumerate(wiggle)]
+        west = Polygon([(-99.01, 40.99), *zigzag, (-99.01, 41.0)])
+        east = Polygon([*zigzag[::-1][:1], (-98.99, 41.0), (-98.99, 40.99), *zigzag])
+        districts.loc[1, "geometry"], districts.loc[2, "geometry"] = west, east.buffer(0)
+        [closeup] = state_closeups(districts, 0.002)
+        shapes = [evenodd_shape(p) for p in closeup["paths"].values()]
+        width, height = map(int, closeup["viewBox"].split()[2:])
+        # Exact to a square unit: a few dozen square units of gap is what separately simplified
+        # borders leave here.
+        assert sum(g.area for g in shapes) == pytest.approx(width * height, abs=1)
+        assert shapely.union_all(shapes).area == pytest.approx(width * height, abs=1)
+
+    def test_is_drawn_from_full_detail_not_the_simplified_map(self, districts):
+        # A 50 m notch in a tiny district: far below the main map's detail, but visible enlarged.
+        notch = box(-99.0055, 40.9945, -99.005, 41.0)
+        districts.loc[1, "geometry"] = districts.geometry[1].difference(notch)
+        districts.loc[0, "geometry"] = districts.geometry[0].union(notch)
+        [closeup] = state_closeups(districts, 0.002)
+        main = state_map(districts, 0.002)
+        assert len(points(closeup["paths"]["KS-02"])) > len(points(main["paths"]["KS-02"]))
+
+    def test_none_for_a_state_whose_districts_are_all_big(self):
+        halves = gpd.GeoDataFrame(
+            {"district_id": ["KS-01", "KS-02"], "state": "KS"},
+            geometry=[box(-100, 40, -99, 42), box(-99, 40, -98, 42)],
+            crs="EPSG:4269",
+        )
+        assert state_closeups(halves, 0.002) == []
