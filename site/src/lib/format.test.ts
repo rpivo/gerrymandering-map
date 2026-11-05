@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { districtTitle, lessCompactThan, measurePercentileText, ordinal, scoreBand } from "./format";
+import { sources } from "./data";
+import { districtTitle, lessCompactThan, measurePercentileText, ordinal, scoreBand, sourceNote } from "./format";
 
 describe("ordinal", () => {
   it.each([
@@ -81,5 +82,26 @@ describe("measurePercentileText", () => {
 
   it("calls the very top the most compact", () => {
     expect(measurePercentileText(100)).toBe("the most compact district on this measure");
+  });
+});
+
+describe("sourceNote", () => {
+  it("ends the description with one period, even when it already has one", () => {
+    expect(sourceNote("Congress Act 2 (SB 121), 2026 Regular Session. Page: https://x.gov", "No license stated", "2026-11-04")).toBe(
+      "Congress Act 2 (SB 121), 2026 Regular Session. No license stated. Downloaded 2026-11-04.",
+    );
+  });
+
+  it("adds the period when the description has none", () => {
+    expect(sourceNote("TIGER/Line 2020 blocks", "Public domain (U.S. Government work)", "2026-11-04")).toBe(
+      "TIGER/Line 2020 blocks. Public domain (U.S. Government work). Downloaded 2026-11-04.",
+    );
+  });
+
+  it("never doubles a period for any source the site lists", () => {
+    // Anchor: the site credits a dozen boundary sources, so an empty list can't pass.
+    const notes = sources.filter((s) => s.role === "boundaries").map((s) => sourceNote(s.description, s.license, s.downloaded));
+    expect(notes.length).toBeGreaterThan(10);
+    expect(notes.filter((n) => n.includes(".."))).toEqual([]);
   });
 });

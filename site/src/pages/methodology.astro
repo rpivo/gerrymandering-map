@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import { rankedCount, sources, states } from "../lib/data";
+import { sourceNote } from "../lib/format";
 
 const boundarySources = sources.filter((s) => s.role === "boundaries");
 const calibrationCount = sources.filter((s) => s.role === "calibration").length;
@@ -101,8 +102,7 @@ const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
       {
         boundarySources.map((s) => (
           <li>
-            <a href={s.url}>{s.publisher}</a>: {s.description.replace(/ Page: .*$/, "")}. {s.license}.
-            Downloaded {s.downloaded}.
+            <a href={s.url}>{s.publisher}</a>: {sourceNote(s.description, s.license, s.downloaded)}
           </li>
         ))
       }

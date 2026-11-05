@@ -79,3 +79,16 @@ export function measurePercentileText(pct: number): string {
   }
   return `at least as compact as ${Math.round(pct)}% of districts on this measure`;
 }
+
+/**
+ * Describe a data source for the methodology page's credits.
+ * Drops the trailing " Page: <url>" (the publisher's name already links there) and ends each part with one period.
+ * @param description - The source's description from sources.json.
+ * @param license - Its license, such as "Public domain (U.S. Government work)".
+ * @param downloaded - The download date, YYYY-MM-DD.
+ * @returns A sentence such as "TIGER/Line 2020 blocks. Public domain (U.S. Government work). Downloaded 2026-11-04."
+ */
+export function sourceNote(description: string, license: string, downloaded: string): string {
+  const what = description.replace(/ Page: .*$/, "").replace(/\.$/, "");
+  return `${what}. ${license}. Downloaded ${downloaded}.`;
+}
