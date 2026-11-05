@@ -109,6 +109,10 @@ The pipeline doesn't run on Cloudflare: the site builds only from the committed 
 
 To check a deploy locally without uploading: `cd site && pnpm build && pnpm exec wrangler deploy --dry-run`.
 
+## Support
+
+The project is supported by donations through Ko-fi (https://ko-fi.com/rpivovar), linked from every page's footer. `.github/FUNDING.yml` adds the same link as a Sponsor button on the GitHub repo.
+
 ## License
 
 - **Code:** MIT License, in [`LICENSE`](LICENSE).
