@@ -3,7 +3,7 @@ import { districtTitle, lessCompactThan, scoreBand } from "./format";
 import { lightTokens } from "./tokens";
 
 /** The site's public address, for the absolute URLs link previews need. Change it if the domain changes. */
-export const SITE_URL = "https://gerrymandering-map.ryanpivovar.workers.dev";
+export const SITE_URL = "https://gerrymandermap.us";
 
 const WIDTH = 1200;
 const HEIGHT = 630;

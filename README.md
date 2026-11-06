@@ -4,7 +4,7 @@ A website that lists every US congressional district, shows its shape, and score
 
 The scores describe shape, not intent. An irregular district isn't proof of a gerrymander, and a compact one isn't proof against it.
 
-**Status:** the site is built: a searchable grid of all 435 districts under a clickable US map that opens each state's page, a page for every district and state (with partisan fairness scores for the 28 states that can be scored so far), and a methodology page. It's live at https://gerrymandering-map.ryanpivovar.workers.dev (see Deploy below). Run `make site-dev` to see it locally at http://localhost:4324.
+**Status:** the site is built: a searchable grid of all 435 districts under a clickable US map that opens each state's page, a page for every district and state (with partisan fairness scores for the 28 states that can be scored so far), and a methodology page. It's live at https://gerrymandermap.us (see Deploy below). Run `make site-dev` to see it locally at http://localhost:4324.
 
 ## Layout
 
@@ -83,7 +83,9 @@ For each measure, a district's percentile is where it falls among the 429 distri
 
 ## Deploy
 
-The site is a Cloudflare Worker that serves the Astro build as static files (no Worker script), connected to this GitHub repo with Workers Builds. Every merge to `main` deploys to production at https://gerrymandering-map.ryanpivovar.workers.dev. Branches and PRs don't get preview builds: check changes on the local dev server (`make site-dev`) instead.
+The site is a Cloudflare Worker that serves the Astro build as static files (no Worker script), connected to this GitHub repo with Workers Builds. Every merge to `main` deploys to production at https://gerrymandermap.us.
+
+The domain is registered with Cloudflare, in the same account. `routes` in `site/wrangler.json` attaches both gerrymandermap.us and www.gerrymandermap.us to the Worker as custom domains, so each deploy keeps them attached and Cloudflare manages their DNS records and certificates. A Redirect Rule on the gerrymandermap.us zone (Rules, Redirect Rules, set in the dashboard) sends www.gerrymandermap.us permanently to the same path on gerrymandermap.us. The original address, https://gerrymandering-map.ryanpivovar.workers.dev, still serves the site, and every page's canonical link points to gerrymandermap.us. `SITE_URL` in `site/src/lib/og.ts` holds the address for canonical links and link previews. Branches and PRs don't get preview builds: check changes on the local dev server (`make site-dev`) instead.
 
 The Worker's config is `site/wrangler.json`. Build settings in the Cloudflare dashboard (Workers & Pages, Create application, Continue with GitHub):
 

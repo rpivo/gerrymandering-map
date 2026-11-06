@@ -12,6 +12,13 @@ describe("Cloudflare Worker config", () => {
     expect("main" in config).toBe(false);
   });
 
+  it("serves the site on gerrymandermap.us, with www attached for its redirect", () => {
+    expect(config.routes).toEqual([
+      { pattern: "gerrymandermap.us", custom_domain: true },
+      { pattern: "www.gerrymandermap.us", custom_domain: true },
+    ]);
+  });
+
   it("sets a compatibility date", () => {
     expect(config.compatibility_date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
