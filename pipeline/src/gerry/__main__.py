@@ -30,6 +30,7 @@ from gerry.export import (
     write_fairness_json,
     write_places_json,
     write_population_json,
+    write_president_json,
     write_shapes_json,
     write_sources_json,
     write_states_json,
@@ -81,6 +82,7 @@ from gerry.votes import (
     read_precinct_returns,
     replace_county,
     state_quality,
+    statewide_totals,
     two_party_by_precinct,
     unopposed_districts,
 )
@@ -221,7 +223,10 @@ def _place_president_2024(raw: Path, manifest: Path) -> tuple[pd.DataFrame, pd.D
     nj = manifest.parent / "votes" / "nj-2024-president-by-county.csv"
     two = calibrate_to_county_totals(two, pd.read_csv(nj, dtype={"county_fips": str}))
     assigned = assign_to_districts(two, weights, unopposed_districts(weights))
-    return district_totals(assigned), state_quality(assigned)
+    at_large = statewide_totals(two, [s.usps for s in STATES if s.seats == 1])
+    return pd.concat([district_totals(assigned), at_large], ignore_index=True), state_quality(
+        assigned
+    )
 
 
 def votes(repo_root: Path) -> int:
@@ -247,7 +252,8 @@ def votes(repo_root: Path) -> int:
     if both:
         _print_problems([f"{s}: has an official report but kept its 2024 lines." for s in both])
         return 1
-    keep = totals["state"].isin(lined)
+    at_large = {s.usps for s in STATES if s.seats == 1}
+    keep = totals["state"].isin(lined | at_large)
     votes_dir = data / "sources" / "votes"
     official = [read_official_results(votes_dir / name) for name in OFFICIAL_RESULTS.values()]
     out = data / "build" / "president-2024-by-district.csv"
@@ -256,8 +262,10 @@ def votes(repo_root: Path) -> int:
     quality = quality[quality["state"].isin(lined)]
     quality.to_csv(out.with_name("president-2024-quality.csv"), index=False)
     shaky = quality[(quality["big_row_pct"] > MAX_BIG_ROW_PCT) | (quality["lost_pct"] > 0)]
+    joined = keep & ~totals["state"].isin(at_large)
     print(
-        f"{keep.sum()} districts in {totals[keep]['state'].nunique()} states kept their 2024 lines."
+        f"{joined.sum()} districts in {totals[joined]['state'].nunique()} states kept their 2024 "
+        f"lines, plus {len(at_large)} at-large districts (each a whole state)."
     )
     print(f"Official reports for redrawn states: {', '.join(OFFICIAL_RESULTS)}.")
     for r in shaky.itertuples():
@@ -280,6 +288,7 @@ def fairness(repo_root: Path) -> int:
     table.to_csv(out, index=False)
     site_json = repo_root / "site" / "src" / "data" / "fairness.json"
     write_fairness_json(table, read_state_audit(repo_root / "data/sources/states.csv"), site_json)
+    write_president_json(pd.read_csv(votes_csv), site_json.with_name("president-2024.json"))
     shown = table.sort_values("efficiency_gap", key=abs, ascending=False)
     print(
         f"Scored {len(table)} states with {MIN_DISTRICTS}+ districts. Positive favors Republicans."

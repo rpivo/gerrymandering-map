@@ -52,3 +52,48 @@ describe("a district page's outline", () => {
     expect(html.slice(html.indexOf('id="state-heading"'))).toMatch(/class="cities state-tier-0/);
   });
 });
+
+describe("a district page's 2024 presidential vote", () => {
+  const section = async (id: string) => {
+    const html = await render(id);
+    const start = html.indexOf('id="president-heading"');
+    expect(start).toBeGreaterThan(-1); // anchor: every district has the section
+    expect(start).toBeLessThan(html.indexOf('id="state-heading"'));
+    const end = html.indexOf("</section>", start);
+    return {
+      html: html.slice(start, end),
+      text: html
+        .slice(start, end)
+        .replace(/<[^>]+>/g, " ")
+        .replace(/&#39;/g, "'")
+        .replace(/\s+/g, " "),
+    };
+  };
+
+  it("gives both candidates' shares, added up from precincts where the lines didn't change", async () => {
+    const { text, html } = await section("NE-02");
+    expect(text).toContain("Kamala Harris 52.3%");
+    expect(text).toContain("Donald Trump 47.7%");
+    expect(text).toContain("added up from precinct results");
+    expect(html).toContain('href="/methodology#votes"');
+  });
+
+  it("uses the state's own report for a redrawn district it published results for", async () => {
+    const { text } = await section("TX-35");
+    expect(text).toContain("Kamala Harris 44.7%");
+    expect(text).toContain("Texas published 2024 results on its 2026 lines");
+    expect(text).not.toContain("precinct");
+  });
+
+  it("gives the whole state's vote for an at-large district", async () => {
+    const { text } = await section("AK-AL");
+    expect(text).toContain("Kamala Harris 43.2%");
+    expect(text).toContain("the whole state's vote");
+  });
+
+  it("says no results exist yet for a redrawn district without any", async () => {
+    const { text } = await section("CA-34");
+    expect(text).not.toMatch(/\d%/);
+    expect(text).toContain("California drew new lines for 2026");
+  });
+});

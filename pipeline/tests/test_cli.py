@@ -260,7 +260,7 @@ def test_scores_needs_the_built_map_first(tmp_path, capsys):
 
 VOTES_HEADER = (
     "precinct,office,party_simplified,mode,votes,county_fips,jurisdiction_fips,district,state_po,"
-    "party_detailed\n"
+    "party_detailed,candidate\n"
 )
 
 
@@ -269,15 +269,15 @@ def write_votes_repo(tmp_path: Path, tx_harris: int) -> Path:
     pres = (
         VOTES_HEADER
         + "".join(
-            f"{st}{d},US PRESIDENT,{party},TOTAL,{v},{c},{c},STATEWIDE,{st},{party}\n"
+            f"{st}{d},US PRESIDENT,{party},TOTAL,{v},{c},{c},STATEWIDE,{st},{party},\n"
             for st, c in (("TX", "48001"), ("WA", "53001"))
             for d in (1, 2)
             for party, v in (("DEMOCRAT", 60 * d), ("REPUBLICAN", 40))
         )
-        + "WY1,US PRESIDENT,DEMOCRAT,TOTAL,9,56001,56001,STATEWIDE,WY,DEMOCRAT\n"
+        + "WY1,US PRESIDENT,DEMOCRAT,TOTAL,9,56001,56001,STATEWIDE,WY,DEMOCRAT,\n"
     )
     house = VOTES_HEADER + "".join(
-        f"{st}{d},US HOUSE,DEMOCRAT,TOTAL,5,{c},{c},00{d},{st},DEMOCRAT\n"
+        f"{st}{d},US HOUSE,DEMOCRAT,TOTAL,5,{c},{c},00{d},{st},DEMOCRAT,\n"
         for st, c in (("TX", "48001"), ("WA", "53001"))
         for d in (1, 2)
     )
@@ -322,10 +322,11 @@ def test_votes_writes_unchanged_states_and_checks_texas(tmp_path, monkeypatch, c
     monkeypatch.setattr(cli, "fetch", fake_votes_fetch(raw))
     assert cli.main(["votes", "--repo-root", str(tmp_path)]) == 0
     out = pd.read_csv(tmp_path / "data" / "build" / "president-2024-by-district.csv")
-    # Texas redrew for 2026, so its 2024-map results are only used for the check.
-    # Wyoming has one at-large seat: no lines, nothing to place. Texas redrew, so its
-    # precinct join (on the 2024 map) is only for the check; its official report is used.
-    assert sorted(out["state"].unique()) == ["TX", "WA"]
+    # Texas redrew, so its precinct join (on the 2024 map) is only for the check; its official
+    # report is used. Wyoming's one at-large district is the whole state.
+    assert sorted(out["state"].unique()) == ["TX", "WA", "WY"]
+    wy = out[out["state"] == "WY"]
+    assert wy[["district", "dem", "rep", "method"]].values.tolist() == [[0, 9, 0, "statewide"]]
     wa = out[out["state"] == "WA"]
     # King County's one precinct (6 Harris votes, district 1) joins WA's other precincts.
     assert wa[["district", "dem", "rep"]].values.tolist() == [[1, 66, 40], [2, 120, 40]]
@@ -378,6 +379,14 @@ def test_fairness_scores_states_from_the_votes_output(tmp_path, capsys):
     assert by_state["AR"]["efficiency_gap"] == pytest.approx(out.loc[0, "efficiency_gap"], abs=1e-4)
     assert by_state["NH"]["status"] == "too_few_districts"
     assert "AR" in capsys.readouterr().out
+    # Each district's own result, for its page.
+    president = json.loads((tmp_path / "site/src/data/president-2024.json").read_text())
+    assert president["districts"]["NH-02"] == {
+        "harris": 0.6,
+        "trump": 0.4,
+        "method": "official report",
+    }
+    assert len(president["districts"]) == 6
 
 
 def test_fairness_asks_for_the_votes_first(tmp_path, capsys):

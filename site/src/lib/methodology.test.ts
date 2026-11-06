@@ -40,6 +40,12 @@ describe("the methodology page", () => {
     expect(text).toContain("Close-ups mark the largest places in them the same way as state maps");
   });
 
+  it("explains the 2024 vote on district pages, with an anchor they can link to", () => {
+    expect(html).toMatch(/<h3[^>]*id="votes"/);
+    expect(text).toContain("District pages show each district's 2024 presidential vote");
+    expect(text).toContain("a district covering a whole state gets the state's vote");
+  });
+
   it("has a fairness section the state pages can link to", () => {
     expect(html).toMatch(/<h2[^>]*id="fairness"/);
   });
