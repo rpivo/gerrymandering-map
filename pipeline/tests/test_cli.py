@@ -259,7 +259,8 @@ def test_scores_needs_the_built_map_first(tmp_path, capsys):
 
 
 VOTES_HEADER = (
-    "precinct,office,party_simplified,mode,votes,county_fips,jurisdiction_fips,district,state_po\n"
+    "precinct,office,party_simplified,mode,votes,county_fips,jurisdiction_fips,district,state_po,"
+    "party_detailed\n"
 )
 
 
@@ -268,15 +269,15 @@ def write_votes_repo(tmp_path: Path, tx_harris: int) -> Path:
     pres = (
         VOTES_HEADER
         + "".join(
-            f"{st}{d},US PRESIDENT,{party},TOTAL,{v},{c},{c},STATEWIDE,{st}\n"
+            f"{st}{d},US PRESIDENT,{party},TOTAL,{v},{c},{c},STATEWIDE,{st},{party}\n"
             for st, c in (("TX", "48001"), ("WA", "53001"))
             for d in (1, 2)
             for party, v in (("DEMOCRAT", 60 * d), ("REPUBLICAN", 40))
         )
-        + "WY1,US PRESIDENT,DEMOCRAT,TOTAL,9,56001,56001,STATEWIDE,WY\n"
+        + "WY1,US PRESIDENT,DEMOCRAT,TOTAL,9,56001,56001,STATEWIDE,WY,DEMOCRAT\n"
     )
     house = VOTES_HEADER + "".join(
-        f"{st}{d},US HOUSE,DEMOCRAT,TOTAL,5,{c},{c},00{d},{st}\n"
+        f"{st}{d},US HOUSE,DEMOCRAT,TOTAL,5,{c},{c},00{d},{st},DEMOCRAT\n"
         for st, c in (("TX", "48001"), ("WA", "53001"))
         for d in (1, 2)
     )

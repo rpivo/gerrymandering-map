@@ -369,9 +369,9 @@
       "dem_vote_share": 0.5301,
       "dem_seats": 8,
       "one_party_won_every_district": false,
-      "efficiency_gap": -0.0822,
-      "mean_median": 0.0141,
-      "declination": -0.0613,
+      "efficiency_gap": -0.0791,
+      "mean_median": 0.0146,
+      "declination": -0.0585,
       "method": "precinct join"
     },
     {
