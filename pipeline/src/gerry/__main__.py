@@ -50,6 +50,7 @@ from gerry.export import (
     write_sources_json,
     write_states_json,
     write_us_map_json,
+    write_zips_json,
 )
 from gerry.fairness import MIN_DISTRICTS, state_fairness
 from gerry.fetch import CENSUS_CD119, CENSUS_STATES, fetch, read_manifest
@@ -102,6 +103,7 @@ from gerry.votes import (
     two_party_by_precinct,
     unopposed_districts,
 )
+from gerry.zips import ZCTA_BLOCKS, district_zctas, read_zcta_blocks, zcta_shares
 
 # pipeline/src/gerry/__main__.py -> repo root
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -322,9 +324,11 @@ def _population_tables(districts: gpd.GeoDataFrame, raw: Path, manifest: Path):
 
     Returns:
         Population per district, place counts per district, every place (at populated_points),
-        each place's part of each district with a point (piece_points), and place problems.
+        each place's part of each district with a point (piece_points), place problems, and
+        each ZIP code area's residents per district with shares (gerry.zips.zcta_shares).
     """
     tables, place_tables, all_places, pieces, problems = [], [], [], [], []
+    zcta_blocks, zcta_counts = read_zcta_blocks(fetch(ZCTA_BLOCKS, raw, manifest)), []
     for state in STATES:
         pl_zip = fetch(pl_source(state.usps), raw, manifest)
         blocks = read_pl_blocks(pl_zip)
@@ -338,12 +342,14 @@ def _population_tables(districts: gpd.GeoDataFrame, raw: Path, manifest: Path):
         all_places.append(populated_points(places, placed))
         pieces.append(piece_points(placed))
         problems += place_problems(placed, found, places)
+        zcta_counts.append(district_zctas(placed, zcta_blocks))
     return (
         pd.concat(tables, ignore_index=True),
         pd.concat(place_tables, ignore_index=True),
         pd.concat(all_places, ignore_index=True),
         pd.concat(pieces, ignore_index=True),
         problems,
+        zcta_shares(pd.concat(zcta_counts, ignore_index=True)),
     )
 
 
@@ -356,7 +362,7 @@ def population(repo_root: Path) -> int:
         return 1
     districts = gpd.read_file(built).to_crs("EPSG:4269")
     raw, manifest = repo_root / "data" / "raw", repo_root / "data" / "sources" / "sources.csv"
-    table, places, all_places, pieces, problems = _population_tables(districts, raw, manifest)
+    table, places, all_places, pieces, problems, zips = _population_tables(districts, raw, manifest)
     out = build / "population-by-district.csv"
     table.to_csv(out, index=False)
     places.to_csv(build / "places-by-district.csv", index=False)
@@ -374,8 +380,12 @@ def population(repo_root: Path) -> int:
     write_places_json(places, table[["district_id", "pop"]], site / "places.json")
     write_cities_json(districts, all_places, site / "cities.json")
     write_district_cities_json(districts, pieces, all_places, site / "district-cities.json")
-    print(f"Wrote {(site / 'population.json').relative_to(repo_root)}, places.json, cities.json "
-          "and district-cities.json")  # fmt: skip
+    write_zips_json(zips, site / "zips.json")
+    write_sources_json(read_manifest(manifest), site / "sources.json")
+    in_zips = zips["pop"].sum() / table["pop"].sum() if len(table) else 0
+    print(f"Wrote {(site / 'population.json').relative_to(repo_root)}, places.json, cities.json, "
+          "district-cities.json and zips.json")  # fmt: skip
+    print(f"{in_zips:.2%} of residents live in a ZIP code area.")
     return 0
 
 

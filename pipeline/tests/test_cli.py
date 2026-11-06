@@ -394,6 +394,14 @@ def test_fairness_asks_for_the_votes_first(tmp_path, capsys):
     assert "make votes" in capsys.readouterr().out
 
 
+@pytest.fixture(autouse=True)
+def no_zcta_file(monkeypatch):
+    """Commands that place blocks read the national ZCTA file; tests give them none."""
+    monkeypatch.setattr(
+        cli, "read_zcta_blocks", lambda path: pd.DataFrame({"block": [], "zcta": []})
+    )
+
+
 def test_population_places_census_blocks_in_the_built_districts(tmp_path, monkeypatch, capsys):
     from shapely.geometry import box as shape_box
     from test_population import write_pl_zip
@@ -416,8 +424,12 @@ def test_population_places_census_blocks_in_the_built_districts(tmp_path, monkey
 
     monkeypatch.setattr(cli, "fetch", fake_fetch)
     monkeypatch.setattr(cli, "STATES", [STATES_BY_USPS["WY"]])
+    zctas = pd.DataFrame({"block": [560019627001000, 560019627001001], "zcta": [82070, 82072]})
+    monkeypatch.setattr(cli, "read_zcta_blocks", lambda path: zctas)
     assert cli.main(["population", "--repo-root", str(tmp_path)]) == 0
-    assert fetched == ["census-pl94171-2020-56"]
+    assert fetched == ["census-zcta520-tabblock20", "census-pl94171-2020-56"]
+    zips = json.loads((tmp_path / "site/src/data/zips.json").read_text())
+    assert zips["districts"] == {"WY-AL": [["82070", 1], ["82072", 1]]}
     table = pd.read_csv(build / "population-by-district.csv")
     assert table["district_id"].tolist() == ["WY-AL"]
     assert (table.loc[0, "pop"], table.loc[0, "vap"], table.loc[0, "minority"]) == (200, 150, 85)

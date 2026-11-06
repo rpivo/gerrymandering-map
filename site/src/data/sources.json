@@ -605,6 +605,15 @@
       "role": "calibration"
     },
     {
+      "id": "census-zcta520-tabblock20",
+      "publisher": "U.S. Census Bureau",
+      "description": "2020 ZIP Code Tabulation Area to 2020 census block relationship file: the ZIP code area each block belongs to. Page: https://www.census.gov/geographies/reference-files/time-series/geo/relationship-files.2020.html",
+      "url": "https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_tabblock20_natl.txt",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-06",
+      "role": "zips"
+    },
+    {
       "id": "fl-2026-eogpcrp2026-congress",
       "publisher": "Florida Legislature, Office of Economic and Demographic Research",
       "description": "2026 congressional plan EOGPCRP2026 (HB 1-D), revised 2026-05-04. Page: https://www.edr.state.fl.us/Content/redistricting/2026redistricting/index.cfm",

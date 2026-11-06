@@ -1,0 +1,78 @@
+---
+import { getZips, zipLabel, zipSummary, ZIPS_SHOWN_OPEN } from "../lib/zips";
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+const zips = getZips(id);
+const long = zips.length > ZIPS_SHOWN_OPEN;
+---
+
+{
+  zips.length > 0 && (
+    <section class="zips" aria-labelledby="zips-heading">
+      <h2 id="zips-heading">ZIP codes</h2>
+      <p class="intro">
+        {zipSummary(zips)} A percentage is the share of that ZIP code's 2020 residents who live here.
+      </p>
+      {
+        long ? (
+          <details>
+            <summary>Show all {zips.length} ZIP codes</summary>
+            <ul>
+              {zips.map((z) => (
+                <li>{zipLabel(z)}</li>
+              ))}
+            </ul>
+          </details>
+        ) : (
+          <ul>
+            {zips.map((z) => (
+              <li>{zipLabel(z)}</li>
+            ))}
+          </ul>
+        )
+      }
+      <p class="note">
+        These are the Census Bureau's ZIP code areas, which match residential ZIP codes closely. ZIP codes used only
+        for PO boxes or a single organization aren't included. <a href="/methodology#zips">How ZIP codes are matched</a>
+      </p>
+    </section>
+  )
+}
+
+<style>
+  .zips h2 {
+    font-size: 1.25rem;
+  }
+
+  ul {
+    max-width: 42rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(6.25rem, 1fr));
+    gap: 0.25rem 0.75rem;
+    padding: 0;
+    list-style: none;
+    font-variant-numeric: tabular-nums;
+  }
+
+  summary {
+    cursor: pointer;
+    color: var(--accent);
+  }
+
+  details[open] summary {
+    margin-bottom: 0.5rem;
+  }
+
+  .intro,
+  .note {
+    max-width: 42rem;
+  }
+
+  .note {
+    color: var(--text-muted);
+  }
+</style>

@@ -8,6 +8,7 @@ import { sourceNote } from "../lib/format";
 const boundarySources = sources.filter((s) => s.role === "boundaries");
 const voteSources = sources.filter((s) => s.role === "votes");
 const memberSources = sources.filter((s) => s.role === "members");
+const zipSources = sources.filter((s) => s.role === "zips");
 const resultSources = Object.entries(electedSources());
 const asOfCalls = calledAsOf();
 // The 50 state redistricting files share one credit, linked to the Census folder that holds them.
@@ -162,6 +163,22 @@ const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
       average, so the dot always falls inside the district.
     </p>
 
+    <h2 id="zips">ZIP codes in each district</h2>
+    <p>
+      A ZIP code is a set of mail delivery routes, not an area on a map. For statistics, the Census
+      Bureau draws ZIP Code Tabulation Areas: it gives each 2020 census block the ZIP code most of
+      its addresses use, so each area is a group of whole blocks that closely matches a
+      residential ZIP code. ZIP codes used only for PO boxes or a single organization, and ZIP
+      codes created since 2020, have no area, so they aren't listed.
+    </p>
+    <p>
+      Each block's 2020 residents count toward the district it's placed in, the same way as for
+      population and places. A district page lists every ZIP code with residents in the district.
+      Where a ZIP code is split between districts, it shows the share of that ZIP code's residents,
+      across every state, who live in the district. Someone whose ZIP code is split should check
+      their address with their state or county election office.
+    </p>
+
     <h2 id="closeups">Close-ups of crowded areas</h2>
     <p>
       Some districts cover only a few city neighborhoods, so on a state map they're too small to
@@ -301,6 +318,16 @@ const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
         <a href={populationFolder}>U.S. Census Bureau</a>: 2020 Census Redistricting Data (PL 94-171),
         one file for each state. Public domain (U.S. Government work). Downloaded {populationDownloaded}.
       </li>
+    </ul>
+    <h3>ZIP codes</h3>
+    <ul class="sources">
+      {
+        zipSources.map((s) => (
+          <li>
+            <a href={s.url}>{s.publisher}</a>: {sourceNote(s.description, s.license, s.downloaded)}
+          </li>
+        ))
+      }
     </ul>
     <h3>Votes</h3>
     <ul class="sources">

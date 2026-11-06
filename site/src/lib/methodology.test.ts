@@ -106,3 +106,17 @@ describe("the methodology page", () => {
     }
   });
 });
+
+describe("the methodology page's ZIP codes", () => {
+  it("explains how ZIP codes are matched to districts, with an anchor", () => {
+    expect(html).toMatch(/<h2[^>]*id="zips"/);
+    expect(text).toContain("ZIP Code Tabulation Areas");
+    expect(text).toContain("PO boxes");
+  });
+
+  it("credits the ZIP code area file", () => {
+    const zips = sources.filter((s) => s.role === "zips");
+    expect(zips).toHaveLength(1); // anchor
+    expect(html).toContain(`href="${zips[0]?.url}"`);
+  });
+});

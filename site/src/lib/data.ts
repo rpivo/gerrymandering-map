@@ -51,7 +51,7 @@ export interface Source {
   url: string;
   license: string;
   downloaded: string;
-  role: "boundaries" | "calibration" | "votes" | "population" | "members";
+  role: "boundaries" | "calibration" | "votes" | "population" | "members" | "zips";
 }
 
 /** An SVG outline: a viewBox and a path. */
