@@ -42,17 +42,17 @@ const themeToggle = `(${setupThemeToggle.toString()})(document.documentElement, 
       <a class="site-name" href="/">Gerrymandering Map</a>
       <nav aria-label="Main">
         <a href="/methodology">How scores work</a>
-        <button type="button" class="theme-toggle" role="switch" aria-checked="false" aria-label="Dark mode" hidden>
-          <span class="knob"></span>
-          <svg class="icon sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <circle cx="12" cy="12" r="4" />
-            <path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" />
-          </svg>
-          <svg class="icon moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M20 14.6A8.2 8.2 0 0 1 9.4 4a8.2 8.2 0 1 0 10.6 10.6z" />
-          </svg>
-        </button>
       </nav>
+      <button type="button" class="theme-toggle" role="switch" aria-checked="false" aria-label="Dark mode" hidden>
+        <span class="knob"></span>
+        <svg class="icon sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" />
+        </svg>
+        <svg class="icon moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M20 14.6A8.2 8.2 0 0 1 9.4 4a8.2 8.2 0 1 0 10.6 10.6z" />
+        </svg>
+      </button>
     </header>
     <slot />
     <footer class="site-footer">
@@ -78,24 +78,39 @@ const themeToggle = `(${setupThemeToggle.toString()})(document.documentElement, 
     padding: 1rem;
   }
 
+  /* One row: the name on the left, the link and the theme switch on the right. */
   .site-header {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    grid-template-areas: "name nav toggle";
     gap: 0.5rem 1rem;
-    align-items: baseline;
-    justify-content: space-between;
+    align-items: center;
     border-bottom: 1px solid var(--border);
   }
 
+  .site-name {
+    grid-area: name;
+  }
+
   nav {
-    display: flex;
-    gap: 1rem;
-    align-items: baseline;
+    grid-area: nav;
     white-space: nowrap;
+  }
+
+  /* Phones have no room for one row (it needs about 410px), so the switch stays beside the
+     name and the link moves to a line of its own below. */
+  @media (max-width: 26rem) {
+    .site-header {
+      grid-template-columns: 1fr auto;
+      grid-template-areas:
+        "name toggle"
+        "nav nav";
+    }
   }
 
   /* A switch: a pill with a sun and a moon, and a knob that slides to the mode in use. */
   .theme-toggle {
+    grid-area: toggle;
     --track-w: 3.5rem;
     --track-h: 1.9rem;
     --gap: 3px;

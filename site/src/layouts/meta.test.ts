@@ -50,6 +50,18 @@ describe("link preview tags", () => {
   });
 });
 
+describe("the site header", () => {
+  it("keeps the theme switch out of the nav, so phones can put it beside the site name", async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Base, { props: { title: "TX-35", description: "About TX-35." } });
+    const header = html.slice(html.indexOf('<header class="site-header"'), html.indexOf("</header>"));
+    const nav = header.slice(header.indexOf("<nav"), header.indexOf("</nav>"));
+    expect(nav).toContain('href="/methodology"'); // anchor: the nav was found
+    expect(nav).not.toContain("theme-toggle");
+    expect(header).toContain('class="theme-toggle"');
+  });
+});
+
 describe("preview image routes", () => {
   it("builds one image per district, per state, plus the home and methodology pages", () => {
     const images = getStaticPaths().map((p) => p.params.image);
