@@ -26,7 +26,9 @@ const band = score === null ? null : scoreBand(score);
   .badge {
     display: inline-flex;
     gap: 0.4em;
-    align-items: baseline;
+    /* Centered, not on a shared baseline: the large badge's number is 1.6 times the
+       label's size, and a shared baseline leaves the label sitting low in the pill. */
+    align-items: center;
     padding: 0.15em 0.55em;
     border-radius: 999px;
     background: var(--band);
