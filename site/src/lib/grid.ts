@@ -13,6 +13,8 @@ export interface Filters {
   query: string;
   state: string;
   includeAtLarge: boolean;
+  /** When the query is a ZIP code: the IDs of its districts, which are all that's shown. */
+  zipDistricts?: string[];
 }
 
 export type SortKey = "irregular" | "compact" | "state";
@@ -46,6 +48,10 @@ function idKeys(card: Card): string[] {
  * @returns True if the card should be shown.
  */
 export function matches(card: Card, filters: Filters): boolean {
+  // A ZIP code search shows its districts whatever the other filters say, at-large ones too.
+  if (filters.zipDistricts) {
+    return filters.zipDistricts.includes(card.id);
+  }
   if (filters.state && card.state !== filters.state) {
     return false;
   }

@@ -4,7 +4,7 @@ A website that lists every US congressional district, shows its shape, and score
 
 The scores describe shape, not intent. An irregular district isn't proof of a gerrymander, and a compact one isn't proof against it.
 
-**Status:** the site is built: a searchable grid of all 435 districts under a clickable US map that opens each state's page, a page for every district and state (with partisan fairness scores for the 28 states that can be scored so far), and a methodology page. It's live at https://gerrymandermap.us (see Deploy below). Run `make site-dev` to see it locally at http://localhost:4324.
+**Status:** the site is built: a grid of all 435 districts, searchable by district, state or ZIP code, under a clickable US map that opens each state's page, a page for every district and state (with partisan fairness scores for the 28 states that can be scored so far), and a methodology page. It's live at https://gerrymandermap.us (see Deploy below). Run `make site-dev` to see it locally at http://localhost:4324.
 
 ## Layout
 
@@ -106,6 +106,10 @@ Preview builds are off because Cloudflare's preview setup (in open beta in Novem
 ### Light and dark mode
 
 The site opens in light mode for everyone, whatever their device prefers. A sun and moon switch in the header (announced to screen readers as a "Dark mode" switch) changes it and remembers the choice in that browser (`localStorage`). The colors for both modes are in `site/src/styles/global.css` (dark ones under `:root[data-theme="dark"]`), and `site/src/lib/theme.ts` holds the two small inline scripts: one in the page head applies a saved dark choice before the page draws, so it never flashes light, and one runs the switch. Without JavaScript the switch stays hidden and the site is light. Link preview images are always light.
+
+### ZIP code search
+
+Typing a five-digit ZIP code in the home page search shows its district, or every district it's split between with the share of its residents in each. The build writes one small file per group of ZIP codes sharing their first three digits (`/zip/782.json`, about 885 files of up to 3 KB, from `site/src/pages/zip/[prefix].json.ts`), and the page fetches only the group it needs. A ZIP code search shows its districts whatever the state and at-large filters say.
 
 ### Map tooltips
 
