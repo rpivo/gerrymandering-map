@@ -63,12 +63,16 @@ const drawnBy: Record<string, string> = {
       <h2 id="table-heading">Districts</h2>
       <table>
         <thead>
-          <tr><th scope="col">District</th><th scope="col">Irregularity</th><th scope="col">National rank</th></tr>
+          <tr>
+            <th scope="col" data-sort-key="district" aria-sort="ascending"><button type="button">District</button></th>
+            <th scope="col" data-sort-key="score"><button type="button">Irregularity</button></th>
+            <th scope="col" data-sort-key="rank"><button type="button">National rank</button></th>
+          </tr>
         </thead>
-        <tbody>
+        <tbody data-sort-body>
           {
             rows.map((d) => (
-              <tr>
+              <tr data-number={d.number ?? ""} data-score={d.irregularity ?? ""} data-rank={d.rank_national ?? ""}>
                 <th scope="row"><a href={districtPath(d.id)}>{d.id}</a></th>
                 <td><ScoreBadge score={d.irregularity} /></td>
                 <td>{d.rank_national === null ? "Not ranked" : `${ordinal(d.rank_national)} least compact`}</td>
@@ -85,6 +89,33 @@ const drawnBy: Record<string, string> = {
     <FairnessSection state={state} />
   </main>
 </Base>
+
+<script>
+  import { nextSort, sortRows, type TableSort, type TableSortKey } from "../../lib/table-sort";
+
+  // Sort the district table when a column heading is clicked; the table works unsorted without this.
+  const body = document.querySelector<HTMLElement>("[data-sort-body]");
+  const headings = [...document.querySelectorAll<HTMLElement>("th[data-sort-key]")];
+  const value = (el: HTMLElement, name: string) => (el.dataset[name] ? Number(el.dataset[name]) : null);
+  const rows = [...(body?.querySelectorAll<HTMLElement>("tr") ?? [])].map((el) => ({
+    el,
+    number: value(el, "number"),
+    score: value(el, "score"),
+    rank: value(el, "rank"),
+  }));
+  let sort: TableSort = { key: "district", dir: "ascending" };
+
+  for (const th of headings) {
+    th.querySelector("button")?.addEventListener("click", () => {
+      sort = nextSort(sort, th.dataset["sortKey"] as TableSortKey);
+      for (const h of headings) {
+        if (h === th) h.setAttribute("aria-sort", sort.dir);
+        else h.removeAttribute("aria-sort");
+      }
+      for (const r of sortRows(rows, sort)) body?.append(r.el);
+    });
+  }
+</script>
 
 <style>
   main {
@@ -152,6 +183,43 @@ const drawnBy: Record<string, string> = {
     padding: 0.5rem;
     border-bottom: 1px solid var(--border);
     text-align: left;
+  }
+
+  /* Column headings are buttons that sort the table; they look like the headings they are. */
+  thead button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  thead button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* An arrow on the sorted column, and a faint two-way arrow on the others so they look
+     clickable; screen readers get the order from aria-sort instead. */
+  thead button::after {
+    margin-left: 0.35em;
+    font-size: 0.75em;
+  }
+
+  th:not([aria-sort]) button::after {
+    content: "↕" / "";
+    opacity: 0.45;
+  }
+
+  th[aria-sort="ascending"] button::after {
+    content: "▲" / "";
+  }
+
+  th[aria-sort="descending"] button::after {
+    content: "▼" / "";
   }
 
   @media (max-width: 40rem) {
