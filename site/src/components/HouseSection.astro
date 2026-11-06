@@ -1,0 +1,52 @@
+---
+import { getHouseOutcome, houseLines, resultsSource } from "../lib/elected";
+import { asOfDate } from "../lib/senators";
+
+interface Props {
+  id: string;
+  usps: string;
+  stateName: string;
+}
+
+const { id, usps, stateName } = Astro.props;
+const outcome = getHouseOutcome(id);
+const lines = outcome && houseLines(outcome, stateName);
+const source = resultsSource(usps);
+---
+
+{
+  lines && source && (
+    <section class="house" aria-labelledby="house-heading">
+      <h2 id="house-heading">U.S. House</h2>
+      {lines.winner && <p class="winner">{lines.winner}</p>}
+      <p>{lines.detail}</p>
+      <p class="note">
+        {
+          outcome.status !== "pending" && (
+            <>
+              Unofficial results from the <a href={source.url}>{source.publisher}</a>, checked{" "}
+              {asOfDate(source.checked)}. A race shows a winner once news decision desks have called it. Results become
+              official when the state certifies them.{" "}
+            </>
+          )
+        }
+        <a href="/methodology#members">Where this comes from</a>
+      </p>
+    </section>
+  )
+}
+
+<style>
+  .house h2 {
+    font-size: 1.25rem;
+  }
+
+  .winner {
+    font-size: 1.1rem;
+  }
+
+  .note {
+    color: var(--text-muted);
+    max-width: 42rem;
+  }
+</style>

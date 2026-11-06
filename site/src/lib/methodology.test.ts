@@ -52,6 +52,18 @@ describe("the methodology page", () => {
     expect(text).toContain("updated after January 3, 2027");
   });
 
+  it("explains the 2026 results, the called-race rule and pending states, with an anchor", () => {
+    expect(html).toMatch(/<h2[^>]*id="members"/);
+    expect(text).toContain("The site never calls a race itself");
+    expect(text).toContain("so they're unofficial");
+    expect(text).toContain("results aren't available yet");
+  });
+
+  it("credits every state's results page and the uncalled list", () => {
+    expect(text.match(/unofficial results, checked 2026-11-06/g)).toHaveLength(50);
+    expect(html).toContain('href="https://www.nbcnews.com/politics/2026-elections/house-results"');
+  });
+
   it("credits the Senate's list", () => {
     const members = sources.filter((s) => s.role === "members");
     expect(members).toHaveLength(1); // anchor

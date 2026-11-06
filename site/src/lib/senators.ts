@@ -1,9 +1,11 @@
 import senatorsFile from "../data/senators.json";
 
-/** A U.S. senator, with their party in words. */
+/** A U.S. senator, with their party in words and their seat's class (1, 2 or 3). */
 export interface Senator {
   name: string;
+  last: string;
   party: "Democrat" | "Republican" | "Independent";
+  class: number;
 }
 
 const byState = senatorsFile.states as Record<string, Senator[]>;

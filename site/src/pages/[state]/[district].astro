@@ -4,6 +4,7 @@ import { districtCityTiers } from "../../lib/cities";
 import MetricRow from "../../components/MetricRow.astro";
 import ScoreBadge from "../../components/ScoreBadge.astro";
 import ScoreLegend from "../../components/ScoreLegend.astro";
+import HouseSection from "../../components/HouseSection.astro";
 import PlacesSection from "../../components/PlacesSection.astro";
 import PopulationNote from "../../components/PopulationNote.astro";
 import PresidentSection from "../../components/PresidentSection.astro";
@@ -108,6 +109,8 @@ const ranked = district.rank_national !== null;
     <PlacesSection id={district.id} />
 
     <PresidentSection id={district.id} stateName={state.name} />
+
+    <HouseSection id={district.id} usps={state.state} stateName={state.name} />
 
     <SenatorsSection usps={state.state} stateName={state.name} />
 
