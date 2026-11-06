@@ -14,7 +14,7 @@ from gerry.votes import (
 
 HEADER = (
     "precinct,office,party_detailed,party_simplified,mode,votes,county_fips,jurisdiction_fips,"
-    "district,state_po\n"
+    "district,state_po,candidate\n"
 )
 
 
@@ -41,8 +41,8 @@ def test_read_precinct_returns_treats_redacted_votes_as_zero(tmp_path):
     path = tmp_path / "pres.csv"
     path.write_text(
         HEADER
-        + "P1,US PRESIDENT,DEMOCRAT,DEMOCRAT,TOTAL,*,06001,06001,STATEWIDE,CA\n"
-        + "P1,US PRESIDENT,REPUBLICAN,REPUBLICAN,TOTAL,12,06001,06001,STATEWIDE,CA\n"
+        + "P1,US PRESIDENT,DEMOCRAT,DEMOCRAT,TOTAL,*,06001,06001,STATEWIDE,CA,\n"
+        + "P1,US PRESIDENT,REPUBLICAN,REPUBLICAN,TOTAL,12,06001,06001,STATEWIDE,CA,\n"
     )
     df = read_precinct_returns(path)
     assert df["votes"].tolist() == [0.0, 12.0]
@@ -58,10 +58,10 @@ def test_read_precinct_returns_takes_the_party_from_party_detailed_when_marked_n
     path = tmp_path / "pres.csv"
     path.write_text(
         HEADER
-        + "P1,US PRESIDENT,DEMOCRAT,NONPARTISAN,TOTAL,40,31055,31055,STATEWIDE,NE\n"
-        + "P1,US PRESIDENT,REPUBLICAN,NONPARTISAN,TOTAL,35,31055,31055,STATEWIDE,NE\n"
-        + "P1,US PRESIDENT,LIBERTARIAN,NONPARTISAN,TOTAL,2,31055,31055,STATEWIDE,NE\n"
-        + "P1,US PRESIDENT,,NONPARTISAN,TOTAL,1,31055,31055,STATEWIDE,NE\n"
+        + "P1,US PRESIDENT,DEMOCRAT,NONPARTISAN,TOTAL,40,31055,31055,STATEWIDE,NE,\n"
+        + "P1,US PRESIDENT,REPUBLICAN,NONPARTISAN,TOTAL,35,31055,31055,STATEWIDE,NE,\n"
+        + "P1,US PRESIDENT,LIBERTARIAN,NONPARTISAN,TOTAL,2,31055,31055,STATEWIDE,NE,\n"
+        + "P1,US PRESIDENT,,NONPARTISAN,TOTAL,1,31055,31055,STATEWIDE,NE,\n"
     )
     df = read_precinct_returns(path)
     assert df["party_simplified"].tolist() == [
@@ -69,6 +69,20 @@ def test_read_precinct_returns_takes_the_party_from_party_detailed_when_marked_n
     ]  # fmt: skip
     row = two_party_by_precinct(df).iloc[0]
     assert (row["dem"], row["rep"]) == (40.0, 35.0)
+
+
+def test_read_precinct_returns_drops_the_party_from_overvote_and_undervote_rows(tmp_path):
+    # MIT's 2024 file labels Alaska's OVERVOTES and UNDERVOTES rows DEMOCRAT (President) and
+    # REPUBLICAN (House); they're ballots with no valid choice, not votes for a party.
+    path = tmp_path / "pres.csv"
+    path.write_text(
+        HEADER
+        + "P1,US PRESIDENT,DEMOCRAT,DEMOCRAT,TOTAL,40,02001,02001,STATEWIDE,AK,KAMALA D HARRIS\n"
+        + "P1,US PRESIDENT,DEMOCRAT,DEMOCRAT,TOTAL,3,02001,02001,STATEWIDE,AK,OVERVOTES\n"
+        + "P1,US PRESIDENT,DEMOCRAT,DEMOCRAT,TOTAL,5,02001,02001,STATEWIDE,AK,UNDERVOTES\n"
+    )
+    row = two_party_by_precinct(read_precinct_returns(path)).iloc[0]
+    assert row["dem"] == 40.0
 
 
 def test_one_count_per_precinct_prefers_total_rows():
@@ -527,3 +541,24 @@ def test_read_official_results_gives_district_totals_marked_as_official(tmp_path
     ]
     assert out["dem_share"].tolist() == [0.3, 0.6]
     assert set(out["method"]) == {"official report"}
+
+
+def test_statewide_totals_give_an_at_large_district_its_whole_states_vote():
+    from gerry.votes import statewide_totals
+
+    two = two_party_by_precinct(
+        returns([
+            ("WY", "56001", "A", "TOTAL", "DEMOCRAT", 30, ""),
+            ("WY", "56001", "A", "TOTAL", "REPUBLICAN", 60, ""),
+            ("WY", "56003", "B", "TOTAL", "REPUBLICAN", 10, ""),
+            ("VT", "50001", "C", "TOTAL", "DEMOCRAT", 7, ""),
+            ("TX", "48001", "D", "TOTAL", "DEMOCRAT", 99, ""),
+        ])
+    )  # fmt: skip
+    out = statewide_totals(two, ["WY", "VT"])
+    assert out.to_dict("records") == [
+        {"state": "VT", "district": 0, "dem": 7.0, "rep": 0.0, "dem_share": 1.0,
+         "method": "statewide"},
+        {"state": "WY", "district": 0, "dem": 30.0, "rep": 70.0, "dem_share": 0.3,
+         "method": "statewide"},
+    ]  # fmt: skip

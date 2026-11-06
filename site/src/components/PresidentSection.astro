@@ -1,0 +1,48 @@
+---
+import { getPresident, percent, voteSource } from "../lib/president";
+
+interface Props {
+  id: string;
+  stateName: string;
+}
+
+const { id, stateName } = Astro.props;
+const vote = getPresident(id);
+---
+
+<section class="president" aria-labelledby="president-heading">
+  <h2 id="president-heading">2024 presidential vote</h2>
+  {
+    vote ? (
+      <>
+        <p class="shares">
+          Kamala Harris {percent(vote.harris)}, Donald Trump {percent(vote.trump)}
+        </p>
+        <p class="note">
+          Shares of the votes for the two of them; other candidates are left out.{" "}
+          {voteSource(vote.method, stateName)} <a href="/methodology#votes">Where the votes come from</a>
+        </p>
+      </>
+    ) : (
+      <p class="note">
+        {stateName} drew new lines for 2026, and no 2024 results have been published for them.{" "}
+        <a href="/methodology#votes">Where the votes come from</a>
+      </p>
+    )
+  }
+</section>
+
+<style>
+  .president h2 {
+    font-size: 1.25rem;
+  }
+
+  .shares {
+    font-size: 1.1rem;
+  }
+
+  .note {
+    color: var(--text-muted);
+    max-width: 42rem;
+  }
+</style>

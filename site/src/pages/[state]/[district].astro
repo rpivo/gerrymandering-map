@@ -6,6 +6,7 @@ import ScoreBadge from "../../components/ScoreBadge.astro";
 import ScoreLegend from "../../components/ScoreLegend.astro";
 import PlacesSection from "../../components/PlacesSection.astro";
 import PopulationNote from "../../components/PopulationNote.astro";
+import PresidentSection from "../../components/PresidentSection.astro";
 import StateEdgeNote from "../../components/StateEdgeNote.astro";
 import MapCloseups from "../../components/MapCloseups.astro";
 import StateMapSvg from "../../components/StateMapSvg.astro";
@@ -104,6 +105,8 @@ const ranked = district.rank_national !== null;
     }
 
     <PlacesSection id={district.id} />
+
+    <PresidentSection id={district.id} stateName={state.name} />
 
     <section aria-labelledby="state-heading">
       <h2 id="state-heading">Where it sits in {state.name}</h2>

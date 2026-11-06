@@ -24,7 +24,8 @@ Rules, each found in the data (see plans/PLAN.md section 3.3):
   and "Deptford", Gloucester County, NJ) takes the House precinct's districts, unless the
   President file already uses that name in the same county.
 - A row marked NONPARTISAN takes its party from party_detailed (MIT's 2024 presidential file
-  marks all of Nebraska's rows NONPARTISAN).
+  marks all of Nebraska's rows NONPARTISAN), and overvote and undervote rows have no party
+  (Alaska's are labeled Democratic and Republican).
 - A precinct with no House votes goes to the state's unopposed district if it has exactly one
   (Oklahoma's 3rd had no race on the ballot), else each party's votes are spread the way that
   party's matched votes are spread across the county's districts.
@@ -39,9 +40,11 @@ from gerry.fetch import Source
 from gerry.states import STATES_BY_USPS
 
 KEY = ["state_po", "county_fips", "jurisdiction_fips", "precinct"]
-COLUMNS = KEY + ["mode", "party_detailed", "party_simplified", "votes", "district"]
+COLUMNS = KEY + ["mode", "party_detailed", "party_simplified", "votes", "district", "candidate"]
 # party_simplified values that party_detailed overrides for the two major parties.
 _UNLABELED = {"NONPARTISAN"}
+# Ballots with no valid choice. MIT's 2024 files give Alaska's a party.
+_NO_CHOICE = {"OVERVOTES", "UNDERVOTES"}
 # A non-exact row bigger than this is a catch-all (a county's mail ballots, a whole county),
 # so splitting it gives every district the same partisan mix. The share of votes in such rows
 # says how far to trust a state's district results.
@@ -90,6 +93,7 @@ def read_precinct_returns(path: Path) -> pd.DataFrame:
 
     MIT's 2024 presidential file marks all of Nebraska's rows NONPARTISAN in party_simplified,
     though party_detailed names the party, so a Democratic or Republican party_detailed wins.
+    Overvote and undervote rows lose any party they were given (Alaska's).
     """
     df = pd.read_csv(path, usecols=COLUMNS, dtype=str, keep_default_na=False)
     df["votes"] = pd.to_numeric(df["votes"], errors="coerce").fillna(0.0)
@@ -97,6 +101,7 @@ def read_precinct_returns(path: Path) -> pd.DataFrame:
         ["DEMOCRAT", "REPUBLICAN"]
     )
     df.loc[fix, "party_simplified"] = df.loc[fix, "party_detailed"]
+    df.loc[df["candidate"].isin(_NO_CHOICE), "party_simplified"] = ""
     return df
 
 
@@ -281,6 +286,19 @@ def district_totals(assigned: pd.DataFrame) -> pd.DataFrame:
     out = placed.groupby(["state", "district"], as_index=False)[["dem", "rep"]].sum()
     out["dem_share"] = out["dem"] / (out["dem"] + out["rep"])
     return out.assign(method="precinct join")
+
+
+def statewide_totals(two: pd.DataFrame, states: list[str]) -> pd.DataFrame:
+    """Return each listed state's whole two-party vote as its one at-large district (0).
+
+    Rows like `district_totals` (state, district, dem, rep, dem_share) with method
+    "statewide": an at-large district has no lines, so every precinct in the state is in it.
+    """
+    picked = two[two["state_po"].isin(states)]
+    out = picked.groupby("state_po", as_index=False)[["dem", "rep"]].sum()
+    out = out.rename(columns={"state_po": "state"}).assign(district=0)
+    out["dem_share"] = out["dem"] / (out["dem"] + out["rep"])
+    return out[["state", "district", "dem", "rep", "dem_share"]].assign(method="statewide")
 
 
 def check_reference(

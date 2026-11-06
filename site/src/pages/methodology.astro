@@ -217,7 +217,7 @@ const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
         both parties, so it can't be measured where one party carried every district.
       </dd>
     </dl>
-    <h3>Where the votes come from</h3>
+    <h3 id="votes">Where the votes come from</h3>
     <p>
       The measures use the 2024 presidential vote (Kamala Harris and Donald Trump only, so third
       parties don't count) as a consistent measure of how each district leans. House races are less
@@ -226,6 +226,13 @@ const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
       North Carolina drew new districts for 2026 and published official 2024 results for them, so
       those are used directly. The other redrawn states published none, so their scores will use the
       2026 House results once they are final.
+    </p>
+    <p>
+      District pages show each district's 2024 presidential vote the same way, as Harris's and
+      Trump's shares of the votes for the two of them, and a district covering a whole state gets
+      the state's vote. Where a precinct is split between districts, its votes are divided the way
+      its House votes were, so those districts' figures are close estimates. Districts in the
+      redrawn states without official results show none.
     </p>
     <h3>What fairness scores can't tell you</h3>
     <ul>
