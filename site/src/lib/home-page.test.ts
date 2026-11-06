@@ -47,3 +47,17 @@ describe("the home page's US map", () => {
     expect(html.indexOf('aria-label="States"')).toBeLessThan(html.indexOf('aria-label="Find districts"'));
   });
 });
+
+describe("the home page's introduction", () => {
+  const paragraph = (cls: string) => {
+    const start = html.indexOf(`<p class="${cls}"`);
+    expect(start).toBeGreaterThan(-1); // anchor: the paragraph rendered
+    return html.slice(start, html.indexOf("</p>", start));
+  };
+
+  it("links to how scores work from the note about shape, not from the opening line", () => {
+    expect(paragraph("note")).toContain("A score describes shape, not intent.");
+    expect(paragraph("note")).toMatch(/<a href="\/methodology"[^>]*>How scores work<\/a>/);
+    expect(paragraph("lede")).not.toContain('href="/methodology"');
+  });
+});
