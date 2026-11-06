@@ -3,6 +3,7 @@ import Base from "../layouts/Base.astro";
 import { rankedCount, sources, states } from "../lib/data";
 import { MIN_DISTRICTS } from "../lib/fairness";
 import { calledAsOf, electedSources } from "../lib/elected";
+import { FEEDBACK_EMAIL, ISSUES_URL } from "../lib/feedback";
 import { sourceNote } from "../lib/format";
 
 const boundarySources = sources.filter((s) => s.role === "boundaries");
@@ -299,6 +300,16 @@ const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
       Some states hadn't published statewide results when they were gathered. Some post results only
       by county until their official count. Those races say results aren't available yet, and are
       filled in as the states publish.
+    </p>
+
+    <h2 id="feedback">Corrections and ideas</h2>
+    <p>
+      If something on the site looks wrong, such as a district's shape, a city in the wrong
+      place or a result that doesn't match your state's, email
+      {" "}<a href={`mailto:${FEEDBACK_EMAIL}`}>{FEEDBACK_EMAIL}</a>. Each district page has a link
+      that names the district for you. Ideas for new features are welcome by email too, or, if you
+      use GitHub, as a <a href={ISSUES_URL}>feature request or data error report</a>, where others
+      can see and add to them.
     </p>
 
     <h2>Data sources</h2>

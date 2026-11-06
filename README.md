@@ -16,6 +16,7 @@ The scores describe shape, not intent. An irregular district isn't proof of a ge
 | `site/` | Astro + TypeScript static site, built from the pipeline's exported JSON |
 | `tools/` | Repo checks run in CI: function length and PR size limits |
 | `.github/workflows/ci.yml` | CI: lint, tests and limit checks on every PR |
+| `.github/ISSUE_TEMPLATE/` | GitHub issue forms for data errors and feature requests, linked from the site's footer |
 | `.claude/` | Claude Code settings, including a hook that blocks commits when checks fail |
 | `CLAUDE.md` | The rules for working on this repo |
 
@@ -126,6 +127,10 @@ Every page has a 1200 by 630 preview image for social sites and chat apps: one p
 The pipeline doesn't run on Cloudflare: the site builds only from the committed data in `site/src/data/`, so a data change ships by committing regenerated files.
 
 To check a deploy locally without uploading: `cd site && pnpm build && pnpm exec wrangler deploy --dry-run`.
+
+## Feedback
+
+The site asks for corrections and ideas at hello@gerrymandermap.us, in every page's footer, on each district page (an email link whose subject names the district) and in the methodology page's "Corrections and ideas" section. The address is a Cloudflare Email Routing rule on the gerrymandermap.us zone that forwards to the maintainer, set in the dashboard. People with GitHub can use the issue forms instead.
 
 ## Support
 

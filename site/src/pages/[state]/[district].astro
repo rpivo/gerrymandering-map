@@ -16,6 +16,7 @@ import StateMapSvg from "../../components/StateMapSvg.astro";
 import Base from "../../layouts/Base.astro";
 import { adjacent, districts, getState, outline, rankedCount, shapeNote, type District } from "../../lib/data";
 import { districtPath } from "../../lib/districts";
+import { reportLink } from "../../lib/feedback";
 import { districtTitle, lessCompactThan, ordinal } from "../../lib/format";
 
 export function getStaticPaths() {
@@ -124,6 +125,10 @@ const ranked = district.rank_national !== null;
       <MapCloseups state={state.state} stateName={state.name} highlight={district.id} />
     </section>
 
+    <p class="report">
+      Spot a problem with this district? <a href={reportLink(district.id)}>Email us about {district.id}</a>.
+    </p>
+
     <nav class="pager" aria-label="Other districts in this state">
       {previous ? <a href={districtPath(previous)}>Previous: {previous}</a> : <span />}
       {next ? <a href={districtPath(next)}>Next: {next}</a> : <span />}
@@ -200,6 +205,10 @@ const ranked = district.rank_national !== null;
   h2 {
     margin-top: 2.5rem;
     font-size: 1.25rem;
+  }
+
+  .report {
+    color: var(--text-muted);
   }
 
   .pager {
