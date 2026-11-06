@@ -19,6 +19,10 @@ describe("Cloudflare Worker config", () => {
     ]);
   });
 
+  it("keeps the workers.dev address on: wrangler turns it off when routes are set", () => {
+    expect(config.workers_dev).toBe(true);
+  });
+
   it("sets a compatibility date", () => {
     expect(config.compatibility_date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
