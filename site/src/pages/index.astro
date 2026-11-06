@@ -39,7 +39,7 @@ const cards = sortCards(
     <form class="controls" role="search" aria-label="Find districts">
       <label>
         Search
-        <input type="search" name="query" placeholder="TX-35, Texas, Ohio" autocomplete="off" />
+        <input type="search" name="query" placeholder="TX-35, Texas or a ZIP code" autocomplete="off" />
       </label>
       <label>
         State
@@ -61,6 +61,7 @@ const cards = sortCards(
         Show at-large districts
       </label>
     </form>
+    <p class="zip-message" aria-live="polite" data-zip-message hidden></p>
     <p class="count" aria-live="polite" data-count>Showing all {cards.length} districts.</p>
 
     <ul class="grid" data-grid>
@@ -92,12 +93,17 @@ const cards = sortCards(
 </Base>
 
 <script>
-  import { type Card, type SortKey, matches, sortCards } from "../lib/grid";
+  import { type Card, type Filters, type SortKey, matches, sortCards } from "../lib/grid";
+  import { type ZipGroup, zipMessage, zipPrefix, zipQuery } from "../lib/zip-search";
 
   const form = document.querySelector<HTMLFormElement>("form.controls");
   const grid = document.querySelector<HTMLElement>("[data-grid]");
   const count = document.querySelector<HTMLElement>("[data-count]");
   const empty = document.querySelector<HTMLElement>("[data-empty]");
+  const zipLine = document.querySelector<HTMLElement>("[data-zip-message]");
+  // Each group of ZIP codes is fetched once, when a ZIP code in it is first searched for.
+  const zipGroups = new Map<string, Promise<ZipGroup>>();
+  let latest = 0;
   const items = [...document.querySelectorAll<HTMLElement>("[data-card]")];
   const toNumber = (value: string | undefined) => (value ? Number(value) : null);
   const cards = new Map<Card, HTMLElement>(
@@ -114,14 +120,39 @@ const cards = sortCards(
     ]),
   );
 
-  function update() {
-    if (!form || !grid || !count || !empty) return;
+  /**
+   * Fetch a group of ZIP codes, once.
+   * @param prefix The first three digits.
+   * @returns The group, or an empty one when it can't be loaded.
+   */
+  function zipGroup(prefix: string): Promise<ZipGroup> {
+    let group = zipGroups.get(prefix);
+    if (!group) {
+      group = fetch(`/zip/${prefix}.json`)
+        .then((r) => (r.ok ? (r.json() as Promise<ZipGroup>) : {}))
+        .catch(() => ({}));
+      zipGroups.set(prefix, group);
+    }
+    return group;
+  }
+
+  async function update() {
+    if (!form || !grid || !count || !empty || !zipLine) return;
+    const run = ++latest;
     const data = new FormData(form);
-    const filters = {
+    const filters: Filters = {
       query: String(data.get("query") ?? ""),
       state: String(data.get("state") ?? ""),
       includeAtLarge: data.get("atLarge") === "on",
     };
+    const zip = zipQuery(filters.query);
+    if (zip) {
+      const districts = (await zipGroup(zipPrefix(zip)))[zip];
+      if (run !== latest) return; // a newer search started while this one was loading
+      filters.zipDistricts = districts?.map(([id]) => id) ?? [];
+      zipLine.textContent = zipMessage(zip, districts);
+    }
+    zipLine.hidden = !zip;
     const sorted = sortCards([...cards.keys()], String(data.get("sort")) as SortKey);
     let shown = 0;
     for (const card of sorted) {
@@ -134,10 +165,10 @@ const cards = sortCards(
     }
     count.textContent =
       shown === cards.size ? `Showing all ${shown} districts.` : `Showing ${shown} of ${cards.size} districts.`;
-    empty.hidden = shown > 0;
+    empty.hidden = shown > 0 || Boolean(zip);
   }
 
-  form?.addEventListener("input", update);
+  form?.addEventListener("input", () => void update());
   form?.addEventListener("submit", (event) => event.preventDefault());
 </script>
 
@@ -204,6 +235,12 @@ const cards = sortCards(
   .count,
   .empty {
     color: var(--text-muted);
+  }
+
+  /* What a ZIP code search found: the answer the visitor came for, so in the main text color. */
+  .zip-message {
+    max-width: 44rem;
+    font-size: 1.1rem;
   }
 
   .grid {

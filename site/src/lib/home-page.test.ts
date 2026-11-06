@@ -61,3 +61,10 @@ describe("the home page's introduction", () => {
     expect(paragraph("lede")).not.toContain('href="/methodology"');
   });
 });
+
+describe("the home page's ZIP code search", () => {
+  it("says a ZIP code works, and has a line that announces what a ZIP code search found", () => {
+    expect(html).toMatch(/<input[^>]*name="query"[^>]*placeholder="TX-35, Texas or a ZIP code"/);
+    expect(html).toMatch(/<p[^>]*class="zip-message"[^>]*aria-live="polite"[^>]*data-zip-message[^>]*hidden/);
+  });
+});
