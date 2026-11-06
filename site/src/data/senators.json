@@ -1,0 +1,506 @@
+{
+  "description": "Each state's two U.S. senators.",
+  "as_of": "2026-11-06",
+  "states": {
+    "AK": [
+      {
+        "name": "Lisa Murkowski",
+        "party": "Republican"
+      },
+      {
+        "name": "Dan Sullivan",
+        "party": "Republican"
+      }
+    ],
+    "AL": [
+      {
+        "name": "Katie Boyd Britt",
+        "party": "Republican"
+      },
+      {
+        "name": "Tommy Tuberville",
+        "party": "Republican"
+      }
+    ],
+    "AR": [
+      {
+        "name": "John Boozman",
+        "party": "Republican"
+      },
+      {
+        "name": "Tom Cotton",
+        "party": "Republican"
+      }
+    ],
+    "AZ": [
+      {
+        "name": "Ruben Gallego",
+        "party": "Democrat"
+      },
+      {
+        "name": "Mark Kelly",
+        "party": "Democrat"
+      }
+    ],
+    "CA": [
+      {
+        "name": "Alex Padilla",
+        "party": "Democrat"
+      },
+      {
+        "name": "Adam B. Schiff",
+        "party": "Democrat"
+      }
+    ],
+    "CO": [
+      {
+        "name": "Michael F. Bennet",
+        "party": "Democrat"
+      },
+      {
+        "name": "John W. Hickenlooper",
+        "party": "Democrat"
+      }
+    ],
+    "CT": [
+      {
+        "name": "Richard Blumenthal",
+        "party": "Democrat"
+      },
+      {
+        "name": "Christopher Murphy",
+        "party": "Democrat"
+      }
+    ],
+    "DE": [
+      {
+        "name": "Lisa Blunt Rochester",
+        "party": "Democrat"
+      },
+      {
+        "name": "Christopher A. Coons",
+        "party": "Democrat"
+      }
+    ],
+    "FL": [
+      {
+        "name": "Ashley Moody",
+        "party": "Republican"
+      },
+      {
+        "name": "Rick Scott",
+        "party": "Republican"
+      }
+    ],
+    "GA": [
+      {
+        "name": "Jon Ossoff",
+        "party": "Democrat"
+      },
+      {
+        "name": "Raphael G. Warnock",
+        "party": "Democrat"
+      }
+    ],
+    "HI": [
+      {
+        "name": "Mazie K. Hirono",
+        "party": "Democrat"
+      },
+      {
+        "name": "Brian Schatz",
+        "party": "Democrat"
+      }
+    ],
+    "IA": [
+      {
+        "name": "Joni Ernst",
+        "party": "Republican"
+      },
+      {
+        "name": "Chuck Grassley",
+        "party": "Republican"
+      }
+    ],
+    "ID": [
+      {
+        "name": "Mike Crapo",
+        "party": "Republican"
+      },
+      {
+        "name": "James E. Risch",
+        "party": "Republican"
+      }
+    ],
+    "IL": [
+      {
+        "name": "Tammy Duckworth",
+        "party": "Democrat"
+      },
+      {
+        "name": "Richard J. Durbin",
+        "party": "Democrat"
+      }
+    ],
+    "IN": [
+      {
+        "name": "Jim Banks",
+        "party": "Republican"
+      },
+      {
+        "name": "Todd Young",
+        "party": "Republican"
+      }
+    ],
+    "KS": [
+      {
+        "name": "Roger Marshall",
+        "party": "Republican"
+      },
+      {
+        "name": "Jerry Moran",
+        "party": "Republican"
+      }
+    ],
+    "KY": [
+      {
+        "name": "Mitch McConnell",
+        "party": "Republican"
+      },
+      {
+        "name": "Rand Paul",
+        "party": "Republican"
+      }
+    ],
+    "LA": [
+      {
+        "name": "Bill Cassidy",
+        "party": "Republican"
+      },
+      {
+        "name": "John Kennedy",
+        "party": "Republican"
+      }
+    ],
+    "MA": [
+      {
+        "name": "Edward J. Markey",
+        "party": "Democrat"
+      },
+      {
+        "name": "Elizabeth Warren",
+        "party": "Democrat"
+      }
+    ],
+    "MD": [
+      {
+        "name": "Angela D. Alsobrooks",
+        "party": "Democrat"
+      },
+      {
+        "name": "Chris Van Hollen",
+        "party": "Democrat"
+      }
+    ],
+    "ME": [
+      {
+        "name": "Susan M. Collins",
+        "party": "Republican"
+      },
+      {
+        "name": "Angus S. King Jr.",
+        "party": "Independent"
+      }
+    ],
+    "MI": [
+      {
+        "name": "Gary C. Peters",
+        "party": "Democrat"
+      },
+      {
+        "name": "Elissa Slotkin",
+        "party": "Democrat"
+      }
+    ],
+    "MN": [
+      {
+        "name": "Amy Klobuchar",
+        "party": "Democrat"
+      },
+      {
+        "name": "Tina Smith",
+        "party": "Democrat"
+      }
+    ],
+    "MO": [
+      {
+        "name": "Josh Hawley",
+        "party": "Republican"
+      },
+      {
+        "name": "Eric Schmitt",
+        "party": "Republican"
+      }
+    ],
+    "MS": [
+      {
+        "name": "Cindy Hyde-Smith",
+        "party": "Republican"
+      },
+      {
+        "name": "Roger F. Wicker",
+        "party": "Republican"
+      }
+    ],
+    "MT": [
+      {
+        "name": "Steve Daines",
+        "party": "Republican"
+      },
+      {
+        "name": "Tim Sheehy",
+        "party": "Republican"
+      }
+    ],
+    "NC": [
+      {
+        "name": "Ted Budd",
+        "party": "Republican"
+      },
+      {
+        "name": "Thom Tillis",
+        "party": "Republican"
+      }
+    ],
+    "ND": [
+      {
+        "name": "Kevin Cramer",
+        "party": "Republican"
+      },
+      {
+        "name": "John Hoeven",
+        "party": "Republican"
+      }
+    ],
+    "NE": [
+      {
+        "name": "Deb Fischer",
+        "party": "Republican"
+      },
+      {
+        "name": "Pete Ricketts",
+        "party": "Republican"
+      }
+    ],
+    "NH": [
+      {
+        "name": "Margaret Wood Hassan",
+        "party": "Democrat"
+      },
+      {
+        "name": "Jeanne Shaheen",
+        "party": "Democrat"
+      }
+    ],
+    "NJ": [
+      {
+        "name": "Cory A. Booker",
+        "party": "Democrat"
+      },
+      {
+        "name": "Andy Kim",
+        "party": "Democrat"
+      }
+    ],
+    "NM": [
+      {
+        "name": "Martin Heinrich",
+        "party": "Democrat"
+      },
+      {
+        "name": "Ben Ray Luján",
+        "party": "Democrat"
+      }
+    ],
+    "NV": [
+      {
+        "name": "Catherine Cortez Masto",
+        "party": "Democrat"
+      },
+      {
+        "name": "Jacky Rosen",
+        "party": "Democrat"
+      }
+    ],
+    "NY": [
+      {
+        "name": "Kirsten E. Gillibrand",
+        "party": "Democrat"
+      },
+      {
+        "name": "Charles E. Schumer",
+        "party": "Democrat"
+      }
+    ],
+    "OH": [
+      {
+        "name": "Jon Husted",
+        "party": "Republican"
+      },
+      {
+        "name": "Bernie Moreno",
+        "party": "Republican"
+      }
+    ],
+    "OK": [
+      {
+        "name": "Alan Armstrong",
+        "party": "Republican"
+      },
+      {
+        "name": "James Lankford",
+        "party": "Republican"
+      }
+    ],
+    "OR": [
+      {
+        "name": "Jeff Merkley",
+        "party": "Democrat"
+      },
+      {
+        "name": "Ron Wyden",
+        "party": "Democrat"
+      }
+    ],
+    "PA": [
+      {
+        "name": "John Fetterman",
+        "party": "Democrat"
+      },
+      {
+        "name": "David McCormick",
+        "party": "Republican"
+      }
+    ],
+    "RI": [
+      {
+        "name": "Jack Reed",
+        "party": "Democrat"
+      },
+      {
+        "name": "Sheldon Whitehouse",
+        "party": "Democrat"
+      }
+    ],
+    "SC": [
+      {
+        "name": "Darline Graham",
+        "party": "Republican"
+      },
+      {
+        "name": "Tim Scott",
+        "party": "Republican"
+      }
+    ],
+    "SD": [
+      {
+        "name": "Mike Rounds",
+        "party": "Republican"
+      },
+      {
+        "name": "John Thune",
+        "party": "Republican"
+      }
+    ],
+    "TN": [
+      {
+        "name": "Marsha Blackburn",
+        "party": "Republican"
+      },
+      {
+        "name": "Bill Hagerty",
+        "party": "Republican"
+      }
+    ],
+    "TX": [
+      {
+        "name": "John Cornyn",
+        "party": "Republican"
+      },
+      {
+        "name": "Ted Cruz",
+        "party": "Republican"
+      }
+    ],
+    "UT": [
+      {
+        "name": "John R. Curtis",
+        "party": "Republican"
+      },
+      {
+        "name": "Mike Lee",
+        "party": "Republican"
+      }
+    ],
+    "VA": [
+      {
+        "name": "Tim Kaine",
+        "party": "Democrat"
+      },
+      {
+        "name": "Mark R. Warner",
+        "party": "Democrat"
+      }
+    ],
+    "VT": [
+      {
+        "name": "Bernard Sanders",
+        "party": "Independent"
+      },
+      {
+        "name": "Peter Welch",
+        "party": "Democrat"
+      }
+    ],
+    "WA": [
+      {
+        "name": "Maria Cantwell",
+        "party": "Democrat"
+      },
+      {
+        "name": "Patty Murray",
+        "party": "Democrat"
+      }
+    ],
+    "WI": [
+      {
+        "name": "Tammy Baldwin",
+        "party": "Democrat"
+      },
+      {
+        "name": "Ron Johnson",
+        "party": "Republican"
+      }
+    ],
+    "WV": [
+      {
+        "name": "Shelley Moore Capito",
+        "party": "Republican"
+      },
+      {
+        "name": "James C. Justice",
+        "party": "Republican"
+      }
+    ],
+    "WY": [
+      {
+        "name": "John Barrasso",
+        "party": "Republican"
+      },
+      {
+        "name": "Cynthia M. Lummis",
+        "party": "Republican"
+      }
+    ]
+  }
+}

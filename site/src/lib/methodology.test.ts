@@ -46,6 +46,18 @@ describe("the methodology page", () => {
     expect(text).toContain("a district covering a whole state gets the state's vote");
   });
 
+  it("says where the senators come from, with an anchor the pages link to", () => {
+    expect(html).toMatch(/<h2[^>]*id="senators"/);
+    expect(text).toContain("the Senate's own list of current senators");
+    expect(text).toContain("updated after January 3, 2027");
+  });
+
+  it("credits the Senate's list", () => {
+    const members = sources.filter((s) => s.role === "members");
+    expect(members).toHaveLength(1); // anchor
+    expect(html).toContain(`href="${members[0]?.url}"`);
+  });
+
   it("has a fairness section the state pages can link to", () => {
     expect(html).toMatch(/<h2[^>]*id="fairness"/);
   });

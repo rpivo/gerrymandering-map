@@ -6,6 +6,7 @@ import { sourceNote } from "../lib/format";
 
 const boundarySources = sources.filter((s) => s.role === "boundaries");
 const voteSources = sources.filter((s) => s.role === "votes");
+const memberSources = sources.filter((s) => s.role === "members");
 // The 50 state redistricting files share one credit, linked to the Census folder that holds them.
 const populationSources = sources.filter((s) => s.role === "population");
 const populationFolder = populationSources[0]?.url.replace(/[^/]+\/[^/]+$/, "") ?? "";
@@ -253,6 +254,20 @@ const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
       </li>
     </ul>
 
+    <h2 id="senators">Senators</h2>
+    <p>
+      District and state pages name each state's two U.S. senators, with their parties, from the
+      Senate's own list of current senators. Senators are elected by the whole state, so every
+      district in a state shares the same two. The list is dated on each page. The winners of the
+      November 2026 Senate races take office January 3, 2027, and the list will be updated after
+      January 3, 2027.
+    </p>
+    <p>
+      Pages don't name House members yet. In the states that drew new lines for 2026, today's
+      members were elected on different lines, so they'll be added once the House Clerk publishes
+      the members elected in November 2026.
+    </p>
+
     <h2>Data sources</h2>
     <h3>District maps</h3>
     <ul class="sources">
@@ -275,6 +290,16 @@ const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
     <ul class="sources">
       {
         voteSources.map((s) => (
+          <li>
+            <a href={s.url}>{s.publisher}</a>: {sourceNote(s.description, s.license, s.downloaded)}
+          </li>
+        ))
+      }
+    </ul>
+    <h3>Senators</h3>
+    <ul class="sources">
+      {
+        memberSources.map((s) => (
           <li>
             <a href={s.url}>{s.publisher}</a>: {sourceNote(s.description, s.license, s.downloaded)}
           </li>

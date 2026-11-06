@@ -2,7 +2,7 @@
 UV := uv run --project pipeline
 PY_PATHS := pipeline tools
 
-.PHONY: setup lint format test check-functions check pr-size site-dev site-check boundaries audit calibrate scores data votes fairness population
+.PHONY: setup lint format test check-functions check pr-size site-dev site-check boundaries audit calibrate scores data votes fairness population senators
 
 setup:
 	uv sync --project pipeline
@@ -56,6 +56,10 @@ fairness:
 # Downloads the 2020 Census redistricting file for every state (about 1.3 GB, once).
 population:
 	$(UV) python -m gerry population
+
+# Write each state's two U.S. senators for the site, from the Senate's list (about 30 KB).
+senators:
+	$(UV) python -m gerry senators
 
 # Validate data/sources/states.csv and list states whose 2026 map differs from 2024.
 audit:

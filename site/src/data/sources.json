@@ -677,6 +677,15 @@
       "role": "boundaries"
     },
     {
+      "id": "senate-senators",
+      "publisher": "U.S. Senate",
+      "description": "Senators of the United States: contact information for current senators, with name, party and state. Page: https://www.senate.gov/senators/",
+      "url": "https://www.senate.gov/general/contact_information/senators_cfm.xml",
+      "license": "Public domain (U.S. Government work)",
+      "downloaded": "2026-11-06",
+      "role": "members"
+    },
+    {
       "id": "tn-2026-hb7003-congress",
       "publisher": "State of Tennessee, TNMap (Office for Information Resources)",
       "description": "TN Congressional Districts, 2026 boundaries (HB 7003). Page: https://hub.arcgis.com/datasets/90e4742978674ef4aaf08eb9f9f845bb_2",
