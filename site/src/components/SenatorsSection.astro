@@ -1,0 +1,39 @@
+---
+import { asOfDate, getSenators, senatorsAsOf } from "../lib/senators";
+
+interface Props {
+  usps: string;
+  stateName: string;
+}
+
+const { usps, stateName } = Astro.props;
+const senators = getSenators(usps);
+---
+
+<section class="senators" aria-labelledby="senators-heading">
+  <h2 id="senators-heading">{stateName}'s senators</h2>
+  <ul>
+    {senators.map((s) => <li>{s.name}, {s.party}</li>)}
+  </ul>
+  <p class="note">
+    Senators are elected by the whole state, so district lines don't change who they are.
+    As of {asOfDate(senatorsAsOf)}. Senators elected in November 2026 take office January 3, 2027.{" "}
+    <a href="/methodology#senators">Where this comes from</a>
+  </p>
+</section>
+
+<style>
+  .senators h2 {
+    font-size: 1.25rem;
+  }
+
+  ul {
+    padding-left: 1.25rem;
+    font-size: 1.1rem;
+  }
+
+  .note {
+    color: var(--text-muted);
+    max-width: 42rem;
+  }
+</style>

@@ -300,6 +300,8 @@ def _source_role(source_id: str) -> str:
         return "calibration"
     if source_id.startswith("census-pl94171-"):
         return "population"
+    if source_id.startswith("senate-"):
+        return "members"
     votes = source_id.startswith("medsl-") or source_id.endswith("-votes")
     return "votes" if votes else "boundaries"
 
@@ -310,6 +312,7 @@ def write_sources_json(entries: dict[str, dict[str, str]], path: Path) -> None:
     Census TIGER files are used only by `python -m gerry calibrate`, so their role is
     "calibration"; MIT election files (`medsl-`) and other results (`-votes`) supply "votes";
     the 2020 redistricting files (`census-pl94171-`) supply "population";
+    the Senate's list (`senate-`) supplies "members";
     every other source supplies boundaries.
     """
     sources = [
@@ -497,3 +500,21 @@ def write_places_json(table: pd.DataFrame, districts: pd.DataFrame, path: Path) 
         "districts": records,
     }
     _write_json(data, path)
+
+
+def write_senators_json(table: pd.DataFrame, as_of: str, path: Path) -> None:
+    """Write site/src/data/senators.json: each state's senators, by last name.
+
+    Args:
+        table: From gerry.senators.read_senators.
+        as_of: The date the Senate's list was downloaded (YYYY-MM-DD).
+        path: Where to write.
+    """
+    ordered = table.sort_values(["state", "last", "name"], kind="stable")
+    states = {
+        state: [{"name": r.name, "party": r.party} for r in rows.itertuples()]
+        for state, rows in ordered.groupby("state", sort=True)
+    }
+    _write_json(
+        {"description": "Each state's two U.S. senators.", "as_of": as_of, "states": states}, path
+    )

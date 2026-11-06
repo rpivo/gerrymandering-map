@@ -2,6 +2,7 @@
 import FairnessSection from "../../components/FairnessSection.astro";
 import ScoreBadge from "../../components/ScoreBadge.astro";
 import ScoreLegend from "../../components/ScoreLegend.astro";
+import SenatorsSection from "../../components/SenatorsSection.astro";
 import MapCloseups from "../../components/MapCloseups.astro";
 import StateMapSvg from "../../components/StateMapSvg.astro";
 import Base from "../../layouts/Base.astro";
@@ -78,6 +79,8 @@ const drawnBy: Record<string, string> = {
       </table>
       <p class="caveat">Scores describe shape, not intent. <a href="/methodology">How scores work</a></p>
     </section>
+
+    <SenatorsSection usps={state.state} stateName={state.name} />
 
     <FairnessSection state={state} />
   </main>

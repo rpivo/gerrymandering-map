@@ -10,6 +10,7 @@ Commands:
     fairness    Score each state's map for partisan fairness from the votes.
     population  Add up 2020 voting-age population by race, and people by city or town, per
                 district; write data/build/.
+    senators    Write each state's two U.S. senators for the site, from the Senate's list.
 """
 
 import argparse
@@ -31,6 +32,7 @@ from gerry.export import (
     write_places_json,
     write_population_json,
     write_president_json,
+    write_senators_json,
     write_shapes_json,
     write_sources_json,
     write_states_json,
@@ -61,6 +63,7 @@ from gerry.replacement import (
     replace_states,
 )
 from gerry.scoring import score_districts
+from gerry.senators import SENATORS, read_senators, senator_problems
 from gerry.state_audit import changed_states, read_state_audit, validate_state_audit
 from gerry.state_maps import PENDING, STATE_MAPS, BlockAssignmentMap, StateMap, read_state_map
 from gerry.states import STATES
@@ -361,6 +364,24 @@ def population(repo_root: Path) -> int:
     return 0
 
 
+def senators(repo_root: Path) -> int:
+    """Write each state's senators to site/src/data/senators.json, from the Senate's list."""
+    manifest = repo_root / "data" / "sources" / "sources.csv"
+    table = read_senators(fetch(SENATORS, repo_root / "data" / "raw", manifest))
+    problems = senator_problems(table)
+    if problems:
+        _print_problems(problems, " in the Senate list")
+        print("Site data not written.")
+        return 1
+    site = repo_root / "site" / "src" / "data"
+    entries = read_manifest(manifest)
+    write_senators_json(table, entries[SENATORS.id]["downloaded"], site / "senators.json")
+    write_sources_json(entries, site / "sources.json")
+    print(f"Wrote {(site / 'senators.json').relative_to(repo_root)} ({len(table)} senators) "
+          "and sources.json")  # fmt: skip
+    return 0
+
+
 COMMANDS = {
     "boundaries": (boundaries, "Build and validate the 2026 district map."),
     "audit": (audit, "Validate the state map audit and list changed states."),
@@ -369,6 +390,7 @@ COMMANDS = {
     "votes": (votes, "Place 2024 presidential votes in districts."),
     "fairness": (fairness, "Score each state's map for partisan fairness."),
     "population": (population, "Add up 2020 population by race and by place per district."),
+    "senators": (senators, "Write each state's two U.S. senators for the site."),
 }
 
 
