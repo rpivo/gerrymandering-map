@@ -22,7 +22,8 @@ describe("the methodology page", () => {
 
   it("says which cities the state maps mark, and where the points come from", () => {
     expect(text).toContain("State maps mark the largest places");
-    expect(text).toContain("internal point");
+    expect(text).toContain("at the census block nearest where the place's residents live on average");
+    expect(text).not.toContain("internal point");
   });
 
   it("says how district outlines place a dot for a split city", () => {

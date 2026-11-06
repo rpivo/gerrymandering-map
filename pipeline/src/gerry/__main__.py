@@ -38,7 +38,13 @@ from gerry.export import (
 from gerry.fairness import MIN_DISTRICTS, state_fairness
 from gerry.fetch import CENSUS_CD119, CENSUS_STATES, fetch, read_manifest
 from gerry.generalize import absorb_fragments, simplify_to_census
-from gerry.places import district_places, piece_points, place_problems, read_pl_places
+from gerry.places import (
+    district_places,
+    piece_points,
+    place_problems,
+    populated_points,
+    read_pl_places,
+)
 from gerry.population import (
     assign_blocks,
     district_population,
@@ -288,8 +294,8 @@ def _population_tables(districts: gpd.GeoDataFrame, raw: Path, manifest: Path):
     """Place every state's 2020 blocks.
 
     Returns:
-        Population per district, place counts per district, every place, each place's part
-        of each district with a point (piece_points), and place problems.
+        Population per district, place counts per district, every place (at populated_points),
+        each place's part of each district with a point (piece_points), and place problems.
     """
     tables, place_tables, all_places, pieces, problems = [], [], [], [], []
     for state in STATES:
@@ -302,7 +308,7 @@ def _population_tables(districts: gpd.GeoDataFrame, raw: Path, manifest: Path):
         found = district_places(placed, places)
         tables.append(district_population(placed))
         place_tables.append(found)
-        all_places.append(places)
+        all_places.append(populated_points(places, placed))
         pieces.append(piece_points(placed))
         problems += place_problems(placed, found, places)
     return (
