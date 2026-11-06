@@ -84,7 +84,7 @@ function frame(art: string, body: string): string {
     `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}" font-family="Inter">`,
     `<rect width="${WIDTH}" height="${HEIGHT}" fill="${t["bg"]}"/>`,
     art,
-    `<text x="${TEXT_X}" y="96" font-size="22" font-weight="700" letter-spacing="3" fill="${t["text-muted"]}">GERRYMANDERING MAP</text>`,
+    `<text x="${TEXT_X}" y="96" font-size="22" font-weight="700" letter-spacing="3" fill="${t["text-muted"]}">GERRYMANDER MAP</text>`,
     body,
     `<text x="${TEXT_X}" y="574" font-size="24" fill="${t["text-muted"]}">Scores describe shape, not intent.</text>`,
     "</svg>",

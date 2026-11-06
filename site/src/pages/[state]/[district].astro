@@ -35,7 +35,7 @@ const { previous, next } = adjacent(district.id);
 const ranked = district.rank_national !== null;
 ---
 
-<Base title={`${district.id}: ${title} | Gerrymandering Map`} path={districtPath(district.id)} description={`How compact ${title} is, compared with every other congressional district.`}>
+<Base title={`${district.id}: ${title} | Gerrymander Map`} path={districtPath(district.id)} description={`How compact ${title} is, compared with every other congressional district.`}>
   <main>
     <p class="crumbs"><a href={`/${state.state.toLowerCase()}`}>{state.name}</a> / {district.id}</p>
     <h1>{title}</h1>
