@@ -32,7 +32,8 @@ const nestedBoxes = (c: (typeof all)[number]) =>
       </p>
       <div class="closeup-grid">
         {shown.map((c, i) => (
-          <figure class:list={["closeup", { wide: c.wide }]}>
+          <figure class="closeup">
+            <div class="closeup-fit">
             <DistrictMap
               state={state}
               viewBox={c.viewBox}
@@ -40,12 +41,14 @@ const nestedBoxes = (c: (typeof all)[number]) =>
               label={`Close-up of the ${c.name}`}
               highlight={highlight}
               idPrefix={`closeup-${i}-`}
+              size="fit"
             >
               {nestedBoxes(c).map(([x0, y0, x1, y1]) => (
                 <rect class="closeup-box" x={x0} y={y0} width={x1 - x0} height={y1 - y0} />
               ))}
               <CityMarks tiers={closeupCityTiers(state, c)} name={`closeup-${i}`} />
             </DistrictMap>
+            </div>
             <figcaption>{c.name}, enlarged {times(c.zoom)}</figcaption>
           </figure>
         ))}
@@ -65,16 +68,17 @@ const nestedBoxes = (c: (typeof all)[number]) =>
     font-size: 0.9rem;
   }
 
-  /* Two to a row where there's room. The close-ups that enlarge least take a whole row, up to
-     the state map's own size, since they need the room most. */
+  /* One column of identical cards, centered under the state map like the map itself. Each is
+     as tall as the state map (32rem) and square; a tall or wide area fits inside its square. */
   .closeup-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
     gap: 1rem;
-    align-items: start;
   }
 
   .closeup {
+    width: min(100%, 32rem);
     margin: 0;
     padding: 0.5rem;
     border: 1px solid var(--border);
@@ -82,10 +86,11 @@ const nestedBoxes = (c: (typeof all)[number]) =>
     background: var(--surface);
   }
 
-  .closeup.wide {
-    grid-column: 1 / -1;
-    justify-self: center;
-    width: min(100%, 32rem);
+  .closeup-fit {
+    display: grid;
+    align-items: center;
+    aspect-ratio: 1;
+    container-type: inline-size;
   }
 
   figcaption {

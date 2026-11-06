@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { closeupFor, closeups, WIDE_BELOW_ZOOM } from "./closeups";
+import { closeupFor, closeups } from "./closeups";
 import { districtsInState, states } from "./data";
 
 describe("closeups", () => {
@@ -46,15 +46,9 @@ describe("closeups", () => {
     expect(closeups("KS")).toEqual([]);
   });
 
-  it("gives how much each close-up enlarges the map, and widens the ones that enlarge least", () => {
+  it("gives how much each close-up enlarges the map", () => {
     const [la] = closeups("CA");
     expect(la?.zoom).toBeCloseTo(1000 / 329, 1);
-    expect(la?.wide).toBe(true);
-    // Wide or not goes by how much it enlarges what it's drawn beside: the map, or its parent.
-    const step = (c: { box: number[] }) => 1000 / ((c.box[2] ?? 0) - (c.box[0] ?? 0));
-    const narrow = states.flatMap((s) => closeups(s.state)).filter((c) => !c.wide);
-    expect(narrow.length).toBeGreaterThan(10); // anchor
-    expect(narrow.every((c) => step(c) >= WIDE_BELOW_ZOOM)).toBe(true);
   });
 });
 
