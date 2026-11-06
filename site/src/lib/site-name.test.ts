@@ -1,20 +1,14 @@
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
-import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import Base from "../layouts/Base.astro";
 import Home from "../pages/index.astro";
 import { districtCardSvg } from "./og";
 
-/** Every source file under a folder, skipping generated data. */
-function sourceFiles(dir: string): string[] {
-  return readdirSync(dir).flatMap((name) => {
-    const path = join(dir, name);
-    if (statSync(path).isDirectory()) return name === "data" ? [] : sourceFiles(path);
-    return /\.(astro|ts|mjs)$/.test(name) && !name.endsWith(".test.ts") ? [path] : [];
-  });
-}
+// Every source file under site/src as text, skipping tests and generated data.
+const sources = Object.entries(
+  import.meta.glob<string>("../**/*.{astro,ts}", { query: "?raw", import: "default", eager: true }),
+).filter(([path]) => !path.endsWith(".test.ts") && !path.startsWith("../data/"));
 
 describe("the site's name", () => {
   it("is Gerrymander Map in the header, with the domain beneath it", async () => {
@@ -38,9 +32,8 @@ describe("the site's name", () => {
   });
 
   it("no longer appears as Gerrymandering Map anywhere in the site's code", () => {
-    const files = sourceFiles(join(__dirname, ".."));
-    expect(files.length).toBeGreaterThan(20); // anchor: the sweep read real files
-    const old = files.filter((f) => /gerrymandering map/i.test(readFileSync(f, "utf8")));
+    expect(sources.length).toBeGreaterThan(20); // anchor: the sweep read real files
+    const old = sources.filter(([, text]) => /gerrymandering map/i.test(text)).map(([path]) => path);
     expect(old).toEqual([]);
   });
 });
