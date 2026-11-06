@@ -232,6 +232,11 @@ const cards = sortCards(
     font: inherit;
   }
 
+  /* Wide enough to show the whole hint, "TX-35, Texas or a ZIP code", plus the clear button. */
+  input[type="search"] {
+    min-width: 15rem;
+  }
+
   .count,
   .empty {
     color: var(--text-muted);
