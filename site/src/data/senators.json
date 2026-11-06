@@ -5,501 +5,701 @@
     "AK": [
       {
         "name": "Lisa Murkowski",
-        "party": "Republican"
+        "last": "Murkowski",
+        "party": "Republican",
+        "class": 3
       },
       {
         "name": "Dan Sullivan",
-        "party": "Republican"
+        "last": "Sullivan",
+        "party": "Republican",
+        "class": 2
       }
     ],
     "AL": [
       {
         "name": "Katie Boyd Britt",
-        "party": "Republican"
+        "last": "Britt",
+        "party": "Republican",
+        "class": 3
       },
       {
         "name": "Tommy Tuberville",
-        "party": "Republican"
+        "last": "Tuberville",
+        "party": "Republican",
+        "class": 2
       }
     ],
     "AR": [
       {
         "name": "John Boozman",
-        "party": "Republican"
+        "last": "Boozman",
+        "party": "Republican",
+        "class": 3
       },
       {
         "name": "Tom Cotton",
-        "party": "Republican"
+        "last": "Cotton",
+        "party": "Republican",
+        "class": 2
       }
     ],
     "AZ": [
       {
         "name": "Ruben Gallego",
-        "party": "Democrat"
+        "last": "Gallego",
+        "party": "Democrat",
+        "class": 1
       },
       {
         "name": "Mark Kelly",
-        "party": "Democrat"
+        "last": "Kelly",
+        "party": "Democrat",
+        "class": 3
       }
     ],
     "CA": [
       {
         "name": "Alex Padilla",
-        "party": "Democrat"
+        "last": "Padilla",
+        "party": "Democrat",
+        "class": 3
       },
       {
         "name": "Adam B. Schiff",
-        "party": "Democrat"
+        "last": "Schiff",
+        "party": "Democrat",
+        "class": 1
       }
     ],
     "CO": [
       {
         "name": "Michael F. Bennet",
-        "party": "Democrat"
+        "last": "Bennet",
+        "party": "Democrat",
+        "class": 3
       },
       {
         "name": "John W. Hickenlooper",
-        "party": "Democrat"
+        "last": "Hickenlooper",
+        "party": "Democrat",
+        "class": 2
       }
     ],
     "CT": [
       {
         "name": "Richard Blumenthal",
-        "party": "Democrat"
+        "last": "Blumenthal",
+        "party": "Democrat",
+        "class": 3
       },
       {
         "name": "Christopher Murphy",
-        "party": "Democrat"
+        "last": "Murphy",
+        "party": "Democrat",
+        "class": 1
       }
     ],
     "DE": [
       {
         "name": "Lisa Blunt Rochester",
-        "party": "Democrat"
+        "last": "Blunt Rochester",
+        "party": "Democrat",
+        "class": 1
       },
       {
         "name": "Christopher A. Coons",
-        "party": "Democrat"
+        "last": "Coons",
+        "party": "Democrat",
+        "class": 2
       }
     ],
     "FL": [
       {
         "name": "Ashley Moody",
-        "party": "Republican"
+        "last": "Moody",
+        "party": "Republican",
+        "class": 3
       },
       {
         "name": "Rick Scott",
-        "party": "Republican"
+        "last": "Scott",
+        "party": "Republican",
+        "class": 1
       }
     ],
     "GA": [
       {
         "name": "Jon Ossoff",
-        "party": "Democrat"
+        "last": "Ossoff",
+        "party": "Democrat",
+        "class": 2
       },
       {
         "name": "Raphael G. Warnock",
-        "party": "Democrat"
+        "last": "Warnock",
+        "party": "Democrat",
+        "class": 3
       }
     ],
     "HI": [
       {
         "name": "Mazie K. Hirono",
-        "party": "Democrat"
+        "last": "Hirono",
+        "party": "Democrat",
+        "class": 1
       },
       {
         "name": "Brian Schatz",
-        "party": "Democrat"
+        "last": "Schatz",
+        "party": "Democrat",
+        "class": 3
       }
     ],
     "IA": [
       {
         "name": "Joni Ernst",
-        "party": "Republican"
+        "last": "Ernst",
+        "party": "Republican",
+        "class": 2
       },
       {
         "name": "Chuck Grassley",
-        "party": "Republican"
+        "last": "Grassley",
+        "party": "Republican",
+        "class": 3
       }
     ],
     "ID": [
       {
         "name": "Mike Crapo",
-        "party": "Republican"
+        "last": "Crapo",
+        "party": "Republican",
+        "class": 3
       },
       {
         "name": "James E. Risch",
-        "party": "Republican"
+        "last": "Risch",
+        "party": "Republican",
+        "class": 2
       }
     ],
     "IL": [
       {
         "name": "Tammy Duckworth",
-        "party": "Democrat"
+        "last": "Duckworth",
+        "party": "Democrat",
+        "class": 3
       },
       {
         "name": "Richard J. Durbin",
-        "party": "Democrat"
+        "last": "Durbin",
+        "party": "Democrat",
+        "class": 2
       }
     ],
     "IN": [
       {
         "name": "Jim Banks",
-        "party": "Republican"
+        "last": "Banks",
+        "party": "Republican",
+        "class": 1
       },
       {
         "name": "Todd Young",
-        "party": "Republican"
+        "last": "Young",
+        "party": "Republican",
+        "class": 3
       }
     ],
     "KS": [
       {
         "name": "Roger Marshall",
-        "party": "Republican"
+        "last": "Marshall",
+        "party": "Republican",
+        "class": 2
       },
       {
         "name": "Jerry Moran",
-        "party": "Republican"
+        "last": "Moran",
+        "party": "Republican",
+        "class": 3
       }
     ],
     "KY": [
       {
         "name": "Mitch McConnell",
-        "party": "Republican"
+        "last": "McConnell",
+        "party": "Republican",
+        "class": 2
       },
       {
         "name": "Rand Paul",
-        "party": "Republican"
+        "last": "Paul",
+        "party": "Republican",
+        "class": 3
       }
     ],
     "LA": [
       {
         "name": "Bill Cassidy",
-        "party": "Republican"
+        "last": "Cassidy",
+        "party": "Republican",
+        "class": 2
       },
       {
         "name": "John Kennedy",
-        "party": "Republican"
+        "last": "Kennedy",
+        "party": "Republican",
+        "class": 3
       }
     ],
     "MA": [
       {
         "name": "Edward J. Markey",
-        "party": "Democrat"
+        "last": "Markey",
+        "party": "Democrat",
+        "class": 2
       },
       {
         "name": "Elizabeth Warren",
-        "party": "Democrat"
+        "last": "Warren",
+        "party": "Democrat",
+        "class": 1
       }
     ],
     "MD": [
       {
         "name": "Angela D. Alsobrooks",
-        "party": "Democrat"
+        "last": "Alsobrooks",
+        "party": "Democrat",
+        "class": 1
       },
       {
         "name": "Chris Van Hollen",
-        "party": "Democrat"
+        "last": "Van Hollen",
+        "party": "Democrat",
+        "class": 3
       }
     ],
     "ME": [
       {
         "name": "Susan M. Collins",
-        "party": "Republican"
+        "last": "Collins",
+        "party": "Republican",
+        "class": 2
       },
       {
         "name": "Angus S. King Jr.",
-        "party": "Independent"
+        "last": "King",
+        "party": "Independent",
+        "class": 1
       }
     ],
     "MI": [
       {
         "name": "Gary C. Peters",
-        "party": "Democrat"
+        "last": "Peters",
+        "party": "Democrat",
+        "class": 2
       },
       {
         "name": "Elissa Slotkin",
-        "party": "Democrat"
+        "last": "Slotkin",
+        "party": "Democrat",
+        "class": 1
       }
     ],
     "MN": [
       {
         "name": "Amy Klobuchar",
-        "party": "Democrat"
+        "last": "Klobuchar",
+        "party": "Democrat",
+        "class": 1
       },
       {
         "name": "Tina Smith",
-        "party": "Democrat"
+        "last": "Smith",
+        "party": "Democrat",
+        "class": 2
       }
     ],
     "MO": [
       {
         "name": "Josh Hawley",
-        "party": "Republican"
+        "last": "Hawley",
+        "party": "Republican",
+        "class": 1
       },
       {
         "name": "Eric Schmitt",
-        "party": "Republican"
+        "last": "Schmitt",
+        "party": "Republican",
+        "class": 3
       }
     ],
     "MS": [
       {
         "name": "Cindy Hyde-Smith",
-        "party": "Republican"
+        "last": "Hyde-Smith",
+        "party": "Republican",
+        "class": 2
       },
       {
         "name": "Roger F. Wicker",
-        "party": "Republican"
+        "last": "Wicker",
+        "party": "Republican",
+        "class": 1
       }
     ],
     "MT": [
       {
         "name": "Steve Daines",
-        "party": "Republican"
+        "last": "Daines",
+        "party": "Republican",
+        "class": 2
       },
       {
         "name": "Tim Sheehy",
-        "party": "Republican"
+        "last": "Sheehy",
+        "party": "Republican",
+        "class": 1
       }
     ],
     "NC": [
       {
         "name": "Ted Budd",
-        "party": "Republican"
+        "last": "Budd",
+        "party": "Republican",
+        "class": 3
       },
       {
         "name": "Thom Tillis",
-        "party": "Republican"
+        "last": "Tillis",
+        "party": "Republican",
+        "class": 2
       }
     ],
     "ND": [
       {
         "name": "Kevin Cramer",
-        "party": "Republican"
+        "last": "Cramer",
+        "party": "Republican",
+        "class": 1
       },
       {
         "name": "John Hoeven",
-        "party": "Republican"
+        "last": "Hoeven",
+        "party": "Republican",
+        "class": 3
       }
     ],
     "NE": [
       {
         "name": "Deb Fischer",
-        "party": "Republican"
+        "last": "Fischer",
+        "party": "Republican",
+        "class": 1
       },
       {
         "name": "Pete Ricketts",
-        "party": "Republican"
+        "last": "Ricketts",
+        "party": "Republican",
+        "class": 2
       }
     ],
     "NH": [
       {
         "name": "Margaret Wood Hassan",
-        "party": "Democrat"
+        "last": "Hassan",
+        "party": "Democrat",
+        "class": 3
       },
       {
         "name": "Jeanne Shaheen",
-        "party": "Democrat"
+        "last": "Shaheen",
+        "party": "Democrat",
+        "class": 2
       }
     ],
     "NJ": [
       {
         "name": "Cory A. Booker",
-        "party": "Democrat"
+        "last": "Booker",
+        "party": "Democrat",
+        "class": 2
       },
       {
         "name": "Andy Kim",
-        "party": "Democrat"
+        "last": "Kim",
+        "party": "Democrat",
+        "class": 1
       }
     ],
     "NM": [
       {
         "name": "Martin Heinrich",
-        "party": "Democrat"
+        "last": "Heinrich",
+        "party": "Democrat",
+        "class": 1
       },
       {
         "name": "Ben Ray Luján",
-        "party": "Democrat"
+        "last": "Luján",
+        "party": "Democrat",
+        "class": 2
       }
     ],
     "NV": [
       {
         "name": "Catherine Cortez Masto",
-        "party": "Democrat"
+        "last": "Cortez Masto",
+        "party": "Democrat",
+        "class": 3
       },
       {
         "name": "Jacky Rosen",
-        "party": "Democrat"
+        "last": "Rosen",
+        "party": "Democrat",
+        "class": 1
       }
     ],
     "NY": [
       {
         "name": "Kirsten E. Gillibrand",
-        "party": "Democrat"
+        "last": "Gillibrand",
+        "party": "Democrat",
+        "class": 1
       },
       {
         "name": "Charles E. Schumer",
-        "party": "Democrat"
+        "last": "Schumer",
+        "party": "Democrat",
+        "class": 3
       }
     ],
     "OH": [
       {
         "name": "Jon Husted",
-        "party": "Republican"
+        "last": "Husted",
+        "party": "Republican",
+        "class": 3
       },
       {
         "name": "Bernie Moreno",
-        "party": "Republican"
+        "last": "Moreno",
+        "party": "Republican",
+        "class": 1
       }
     ],
     "OK": [
       {
         "name": "Alan Armstrong",
-        "party": "Republican"
+        "last": "Armstrong",
+        "party": "Republican",
+        "class": 2
       },
       {
         "name": "James Lankford",
-        "party": "Republican"
+        "last": "Lankford",
+        "party": "Republican",
+        "class": 3
       }
     ],
     "OR": [
       {
         "name": "Jeff Merkley",
-        "party": "Democrat"
+        "last": "Merkley",
+        "party": "Democrat",
+        "class": 2
       },
       {
         "name": "Ron Wyden",
-        "party": "Democrat"
+        "last": "Wyden",
+        "party": "Democrat",
+        "class": 3
       }
     ],
     "PA": [
       {
         "name": "John Fetterman",
-        "party": "Democrat"
+        "last": "Fetterman",
+        "party": "Democrat",
+        "class": 3
       },
       {
         "name": "David McCormick",
-        "party": "Republican"
+        "last": "McCormick",
+        "party": "Republican",
+        "class": 1
       }
     ],
     "RI": [
       {
         "name": "Jack Reed",
-        "party": "Democrat"
+        "last": "Reed",
+        "party": "Democrat",
+        "class": 2
       },
       {
         "name": "Sheldon Whitehouse",
-        "party": "Democrat"
+        "last": "Whitehouse",
+        "party": "Democrat",
+        "class": 1
       }
     ],
     "SC": [
       {
         "name": "Darline Graham",
-        "party": "Republican"
+        "last": "Graham",
+        "party": "Republican",
+        "class": 2
       },
       {
         "name": "Tim Scott",
-        "party": "Republican"
+        "last": "Scott",
+        "party": "Republican",
+        "class": 3
       }
     ],
     "SD": [
       {
         "name": "Mike Rounds",
-        "party": "Republican"
+        "last": "Rounds",
+        "party": "Republican",
+        "class": 2
       },
       {
         "name": "John Thune",
-        "party": "Republican"
+        "last": "Thune",
+        "party": "Republican",
+        "class": 3
       }
     ],
     "TN": [
       {
         "name": "Marsha Blackburn",
-        "party": "Republican"
+        "last": "Blackburn",
+        "party": "Republican",
+        "class": 1
       },
       {
         "name": "Bill Hagerty",
-        "party": "Republican"
+        "last": "Hagerty",
+        "party": "Republican",
+        "class": 2
       }
     ],
     "TX": [
       {
         "name": "John Cornyn",
-        "party": "Republican"
+        "last": "Cornyn",
+        "party": "Republican",
+        "class": 2
       },
       {
         "name": "Ted Cruz",
-        "party": "Republican"
+        "last": "Cruz",
+        "party": "Republican",
+        "class": 1
       }
     ],
     "UT": [
       {
         "name": "John R. Curtis",
-        "party": "Republican"
+        "last": "Curtis",
+        "party": "Republican",
+        "class": 1
       },
       {
         "name": "Mike Lee",
-        "party": "Republican"
+        "last": "Lee",
+        "party": "Republican",
+        "class": 3
       }
     ],
     "VA": [
       {
         "name": "Tim Kaine",
-        "party": "Democrat"
+        "last": "Kaine",
+        "party": "Democrat",
+        "class": 1
       },
       {
         "name": "Mark R. Warner",
-        "party": "Democrat"
+        "last": "Warner",
+        "party": "Democrat",
+        "class": 2
       }
     ],
     "VT": [
       {
         "name": "Bernard Sanders",
-        "party": "Independent"
+        "last": "Sanders",
+        "party": "Independent",
+        "class": 1
       },
       {
         "name": "Peter Welch",
-        "party": "Democrat"
+        "last": "Welch",
+        "party": "Democrat",
+        "class": 3
       }
     ],
     "WA": [
       {
         "name": "Maria Cantwell",
-        "party": "Democrat"
+        "last": "Cantwell",
+        "party": "Democrat",
+        "class": 1
       },
       {
         "name": "Patty Murray",
-        "party": "Democrat"
+        "last": "Murray",
+        "party": "Democrat",
+        "class": 3
       }
     ],
     "WI": [
       {
         "name": "Tammy Baldwin",
-        "party": "Democrat"
+        "last": "Baldwin",
+        "party": "Democrat",
+        "class": 1
       },
       {
         "name": "Ron Johnson",
-        "party": "Republican"
+        "last": "Johnson",
+        "party": "Republican",
+        "class": 3
       }
     ],
     "WV": [
       {
         "name": "Shelley Moore Capito",
-        "party": "Republican"
+        "last": "Capito",
+        "party": "Republican",
+        "class": 2
       },
       {
         "name": "James C. Justice",
-        "party": "Republican"
+        "last": "Justice",
+        "party": "Republican",
+        "class": 1
       }
     ],
     "WY": [
       {
         "name": "John Barrasso",
-        "party": "Republican"
+        "last": "Barrasso",
+        "party": "Republican",
+        "class": 1
       },
       {
         "name": "Cynthia M. Lummis",
-        "party": "Republican"
+        "last": "Lummis",
+        "party": "Republican",
+        "class": 2
       }
     ]
   }

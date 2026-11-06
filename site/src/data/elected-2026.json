@@ -1,0 +1,2504 @@
+{
+  "description": "Who won each November 2026 U.S. House and Senate race (unofficial).",
+  "called_as_of": "2026-11-06 09:32 ET",
+  "house": {
+    "AK-AL": {
+      "status": "uncalled"
+    },
+    "AL-01": {
+      "status": "elected",
+      "name": "Jerry Carl",
+      "party": "Republican"
+    },
+    "AL-02": {
+      "status": "elected",
+      "name": "Shomari C. Figures",
+      "party": "Democrat"
+    },
+    "AL-03": {
+      "status": "elected",
+      "name": "Mike Rogers",
+      "party": "Republican"
+    },
+    "AL-04": {
+      "status": "elected",
+      "name": "Robert B. Aderholt",
+      "party": "Republican"
+    },
+    "AL-05": {
+      "status": "elected",
+      "name": "Dale W. Strong",
+      "party": "Republican"
+    },
+    "AL-06": {
+      "status": "elected",
+      "name": "Gary Palmer",
+      "party": "Republican"
+    },
+    "AL-07": {
+      "status": "elected",
+      "name": "Terri Sewell",
+      "party": "Democrat"
+    },
+    "AR-01": {
+      "status": "elected",
+      "name": "Rick Crawford",
+      "party": "Republican"
+    },
+    "AR-02": {
+      "status": "elected",
+      "name": "French Hill",
+      "party": "Republican"
+    },
+    "AR-03": {
+      "status": "elected",
+      "name": "Steve Womack",
+      "party": "Republican"
+    },
+    "AR-04": {
+      "status": "elected",
+      "name": "Bruce Westerman",
+      "party": "Republican"
+    },
+    "AZ-01": {
+      "status": "elected",
+      "name": "Amish Shah",
+      "party": "Democrat"
+    },
+    "AZ-02": {
+      "status": "uncalled"
+    },
+    "AZ-03": {
+      "status": "elected",
+      "name": "Yassamin Ansari",
+      "party": "Democrat"
+    },
+    "AZ-04": {
+      "status": "elected",
+      "name": "Greg Stanton",
+      "party": "Democrat"
+    },
+    "AZ-05": {
+      "status": "uncalled"
+    },
+    "AZ-06": {
+      "status": "elected",
+      "name": "JoAnna Mendoza",
+      "party": "Democrat"
+    },
+    "AZ-07": {
+      "status": "elected",
+      "name": "Adelita Grijalva",
+      "party": "Democrat"
+    },
+    "AZ-08": {
+      "status": "uncalled"
+    },
+    "AZ-09": {
+      "status": "elected",
+      "name": "Paul Gosar",
+      "party": "Republican"
+    },
+    "CA-01": {
+      "status": "elected",
+      "name": "Mike McGuire",
+      "party": "Democrat"
+    },
+    "CA-02": {
+      "status": "elected",
+      "name": "Jared Huffman",
+      "party": "Democrat"
+    },
+    "CA-03": {
+      "status": "elected",
+      "name": "Ami Bera",
+      "party": "Democrat"
+    },
+    "CA-04": {
+      "status": "uncalled"
+    },
+    "CA-05": {
+      "status": "elected",
+      "name": "Tom McClintock",
+      "party": "Republican"
+    },
+    "CA-06": {
+      "status": "elected",
+      "name": "Richard Pan",
+      "party": "Democrat"
+    },
+    "CA-07": {
+      "status": "uncalled"
+    },
+    "CA-08": {
+      "status": "elected",
+      "name": "John Garamendi",
+      "party": "Democrat"
+    },
+    "CA-09": {
+      "status": "elected",
+      "name": "Josh Harder",
+      "party": "Democrat"
+    },
+    "CA-10": {
+      "status": "elected",
+      "name": "Mark DeSaulnier",
+      "party": "Democrat"
+    },
+    "CA-11": {
+      "status": "uncalled"
+    },
+    "CA-12": {
+      "status": "elected",
+      "name": "Lateefah Simon",
+      "party": "Democrat"
+    },
+    "CA-13": {
+      "status": "elected",
+      "name": "Adam Gray",
+      "party": "Democrat"
+    },
+    "CA-14": {
+      "status": "uncalled"
+    },
+    "CA-15": {
+      "status": "elected",
+      "name": "Kevin Mullin",
+      "party": "Democrat"
+    },
+    "CA-16": {
+      "status": "elected",
+      "name": "Sam Liccardo",
+      "party": "Democrat"
+    },
+    "CA-17": {
+      "status": "elected",
+      "name": "Ro Khanna",
+      "party": "Democrat"
+    },
+    "CA-18": {
+      "status": "elected",
+      "name": "Zoe Lofgren",
+      "party": "Democrat"
+    },
+    "CA-19": {
+      "status": "elected",
+      "name": "Jimmy Panetta",
+      "party": "Democrat"
+    },
+    "CA-20": {
+      "status": "elected",
+      "name": "Vince Fong",
+      "party": "Republican"
+    },
+    "CA-21": {
+      "status": "elected",
+      "name": "Jim Costa",
+      "party": "Democrat"
+    },
+    "CA-22": {
+      "status": "elected",
+      "name": "Randy Villegas",
+      "party": "Democrat"
+    },
+    "CA-23": {
+      "status": "uncalled"
+    },
+    "CA-24": {
+      "status": "elected",
+      "name": "Salud Carbajal",
+      "party": "Democrat"
+    },
+    "CA-25": {
+      "status": "elected",
+      "name": "Raul Ruiz",
+      "party": "Democrat"
+    },
+    "CA-26": {
+      "status": "elected",
+      "name": "Jacqui Irwin",
+      "party": "Democrat"
+    },
+    "CA-27": {
+      "status": "elected",
+      "name": "George Whitesides",
+      "party": "Democrat"
+    },
+    "CA-28": {
+      "status": "elected",
+      "name": "Judy Chu",
+      "party": "Democrat"
+    },
+    "CA-29": {
+      "status": "elected",
+      "name": "Luz Maria Rivas",
+      "party": "Democrat"
+    },
+    "CA-30": {
+      "status": "elected",
+      "name": "Laura Friedman",
+      "party": "Democrat"
+    },
+    "CA-31": {
+      "status": "elected",
+      "name": "Gil Cisneros",
+      "party": "Democrat"
+    },
+    "CA-32": {
+      "status": "elected",
+      "name": "Brad Sherman",
+      "party": "Democrat"
+    },
+    "CA-33": {
+      "status": "elected",
+      "name": "Pete Aguilar",
+      "party": "Democrat"
+    },
+    "CA-34": {
+      "status": "elected",
+      "name": "Angela Gonzales-Torres",
+      "party": "Democrat"
+    },
+    "CA-35": {
+      "status": "elected",
+      "name": "Norma J. Torres",
+      "party": "Democrat"
+    },
+    "CA-36": {
+      "status": "elected",
+      "name": "Ted W. Lieu",
+      "party": "Democrat"
+    },
+    "CA-37": {
+      "status": "elected",
+      "name": "Sydney Kamlager-Dove",
+      "party": "Democrat"
+    },
+    "CA-38": {
+      "status": "elected",
+      "name": "Hilda Solis",
+      "party": "Democrat"
+    },
+    "CA-39": {
+      "status": "elected",
+      "name": "Mark Takano",
+      "party": "Democrat"
+    },
+    "CA-40": {
+      "status": "uncalled"
+    },
+    "CA-41": {
+      "status": "elected",
+      "name": "Linda Sánchez",
+      "party": "Democrat"
+    },
+    "CA-42": {
+      "status": "elected",
+      "name": "Robert Garcia",
+      "party": "Democrat"
+    },
+    "CA-43": {
+      "status": "elected",
+      "name": "Maxine Waters",
+      "party": "Democrat"
+    },
+    "CA-44": {
+      "status": "elected",
+      "name": "Nanette Diaz Barragan",
+      "party": "Democrat"
+    },
+    "CA-45": {
+      "status": "elected",
+      "name": "Derek Tran",
+      "party": "Democrat"
+    },
+    "CA-46": {
+      "status": "elected",
+      "name": "Lou Correa",
+      "party": "Democrat"
+    },
+    "CA-47": {
+      "status": "elected",
+      "name": "Dave Min",
+      "party": "Democrat"
+    },
+    "CA-48": {
+      "status": "elected",
+      "name": "Marni von Wilpert",
+      "party": "Democrat"
+    },
+    "CA-49": {
+      "status": "elected",
+      "name": "Mike Levin",
+      "party": "Democrat"
+    },
+    "CA-50": {
+      "status": "elected",
+      "name": "Scott Peters",
+      "party": "Democrat"
+    },
+    "CA-51": {
+      "status": "elected",
+      "name": "Sara Jacobs",
+      "party": "Democrat"
+    },
+    "CA-52": {
+      "status": "elected",
+      "name": "Juan Vargas",
+      "party": "Democrat"
+    },
+    "CO-01": {
+      "status": "elected",
+      "name": "Melat Kiros",
+      "party": "Democrat"
+    },
+    "CO-02": {
+      "status": "elected",
+      "name": "Joe Neguse",
+      "party": "Democrat"
+    },
+    "CO-03": {
+      "status": "uncalled"
+    },
+    "CO-04": {
+      "status": "uncalled"
+    },
+    "CO-05": {
+      "status": "elected",
+      "name": "Jessica Killin",
+      "party": "Democrat"
+    },
+    "CO-06": {
+      "status": "elected",
+      "name": "Jason Crow",
+      "party": "Democrat"
+    },
+    "CO-07": {
+      "status": "elected",
+      "name": "Brittany Pettersen",
+      "party": "Democrat"
+    },
+    "CO-08": {
+      "status": "elected",
+      "name": "Manny Rutinel",
+      "party": "Democrat"
+    },
+    "CT-01": {
+      "status": "elected",
+      "name": "Luke Bronin",
+      "party": "Democrat"
+    },
+    "CT-02": {
+      "status": "elected",
+      "name": "Joe Courtney",
+      "party": "Democrat"
+    },
+    "CT-03": {
+      "status": "elected",
+      "name": "Rosa L. DeLauro",
+      "party": "Democrat"
+    },
+    "CT-04": {
+      "status": "elected",
+      "name": "Jim Himes",
+      "party": "Democrat"
+    },
+    "CT-05": {
+      "status": "elected",
+      "name": "Jahana Hayes",
+      "party": "Democrat"
+    },
+    "DE-AL": {
+      "status": "elected",
+      "name": "Sarah McBride",
+      "party": "Democrat"
+    },
+    "FL-01": {
+      "status": "elected",
+      "name": "Jimmy Patronis",
+      "party": "Republican"
+    },
+    "FL-02": {
+      "status": "elected",
+      "name": "Austin Rogers",
+      "party": "Republican"
+    },
+    "FL-03": {
+      "status": "elected",
+      "name": "Kat Cammack",
+      "party": "Republican"
+    },
+    "FL-04": {
+      "status": "elected",
+      "name": "Aaron Bean",
+      "party": "Republican"
+    },
+    "FL-05": {
+      "status": "elected",
+      "name": "John H. Rutherford",
+      "party": "Republican"
+    },
+    "FL-06": {
+      "status": "elected",
+      "name": "Randy Fine",
+      "party": "Republican"
+    },
+    "FL-07": {
+      "status": "uncalled"
+    },
+    "FL-08": {
+      "status": "elected",
+      "name": "Mike Haridopolos",
+      "party": "Republican"
+    },
+    "FL-09": {
+      "status": "uncalled"
+    },
+    "FL-10": {
+      "status": "elected",
+      "name": "Maxwell Alejandro Frost",
+      "party": "Democrat"
+    },
+    "FL-11": {
+      "status": "elected",
+      "name": "Joe Strada",
+      "party": "Republican"
+    },
+    "FL-12": {
+      "status": "elected",
+      "name": "Gus Michael Bilirakis",
+      "party": "Republican"
+    },
+    "FL-13": {
+      "status": "elected",
+      "name": "Anna Paulina Luna",
+      "party": "Republican"
+    },
+    "FL-14": {
+      "status": "elected",
+      "name": "Kathy Castor",
+      "party": "Democrat"
+    },
+    "FL-15": {
+      "status": "elected",
+      "name": "Laurel Lee",
+      "party": "Republican"
+    },
+    "FL-16": {
+      "status": "elected",
+      "name": "Sydney Gruters",
+      "party": "Republican"
+    },
+    "FL-17": {
+      "status": "elected",
+      "name": "Greg Steube",
+      "party": "Republican"
+    },
+    "FL-18": {
+      "status": "elected",
+      "name": "Scott Franklin",
+      "party": "Republican"
+    },
+    "FL-19": {
+      "status": "elected",
+      "name": "Jim Schwartzel",
+      "party": "Republican"
+    },
+    "FL-20": {
+      "status": "elected",
+      "name": "Debbie Wasserman Schultz",
+      "party": "Democrat"
+    },
+    "FL-21": {
+      "status": "elected",
+      "name": "Brian Mast",
+      "party": "Republican"
+    },
+    "FL-22": {
+      "status": "elected",
+      "name": "Pia Dandiya",
+      "party": "Democrat"
+    },
+    "FL-23": {
+      "status": "elected",
+      "name": "Lois Frankel",
+      "party": "Democrat"
+    },
+    "FL-24": {
+      "status": "elected",
+      "name": "Oliver G. Gilbert",
+      "party": "Democrat"
+    },
+    "FL-25": {
+      "status": "elected",
+      "name": "Jared Moskowitz",
+      "party": "Democrat"
+    },
+    "FL-26": {
+      "status": "uncalled"
+    },
+    "FL-27": {
+      "status": "uncalled"
+    },
+    "FL-28": {
+      "status": "elected",
+      "name": "Carlos A. Gimenez",
+      "party": "Republican"
+    },
+    "GA-01": {
+      "status": "elected",
+      "name": "James \"Jim\" Kingston",
+      "party": "Republican"
+    },
+    "GA-02": {
+      "status": "elected",
+      "name": "Sanford Bishop",
+      "party": "Democrat"
+    },
+    "GA-03": {
+      "status": "elected",
+      "name": "Brian Jack",
+      "party": "Republican"
+    },
+    "GA-04": {
+      "status": "elected",
+      "name": "Henry \"Hank\" Johnson Jr.",
+      "party": "Democrat"
+    },
+    "GA-05": {
+      "status": "elected",
+      "name": "Nikema Williams",
+      "party": "Democrat"
+    },
+    "GA-06": {
+      "status": "elected",
+      "name": "Lucy McBath",
+      "party": "Democrat"
+    },
+    "GA-07": {
+      "status": "elected",
+      "name": "Rich McCormick",
+      "party": "Republican"
+    },
+    "GA-08": {
+      "status": "elected",
+      "name": "Austin Scott",
+      "party": "Republican"
+    },
+    "GA-09": {
+      "status": "elected",
+      "name": "Andrew Clyde",
+      "party": "Republican"
+    },
+    "GA-10": {
+      "status": "elected",
+      "name": "Houston Gaines",
+      "party": "Republican"
+    },
+    "GA-11": {
+      "status": "elected",
+      "name": "John Cowan",
+      "party": "Republican"
+    },
+    "GA-12": {
+      "status": "elected",
+      "name": "Rick W. Allen",
+      "party": "Republican"
+    },
+    "GA-13": {
+      "status": "elected",
+      "name": "Jasmine Clark",
+      "party": "Democrat"
+    },
+    "GA-14": {
+      "status": "elected",
+      "name": "Clay Fuller",
+      "party": "Republican"
+    },
+    "HI-01": {
+      "status": "elected",
+      "name": "Ed Case",
+      "party": "Democrat"
+    },
+    "HI-02": {
+      "status": "elected",
+      "name": "Jill N. Tokuda",
+      "party": "Democrat"
+    },
+    "IA-01": {
+      "status": "elected",
+      "name": "Christina Bohannan",
+      "party": "Democrat"
+    },
+    "IA-02": {
+      "status": "elected",
+      "name": "Lindsay James",
+      "party": "Democrat"
+    },
+    "IA-03": {
+      "status": "elected",
+      "name": "Sarah Trone Garriott",
+      "party": "Democrat"
+    },
+    "IA-04": {
+      "status": "elected",
+      "name": "Chris McGowan",
+      "party": "Republican"
+    },
+    "ID-01": {
+      "status": "elected",
+      "name": "Russ Fulcher",
+      "party": "Republican"
+    },
+    "ID-02": {
+      "status": "elected",
+      "name": "Mike Simpson",
+      "party": "Republican"
+    },
+    "IL-01": {
+      "status": "pending"
+    },
+    "IL-02": {
+      "status": "pending"
+    },
+    "IL-03": {
+      "status": "pending"
+    },
+    "IL-04": {
+      "status": "pending"
+    },
+    "IL-05": {
+      "status": "pending"
+    },
+    "IL-06": {
+      "status": "pending"
+    },
+    "IL-07": {
+      "status": "pending"
+    },
+    "IL-08": {
+      "status": "pending"
+    },
+    "IL-09": {
+      "status": "pending"
+    },
+    "IL-10": {
+      "status": "pending"
+    },
+    "IL-11": {
+      "status": "pending"
+    },
+    "IL-12": {
+      "status": "pending"
+    },
+    "IL-13": {
+      "status": "pending"
+    },
+    "IL-14": {
+      "status": "pending"
+    },
+    "IL-15": {
+      "status": "pending"
+    },
+    "IL-16": {
+      "status": "pending"
+    },
+    "IL-17": {
+      "status": "pending"
+    },
+    "IN-01": {
+      "status": "elected",
+      "name": "Frank J. Mrvan",
+      "party": "Democrat"
+    },
+    "IN-02": {
+      "status": "elected",
+      "name": "Rudy Yakym",
+      "party": "Republican"
+    },
+    "IN-03": {
+      "status": "elected",
+      "name": "Marlin A. Stutzman",
+      "party": "Republican"
+    },
+    "IN-04": {
+      "status": "elected",
+      "name": "Jim Baird",
+      "party": "Republican"
+    },
+    "IN-05": {
+      "status": "elected",
+      "name": "J.D. Ford",
+      "party": "Democrat"
+    },
+    "IN-06": {
+      "status": "elected",
+      "name": "Jefferson Shreve",
+      "party": "Republican"
+    },
+    "IN-07": {
+      "status": "elected",
+      "name": "André Carson",
+      "party": "Democrat"
+    },
+    "IN-08": {
+      "status": "elected",
+      "name": "Mark Messmer",
+      "party": "Republican"
+    },
+    "IN-09": {
+      "status": "elected",
+      "name": "Erin Houchin",
+      "party": "Republican"
+    },
+    "KS-01": {
+      "status": "elected",
+      "name": "Tracey Mann",
+      "party": "Republican"
+    },
+    "KS-02": {
+      "status": "elected",
+      "name": "Derek Schmidt",
+      "party": "Republican"
+    },
+    "KS-03": {
+      "status": "elected",
+      "name": "Sharice L. Davids",
+      "party": "Democrat"
+    },
+    "KS-04": {
+      "status": "elected",
+      "name": "Ron Estes",
+      "party": "Republican"
+    },
+    "KY-01": {
+      "status": "elected",
+      "name": "James R. Comer",
+      "party": "Republican"
+    },
+    "KY-02": {
+      "status": "elected",
+      "name": "S. Brett Guthrie",
+      "party": "Republican"
+    },
+    "KY-03": {
+      "status": "elected",
+      "name": "Morgan McGARVEY",
+      "party": "Democrat"
+    },
+    "KY-04": {
+      "status": "elected",
+      "name": "Ed Gallrein",
+      "party": "Republican"
+    },
+    "KY-05": {
+      "status": "elected",
+      "name": "Hal Rogers",
+      "party": "Republican"
+    },
+    "KY-06": {
+      "status": "elected",
+      "name": "Zach Dembo",
+      "party": "Democrat"
+    },
+    "LA-01": {
+      "status": "elected",
+      "name": "Steve Scalise",
+      "party": "Republican"
+    },
+    "LA-02": {
+      "status": "elected",
+      "name": "Troy A. Carter Sr.",
+      "party": "Democrat"
+    },
+    "LA-03": {
+      "status": "elected",
+      "name": "\"Clay\" Higgins",
+      "party": "Republican"
+    },
+    "LA-04": {
+      "status": "elected",
+      "name": "\"Mike\" Johnson",
+      "party": "Republican"
+    },
+    "LA-05": {
+      "status": "runoff",
+      "runoff_date": "2026-12-12"
+    },
+    "LA-06": {
+      "status": "runoff",
+      "runoff_date": "2026-12-12"
+    },
+    "MA-01": {
+      "status": "pending"
+    },
+    "MA-02": {
+      "status": "pending"
+    },
+    "MA-03": {
+      "status": "pending"
+    },
+    "MA-04": {
+      "status": "pending"
+    },
+    "MA-05": {
+      "status": "pending"
+    },
+    "MA-06": {
+      "status": "pending"
+    },
+    "MA-07": {
+      "status": "pending"
+    },
+    "MA-08": {
+      "status": "pending"
+    },
+    "MA-09": {
+      "status": "pending"
+    },
+    "MD-01": {
+      "status": "elected",
+      "name": "Andy Harris",
+      "party": "Republican"
+    },
+    "MD-02": {
+      "status": "elected",
+      "name": "John \"Johnny O\" Olszewski Jr.",
+      "party": "Democrat"
+    },
+    "MD-03": {
+      "status": "elected",
+      "name": "Sarah Elfreth",
+      "party": "Democrat"
+    },
+    "MD-04": {
+      "status": "elected",
+      "name": "Glenn F. Ivey",
+      "party": "Democrat"
+    },
+    "MD-05": {
+      "status": "elected",
+      "name": "Adrian Boafo",
+      "party": "Democrat"
+    },
+    "MD-06": {
+      "status": "elected",
+      "name": "April McClain Delaney",
+      "party": "Democrat"
+    },
+    "MD-07": {
+      "status": "elected",
+      "name": "Kweisi Mfume",
+      "party": "Democrat"
+    },
+    "MD-08": {
+      "status": "elected",
+      "name": "Jamie Raskin",
+      "party": "Democrat"
+    },
+    "ME-01": {
+      "status": "pending"
+    },
+    "ME-02": {
+      "status": "uncalled"
+    },
+    "MI-01": {
+      "status": "pending"
+    },
+    "MI-02": {
+      "status": "pending"
+    },
+    "MI-03": {
+      "status": "pending"
+    },
+    "MI-04": {
+      "status": "pending"
+    },
+    "MI-05": {
+      "status": "pending"
+    },
+    "MI-06": {
+      "status": "pending"
+    },
+    "MI-07": {
+      "status": "pending"
+    },
+    "MI-08": {
+      "status": "pending"
+    },
+    "MI-09": {
+      "status": "pending"
+    },
+    "MI-10": {
+      "status": "pending"
+    },
+    "MI-11": {
+      "status": "pending"
+    },
+    "MI-12": {
+      "status": "pending"
+    },
+    "MI-13": {
+      "status": "pending"
+    },
+    "MN-01": {
+      "status": "uncalled"
+    },
+    "MN-02": {
+      "status": "elected",
+      "name": "Matt Little",
+      "party": "Democrat"
+    },
+    "MN-03": {
+      "status": "elected",
+      "name": "Kelly Morrison",
+      "party": "Democrat"
+    },
+    "MN-04": {
+      "status": "elected",
+      "name": "Betty McCollum",
+      "party": "Democrat"
+    },
+    "MN-05": {
+      "status": "elected",
+      "name": "Ilhan Omar",
+      "party": "Democrat"
+    },
+    "MN-06": {
+      "status": "elected",
+      "name": "Tom Emmer",
+      "party": "Republican"
+    },
+    "MN-07": {
+      "status": "elected",
+      "name": "Michelle Fischbach",
+      "party": "Republican"
+    },
+    "MN-08": {
+      "status": "elected",
+      "name": "Pete Stauber",
+      "party": "Republican"
+    },
+    "MO-01": {
+      "status": "elected",
+      "name": "Wesley Bell",
+      "party": "Democrat"
+    },
+    "MO-02": {
+      "status": "elected",
+      "name": "Fred Wellman",
+      "party": "Democrat"
+    },
+    "MO-03": {
+      "status": "elected",
+      "name": "Bob Onder",
+      "party": "Republican"
+    },
+    "MO-04": {
+      "status": "elected",
+      "name": "Mark Alford",
+      "party": "Republican"
+    },
+    "MO-05": {
+      "status": "elected",
+      "name": "Emanuel Cleaver II",
+      "party": "Democrat"
+    },
+    "MO-06": {
+      "status": "elected",
+      "name": "Chris Stigall",
+      "party": "Republican"
+    },
+    "MO-07": {
+      "status": "elected",
+      "name": "Eric W. Burlison",
+      "party": "Republican"
+    },
+    "MO-08": {
+      "status": "elected",
+      "name": "Jason T. Smith",
+      "party": "Republican"
+    },
+    "MS-01": {
+      "status": "pending"
+    },
+    "MS-02": {
+      "status": "pending"
+    },
+    "MS-03": {
+      "status": "pending"
+    },
+    "MS-04": {
+      "status": "pending"
+    },
+    "MT-01": {
+      "status": "elected",
+      "name": "Sam Forstag",
+      "party": "Democrat"
+    },
+    "MT-02": {
+      "status": "elected",
+      "name": "Troy Downing",
+      "party": "Republican"
+    },
+    "NC-01": {
+      "status": "elected",
+      "name": "Don Davis",
+      "party": "Democrat"
+    },
+    "NC-02": {
+      "status": "elected",
+      "name": "Deborah K. Ross",
+      "party": "Democrat"
+    },
+    "NC-03": {
+      "status": "uncalled"
+    },
+    "NC-04": {
+      "status": "elected",
+      "name": "Valerie P. Foushee",
+      "party": "Democrat"
+    },
+    "NC-05": {
+      "status": "uncalled"
+    },
+    "NC-06": {
+      "status": "elected",
+      "name": "Cyril Jefferson",
+      "party": "Democrat"
+    },
+    "NC-07": {
+      "status": "uncalled"
+    },
+    "NC-08": {
+      "status": "elected",
+      "name": "Mark Harris",
+      "party": "Republican"
+    },
+    "NC-09": {
+      "status": "elected",
+      "name": "Richard N. Ojeda II",
+      "party": "Democrat"
+    },
+    "NC-10": {
+      "status": "elected",
+      "name": "Pat Harrigan",
+      "party": "Republican"
+    },
+    "NC-11": {
+      "status": "elected",
+      "name": "Jamie Ager",
+      "party": "Democrat"
+    },
+    "NC-12": {
+      "status": "elected",
+      "name": "Alma S. Adams",
+      "party": "Democrat"
+    },
+    "NC-13": {
+      "status": "elected",
+      "name": "Paul Barringer",
+      "party": "Democrat"
+    },
+    "NC-14": {
+      "status": "elected",
+      "name": "Lakesha Womack",
+      "party": "Democrat"
+    },
+    "ND-AL": {
+      "status": "elected",
+      "name": "Julie Fedorchak",
+      "party": "Republican"
+    },
+    "NE-01": {
+      "status": "elected",
+      "name": "Mike Flood",
+      "party": "Republican"
+    },
+    "NE-02": {
+      "status": "elected",
+      "name": "Denise Powell",
+      "party": "Democrat"
+    },
+    "NE-03": {
+      "status": "elected",
+      "name": "Adrian Smith",
+      "party": "Republican"
+    },
+    "NH-01": {
+      "status": "elected",
+      "name": "Stefany Shaheen",
+      "party": "Democrat"
+    },
+    "NH-02": {
+      "status": "elected",
+      "name": "Maggie Goodlander",
+      "party": "Democrat"
+    },
+    "NJ-01": {
+      "status": "elected",
+      "name": "Donald Norcross",
+      "party": "Democrat"
+    },
+    "NJ-02": {
+      "status": "elected",
+      "name": "Zack Mullock",
+      "party": "Democrat"
+    },
+    "NJ-03": {
+      "status": "elected",
+      "name": "Herbert Conaway Jr.",
+      "party": "Democrat"
+    },
+    "NJ-04": {
+      "status": "elected",
+      "name": "Christopher H. Smith",
+      "party": "Republican"
+    },
+    "NJ-05": {
+      "status": "elected",
+      "name": "Josh Gottheimer",
+      "party": "Democrat"
+    },
+    "NJ-06": {
+      "status": "elected",
+      "name": "Frank Pallone Jr.",
+      "party": "Democrat"
+    },
+    "NJ-07": {
+      "status": "elected",
+      "name": "Rebecca Bennett",
+      "party": "Democrat"
+    },
+    "NJ-08": {
+      "status": "elected",
+      "name": "Rob Menendez",
+      "party": "Democrat"
+    },
+    "NJ-09": {
+      "status": "elected",
+      "name": "Nelida Pou",
+      "party": "Democrat"
+    },
+    "NJ-10": {
+      "status": "elected",
+      "name": "LaMonica R. McIver",
+      "party": "Democrat"
+    },
+    "NJ-11": {
+      "status": "elected",
+      "name": "Analilia Mejia",
+      "party": "Democrat"
+    },
+    "NJ-12": {
+      "status": "elected",
+      "name": "Adam Hamawy",
+      "party": "Democrat"
+    },
+    "NM-01": {
+      "status": "elected",
+      "name": "Melanie Ann Stansbury",
+      "party": "Democrat"
+    },
+    "NM-02": {
+      "status": "elected",
+      "name": "Gabriel Vasquez",
+      "party": "Democrat"
+    },
+    "NM-03": {
+      "status": "elected",
+      "name": "Teresa Leger Fernandez",
+      "party": "Democrat"
+    },
+    "NV-01": {
+      "status": "elected",
+      "name": "Dina Titus",
+      "party": "Democrat"
+    },
+    "NV-02": {
+      "status": "elected",
+      "name": "Teresa F. Benitez-Thompson",
+      "party": "Democrat"
+    },
+    "NV-03": {
+      "status": "elected",
+      "name": "Susie Lee",
+      "party": "Democrat"
+    },
+    "NV-04": {
+      "status": "elected",
+      "name": "Steven A. Horsford",
+      "party": "Democrat"
+    },
+    "NY-01": {
+      "status": "elected",
+      "name": "Nicholas J. Lalota",
+      "party": "Republican"
+    },
+    "NY-02": {
+      "status": "elected",
+      "name": "Andrew R. Garbarino",
+      "party": "Republican"
+    },
+    "NY-03": {
+      "status": "elected",
+      "name": "Thomas R. Suozzi",
+      "party": "Democrat"
+    },
+    "NY-04": {
+      "status": "elected",
+      "name": "Laura A. Gillen",
+      "party": "Democrat"
+    },
+    "NY-05": {
+      "status": "elected",
+      "name": "Gregory W. Meeks",
+      "party": "Democrat"
+    },
+    "NY-06": {
+      "status": "elected",
+      "name": "Grace Meng",
+      "party": "Democrat"
+    },
+    "NY-07": {
+      "status": "elected",
+      "name": "Claire Valdez",
+      "party": "Democrat"
+    },
+    "NY-08": {
+      "status": "elected",
+      "name": "Hakeem S. Jeffries",
+      "party": "Democrat"
+    },
+    "NY-09": {
+      "status": "elected",
+      "name": "Yvette D. Clarke",
+      "party": "Democrat"
+    },
+    "NY-10": {
+      "status": "elected",
+      "name": "Brad Lander",
+      "party": "Democrat"
+    },
+    "NY-11": {
+      "status": "elected",
+      "name": "Nicole Malliotakis",
+      "party": "Republican"
+    },
+    "NY-12": {
+      "status": "elected",
+      "name": "Micah C. Lasher",
+      "party": "Democrat"
+    },
+    "NY-13": {
+      "status": "elected",
+      "name": "Darializa Avila Chevalier",
+      "party": "Democrat"
+    },
+    "NY-14": {
+      "status": "elected",
+      "name": "Alexandria Ocasio-Cortez",
+      "party": "Democrat"
+    },
+    "NY-15": {
+      "status": "elected",
+      "name": "Ritchie Torres",
+      "party": "Democrat"
+    },
+    "NY-16": {
+      "status": "elected",
+      "name": "George S. Latimer",
+      "party": "Democrat"
+    },
+    "NY-17": {
+      "status": "elected",
+      "name": "Cait Conley",
+      "party": "Democrat"
+    },
+    "NY-18": {
+      "status": "elected",
+      "name": "Pat Ryan",
+      "party": "Democrat"
+    },
+    "NY-19": {
+      "status": "elected",
+      "name": "Josh Riley",
+      "party": "Democrat"
+    },
+    "NY-20": {
+      "status": "elected",
+      "name": "Paul D. Tonko",
+      "party": "Democrat"
+    },
+    "NY-21": {
+      "status": "uncalled"
+    },
+    "NY-22": {
+      "status": "elected",
+      "name": "John W. Mannion",
+      "party": "Democrat"
+    },
+    "NY-23": {
+      "status": "elected",
+      "name": "Nicholas A. Langworthy",
+      "party": "Republican"
+    },
+    "NY-24": {
+      "status": "elected",
+      "name": "Claudia Tenney",
+      "party": "Republican"
+    },
+    "NY-25": {
+      "status": "elected",
+      "name": "Joseph D. Morelle",
+      "party": "Democrat"
+    },
+    "NY-26": {
+      "status": "elected",
+      "name": "Timothy M. Kennedy",
+      "party": "Democrat"
+    },
+    "OH-01": {
+      "status": "elected",
+      "name": "Greg Landsman",
+      "party": "Democrat"
+    },
+    "OH-02": {
+      "status": "elected",
+      "name": "David J. Taylor",
+      "party": "Republican"
+    },
+    "OH-03": {
+      "status": "elected",
+      "name": "Joyce Beatty",
+      "party": "Democrat"
+    },
+    "OH-04": {
+      "status": "elected",
+      "name": "Jim Jordan",
+      "party": "Republican"
+    },
+    "OH-05": {
+      "status": "elected",
+      "name": "Bob Latta",
+      "party": "Republican"
+    },
+    "OH-06": {
+      "status": "elected",
+      "name": "Michael A. Rulli",
+      "party": "Republican"
+    },
+    "OH-07": {
+      "status": "elected",
+      "name": "Brian Poindexter",
+      "party": "Democrat"
+    },
+    "OH-08": {
+      "status": "elected",
+      "name": "Warren Davidson",
+      "party": "Republican"
+    },
+    "OH-09": {
+      "status": "elected",
+      "name": "Marcy Kaptur",
+      "party": "Democrat"
+    },
+    "OH-10": {
+      "status": "elected",
+      "name": "Kristina Knickerbocker",
+      "party": "Democrat"
+    },
+    "OH-11": {
+      "status": "elected",
+      "name": "Shontel M. Brown",
+      "party": "Democrat"
+    },
+    "OH-12": {
+      "status": "elected",
+      "name": "Troy Balderson",
+      "party": "Republican"
+    },
+    "OH-13": {
+      "status": "elected",
+      "name": "Emilia Sykes",
+      "party": "Democrat"
+    },
+    "OH-14": {
+      "status": "elected",
+      "name": "David P. Joyce",
+      "party": "Republican"
+    },
+    "OH-15": {
+      "status": "elected",
+      "name": "Don Leonard",
+      "party": "Democrat"
+    },
+    "OK-01": {
+      "status": "elected",
+      "name": "Mark Tedford",
+      "party": "Republican"
+    },
+    "OK-02": {
+      "status": "elected",
+      "name": "Josh Brecheen",
+      "party": "Republican"
+    },
+    "OK-03": {
+      "status": "elected",
+      "name": "Frank D. Lucas",
+      "party": "Republican"
+    },
+    "OK-04": {
+      "status": "elected",
+      "name": "Tom Cole",
+      "party": "Republican"
+    },
+    "OK-05": {
+      "status": "elected",
+      "name": "Stephanie Bice",
+      "party": "Republican"
+    },
+    "OR-01": {
+      "status": "elected",
+      "name": "Suzanne Bonamici",
+      "party": "Democrat"
+    },
+    "OR-02": {
+      "status": "elected",
+      "name": "Cliff Bentz",
+      "party": "Republican"
+    },
+    "OR-03": {
+      "status": "elected",
+      "name": "Maxine E Dexter",
+      "party": "Democrat"
+    },
+    "OR-04": {
+      "status": "elected",
+      "name": "Val Hoyle",
+      "party": "Democrat"
+    },
+    "OR-05": {
+      "status": "elected",
+      "name": "Janelle S Bynum",
+      "party": "Democrat"
+    },
+    "OR-06": {
+      "status": "elected",
+      "name": "Andrea Salinas",
+      "party": "Democrat"
+    },
+    "PA-01": {
+      "status": "elected",
+      "name": "Bob Harvie",
+      "party": "Democrat"
+    },
+    "PA-02": {
+      "status": "elected",
+      "name": "Brendan F Boyle",
+      "party": "Democrat"
+    },
+    "PA-03": {
+      "status": "elected",
+      "name": "Chris Rabb",
+      "party": "Democrat"
+    },
+    "PA-04": {
+      "status": "elected",
+      "name": "Madeleine Dean",
+      "party": "Democrat"
+    },
+    "PA-05": {
+      "status": "elected",
+      "name": "Mary Gay Scanlon",
+      "party": "Democrat"
+    },
+    "PA-06": {
+      "status": "elected",
+      "name": "Chrissy Houlahan",
+      "party": "Democrat"
+    },
+    "PA-07": {
+      "status": "elected",
+      "name": "Bob Brooks",
+      "party": "Democrat"
+    },
+    "PA-08": {
+      "status": "elected",
+      "name": "Paige Cognetti",
+      "party": "Democrat"
+    },
+    "PA-09": {
+      "status": "elected",
+      "name": "Dan Meuser",
+      "party": "Republican"
+    },
+    "PA-10": {
+      "status": "elected",
+      "name": "Janelle Stelson",
+      "party": "Democrat"
+    },
+    "PA-11": {
+      "status": "elected",
+      "name": "Lloyd K Smucker",
+      "party": "Republican"
+    },
+    "PA-12": {
+      "status": "elected",
+      "name": "Summer Lee",
+      "party": "Democrat"
+    },
+    "PA-13": {
+      "status": "elected",
+      "name": "John Joyce",
+      "party": "Republican"
+    },
+    "PA-14": {
+      "status": "elected",
+      "name": "Guy Reschenthaler",
+      "party": "Republican"
+    },
+    "PA-15": {
+      "status": "elected",
+      "name": "Glenn Gt Thompson",
+      "party": "Republican"
+    },
+    "PA-16": {
+      "status": "elected",
+      "name": "Mike Kelly",
+      "party": "Republican"
+    },
+    "PA-17": {
+      "status": "elected",
+      "name": "Chris Deluzio",
+      "party": "Democrat"
+    },
+    "RI-01": {
+      "status": "elected",
+      "name": "Gabriel Amo",
+      "party": "Democrat"
+    },
+    "RI-02": {
+      "status": "elected",
+      "name": "Seth Magaziner",
+      "party": "Democrat"
+    },
+    "SC-01": {
+      "status": "uncalled"
+    },
+    "SC-02": {
+      "status": "uncalled"
+    },
+    "SC-03": {
+      "status": "elected",
+      "name": "Sheri Biggs",
+      "party": "Republican"
+    },
+    "SC-04": {
+      "status": "elected",
+      "name": "William Timmons",
+      "party": "Republican"
+    },
+    "SC-05": {
+      "status": "elected",
+      "name": "Wes Climer",
+      "party": "Republican"
+    },
+    "SC-06": {
+      "status": "elected",
+      "name": "James E Jim Clyburn",
+      "party": "Democrat"
+    },
+    "SC-07": {
+      "status": "elected",
+      "name": "Russell Fry",
+      "party": "Republican"
+    },
+    "SD-AL": {
+      "status": "elected",
+      "name": "Marty Jackley",
+      "party": "Republican"
+    },
+    "TN-01": {
+      "status": "elected",
+      "name": "Diana Harshbarger",
+      "party": "Republican"
+    },
+    "TN-02": {
+      "status": "elected",
+      "name": "Tim Burchett",
+      "party": "Republican"
+    },
+    "TN-03": {
+      "status": "elected",
+      "name": "Chuck Fleischmann",
+      "party": "Republican"
+    },
+    "TN-04": {
+      "status": "uncalled"
+    },
+    "TN-05": {
+      "status": "elected",
+      "name": "Charlie Hatcher",
+      "party": "Republican"
+    },
+    "TN-06": {
+      "status": "elected",
+      "name": "Johnny Garrett",
+      "party": "Republican"
+    },
+    "TN-07": {
+      "status": "elected",
+      "name": "Matt Van Epps",
+      "party": "Republican"
+    },
+    "TN-08": {
+      "status": "elected",
+      "name": "David Kustoff",
+      "party": "Republican"
+    },
+    "TN-09": {
+      "status": "elected",
+      "name": "Brent Taylor",
+      "party": "Republican"
+    },
+    "TX-01": {
+      "status": "elected",
+      "name": "Nathaniel Moran",
+      "party": "Republican"
+    },
+    "TX-02": {
+      "status": "elected",
+      "name": "Steve Toth",
+      "party": "Republican"
+    },
+    "TX-03": {
+      "status": "elected",
+      "name": "Keith Self",
+      "party": "Republican"
+    },
+    "TX-04": {
+      "status": "elected",
+      "name": "Pat Fallon",
+      "party": "Republican"
+    },
+    "TX-05": {
+      "status": "elected",
+      "name": "Lance Gooden",
+      "party": "Republican"
+    },
+    "TX-06": {
+      "status": "elected",
+      "name": "Jake Ellzey",
+      "party": "Republican"
+    },
+    "TX-07": {
+      "status": "elected",
+      "name": "Lizzie Pannill Fletcher",
+      "party": "Democrat"
+    },
+    "TX-08": {
+      "status": "elected",
+      "name": "Jessica Hart Steinmann",
+      "party": "Republican"
+    },
+    "TX-09": {
+      "status": "elected",
+      "name": "Leticia Gutierrez",
+      "party": "Democrat"
+    },
+    "TX-10": {
+      "status": "elected",
+      "name": "Chris Gober",
+      "party": "Republican"
+    },
+    "TX-11": {
+      "status": "elected",
+      "name": "August Pfluger",
+      "party": "Republican"
+    },
+    "TX-12": {
+      "status": "elected",
+      "name": "Craig Goldman",
+      "party": "Republican"
+    },
+    "TX-13": {
+      "status": "elected",
+      "name": "Ronny Jackson",
+      "party": "Republican"
+    },
+    "TX-14": {
+      "status": "elected",
+      "name": "Randy Weber",
+      "party": "Republican"
+    },
+    "TX-15": {
+      "status": "elected",
+      "name": "Bobby Pulido",
+      "party": "Democrat"
+    },
+    "TX-16": {
+      "status": "elected",
+      "name": "Veronica Escobar",
+      "party": "Democrat"
+    },
+    "TX-17": {
+      "status": "elected",
+      "name": "Pete Sessions",
+      "party": "Republican"
+    },
+    "TX-18": {
+      "status": "elected",
+      "name": "Christian Dashaun Menefee",
+      "party": "Democrat"
+    },
+    "TX-19": {
+      "status": "elected",
+      "name": "Tom Sell",
+      "party": "Republican"
+    },
+    "TX-20": {
+      "status": "elected",
+      "name": "Joaquin Castro",
+      "party": "Democrat"
+    },
+    "TX-21": {
+      "status": "elected",
+      "name": "Mark Teixeira",
+      "party": "Republican"
+    },
+    "TX-22": {
+      "status": "elected",
+      "name": "Trever Nehls",
+      "party": "Republican"
+    },
+    "TX-23": {
+      "status": "elected",
+      "name": "Katy Padilla Stout",
+      "party": "Democrat"
+    },
+    "TX-24": {
+      "status": "elected",
+      "name": "Beth Van Duyne",
+      "party": "Republican"
+    },
+    "TX-25": {
+      "status": "elected",
+      "name": "Roger Williams",
+      "party": "Republican"
+    },
+    "TX-26": {
+      "status": "elected",
+      "name": "Brandon Gill",
+      "party": "Republican"
+    },
+    "TX-27": {
+      "status": "elected",
+      "name": "Michael Cloud",
+      "party": "Republican"
+    },
+    "TX-28": {
+      "status": "elected",
+      "name": "Henry Cuellar",
+      "party": "Democrat"
+    },
+    "TX-29": {
+      "status": "elected",
+      "name": "Sylvia Garcia",
+      "party": "Democrat"
+    },
+    "TX-30": {
+      "status": "elected",
+      "name": "Frederick D. Haynes III",
+      "party": "Democrat"
+    },
+    "TX-31": {
+      "status": "elected",
+      "name": "John Carter",
+      "party": "Republican"
+    },
+    "TX-32": {
+      "status": "elected",
+      "name": "Jace Yarbrough",
+      "party": "Republican"
+    },
+    "TX-33": {
+      "status": "elected",
+      "name": "Colin Allred",
+      "party": "Democrat"
+    },
+    "TX-34": {
+      "status": "elected",
+      "name": "Vicente Gonzalez",
+      "party": "Democrat"
+    },
+    "TX-35": {
+      "status": "elected",
+      "name": "Johnny C. Garcia",
+      "party": "Democrat"
+    },
+    "TX-36": {
+      "status": "elected",
+      "name": "Brian Babin",
+      "party": "Republican"
+    },
+    "TX-37": {
+      "status": "elected",
+      "name": "Greg Casar",
+      "party": "Democrat"
+    },
+    "TX-38": {
+      "status": "elected",
+      "name": "Jon Bonck",
+      "party": "Republican"
+    },
+    "UT-01": {
+      "status": "elected",
+      "name": "Ben McAdams",
+      "party": "Democrat"
+    },
+    "UT-02": {
+      "status": "elected",
+      "name": "Blake D. Moore",
+      "party": "Republican"
+    },
+    "UT-03": {
+      "status": "elected",
+      "name": "Celeste Maloy",
+      "party": "Republican"
+    },
+    "UT-04": {
+      "status": "elected",
+      "name": "Mike Kennedy",
+      "party": "Republican"
+    },
+    "VA-01": {
+      "status": "elected",
+      "name": "Shannon L. Taylor",
+      "party": "Democrat"
+    },
+    "VA-02": {
+      "status": "elected",
+      "name": "Elaine G. Luria",
+      "party": "Democrat"
+    },
+    "VA-03": {
+      "status": "elected",
+      "name": "Robert C. \"Bobby\" Scott",
+      "party": "Democrat"
+    },
+    "VA-04": {
+      "status": "elected",
+      "name": "Jennifer L. McClellan",
+      "party": "Democrat"
+    },
+    "VA-05": {
+      "status": "elected",
+      "name": "John J. McGuire III",
+      "party": "Republican"
+    },
+    "VA-06": {
+      "status": "elected",
+      "name": "Ben L. Cline",
+      "party": "Republican"
+    },
+    "VA-07": {
+      "status": "elected",
+      "name": "Eugene S. Vindman",
+      "party": "Democrat"
+    },
+    "VA-08": {
+      "status": "elected",
+      "name": "Donald S. Beyer Jr.",
+      "party": "Democrat"
+    },
+    "VA-09": {
+      "status": "elected",
+      "name": "H. Morgan Griffith",
+      "party": "Republican"
+    },
+    "VA-10": {
+      "status": "elected",
+      "name": "Suhas Subramanyam",
+      "party": "Democrat"
+    },
+    "VA-11": {
+      "status": "elected",
+      "name": "James R. Walkinshaw",
+      "party": "Democrat"
+    },
+    "VT-AL": {
+      "status": "elected",
+      "name": "Becca Balint",
+      "party": "Democrat"
+    },
+    "WA-01": {
+      "status": "elected",
+      "name": "Suzan DelBene",
+      "party": "Democrat"
+    },
+    "WA-02": {
+      "status": "elected",
+      "name": "Rick Larsen",
+      "party": "Democrat"
+    },
+    "WA-03": {
+      "status": "elected",
+      "name": "Marie Gluesenkamp Perez",
+      "party": "Democrat"
+    },
+    "WA-04": {
+      "status": "elected",
+      "name": "Amanda McKinney",
+      "party": "Republican"
+    },
+    "WA-05": {
+      "status": "uncalled"
+    },
+    "WA-06": {
+      "status": "elected",
+      "name": "Emily Randall",
+      "party": "Democrat"
+    },
+    "WA-07": {
+      "status": "elected",
+      "name": "Pramila Jayapal",
+      "party": "Democrat"
+    },
+    "WA-08": {
+      "status": "elected",
+      "name": "Kim Schrier",
+      "party": "Democrat"
+    },
+    "WA-09": {
+      "status": "elected",
+      "name": "Adam Smith",
+      "party": "Democrat"
+    },
+    "WA-10": {
+      "status": "elected",
+      "name": "Marilyn Strickland",
+      "party": "Democrat"
+    },
+    "WI-01": {
+      "status": "pending"
+    },
+    "WI-02": {
+      "status": "pending"
+    },
+    "WI-03": {
+      "status": "pending"
+    },
+    "WI-04": {
+      "status": "pending"
+    },
+    "WI-05": {
+      "status": "pending"
+    },
+    "WI-06": {
+      "status": "pending"
+    },
+    "WI-07": {
+      "status": "pending"
+    },
+    "WI-08": {
+      "status": "pending"
+    },
+    "WV-01": {
+      "status": "pending"
+    },
+    "WV-02": {
+      "status": "pending"
+    },
+    "WY-AL": {
+      "status": "elected",
+      "name": "Chuck Gray",
+      "party": "Republican"
+    }
+  },
+  "senate": {
+    "AK": {
+      "regular": {
+        "status": "uncalled"
+      }
+    },
+    "AL": {
+      "regular": {
+        "status": "elected",
+        "name": "Barry Moore",
+        "party": "Republican"
+      }
+    },
+    "AR": {
+      "regular": {
+        "status": "elected",
+        "name": "Tom Cotton",
+        "party": "Republican"
+      }
+    },
+    "CO": {
+      "regular": {
+        "status": "elected",
+        "name": "John Hickenlooper",
+        "party": "Democrat"
+      }
+    },
+    "DE": {
+      "regular": {
+        "status": "elected",
+        "name": "Chris Coons",
+        "party": "Democrat"
+      }
+    },
+    "FL": {
+      "special": {
+        "status": "elected",
+        "name": "Ashley Moody",
+        "party": "Republican"
+      }
+    },
+    "GA": {
+      "regular": {
+        "status": "elected",
+        "name": "Jon Ossoff",
+        "party": "Democrat"
+      }
+    },
+    "IA": {
+      "regular": {
+        "status": "elected",
+        "name": "Josh Turek",
+        "party": "Democrat"
+      }
+    },
+    "ID": {
+      "regular": {
+        "status": "elected",
+        "name": "Jim Risch",
+        "party": "Republican"
+      }
+    },
+    "IL": {
+      "regular": {
+        "status": "pending"
+      }
+    },
+    "KS": {
+      "regular": {
+        "status": "elected",
+        "name": "Adam Hamilton",
+        "party": "Democrat"
+      }
+    },
+    "KY": {
+      "regular": {
+        "status": "elected",
+        "name": "Andy Barr",
+        "party": "Republican"
+      }
+    },
+    "LA": {
+      "regular": {
+        "status": "elected",
+        "name": "Julia Letlow",
+        "party": "Republican"
+      }
+    },
+    "MA": {
+      "regular": {
+        "status": "pending"
+      }
+    },
+    "ME": {
+      "regular": {
+        "status": "pending"
+      }
+    },
+    "MI": {
+      "regular": {
+        "status": "pending"
+      }
+    },
+    "MN": {
+      "regular": {
+        "status": "elected",
+        "name": "Peggy Flanagan",
+        "party": "Democrat"
+      }
+    },
+    "MS": {
+      "regular": {
+        "status": "uncalled"
+      }
+    },
+    "MT": {
+      "regular": {
+        "status": "elected",
+        "name": "Kurt Alme",
+        "party": "Republican"
+      }
+    },
+    "NC": {
+      "regular": {
+        "status": "elected",
+        "name": "Roy Cooper",
+        "party": "Democrat"
+      }
+    },
+    "NE": {
+      "regular": {
+        "status": "elected",
+        "name": "Pete Ricketts",
+        "party": "Republican"
+      }
+    },
+    "NH": {
+      "regular": {
+        "status": "elected",
+        "name": "Chris Pappas",
+        "party": "Democrat"
+      }
+    },
+    "NJ": {
+      "regular": {
+        "status": "elected",
+        "name": "Cory Booker",
+        "party": "Democrat"
+      }
+    },
+    "NM": {
+      "regular": {
+        "status": "elected",
+        "name": "Ben R Lujan",
+        "party": "Democrat"
+      }
+    },
+    "OH": {
+      "special": {
+        "status": "elected",
+        "name": "Sherrod Brown",
+        "party": "Democrat"
+      }
+    },
+    "OK": {
+      "regular": {
+        "status": "elected",
+        "name": "Kevin Hern",
+        "party": "Republican"
+      }
+    },
+    "OR": {
+      "regular": {
+        "status": "elected",
+        "name": "Jeff Merkley",
+        "party": "Democrat"
+      }
+    },
+    "RI": {
+      "regular": {
+        "status": "elected",
+        "name": "John F. Reed",
+        "party": "Democrat"
+      }
+    },
+    "SC": {
+      "regular": {
+        "status": "elected",
+        "name": "Annie Andrews",
+        "party": "Democrat"
+      }
+    },
+    "SD": {
+      "regular": {
+        "status": "elected",
+        "name": "Mike Rounds",
+        "party": "Republican"
+      }
+    },
+    "TN": {
+      "regular": {
+        "status": "elected",
+        "name": "Bill Hagerty",
+        "party": "Republican"
+      }
+    },
+    "TX": {
+      "regular": {
+        "status": "elected",
+        "name": "James Talarico",
+        "party": "Democrat"
+      }
+    },
+    "VA": {
+      "regular": {
+        "status": "elected",
+        "name": "Mark R. Warner",
+        "party": "Democrat"
+      }
+    },
+    "WV": {
+      "regular": {
+        "status": "pending"
+      }
+    },
+    "WY": {
+      "regular": {
+        "status": "elected",
+        "name": "Harriet Hageman",
+        "party": "Republican"
+      }
+    }
+  },
+  "sources": {
+    "AK": {
+      "publisher": "Alaska Division of Elections",
+      "url": "https://www.elections.alaska.gov/enr/26GENR/results/GA_ENR_Precinct_State_of_Alaska.csv",
+      "checked": "2026-11-06"
+    },
+    "AL": {
+      "publisher": "Alabama Secretary of State",
+      "url": "https://www2.alabamavotes.gov/electionNight/statewideResultsByContest.aspx?ecode=1001305",
+      "checked": "2026-11-06"
+    },
+    "AR": {
+      "publisher": "Arkansas Secretary of State",
+      "url": "https://arkansas.tally-enr.com/#bucket=results&filter=Federal&contest=eafd140a-9378-43a2-bd6d-f8661524139b",
+      "checked": "2026-11-06"
+    },
+    "AZ": {
+      "publisher": "Arizona Secretary of State",
+      "url": "https://app.enhancedvoting.com/results/public/api/elections/Arizona/110326GeneralElection/ballot-items",
+      "checked": "2026-11-06"
+    },
+    "CA": {
+      "publisher": "California Secretary of State",
+      "url": "https://electionresults.sos.ca.gov/returns/us-rep/district/1",
+      "checked": "2026-11-06"
+    },
+    "CO": {
+      "publisher": "Colorado Secretary of State",
+      "url": "https://results.enr.clarityelections.com/CO/127407/385835/json/sum.json",
+      "checked": "2026-11-06"
+    },
+    "CT": {
+      "publisher": "Connecticut Secretary of the State (CT Election Management System)",
+      "url": "https://ctemspublic.tgstg.net/ng-app/data/election/108/52620/stateVotes_Electiondata.json",
+      "checked": "2026-11-06"
+    },
+    "DE": {
+      "publisher": "Delaware Department of Elections",
+      "url": "https://elections.delaware.gov/results/enr/Election_StatewideResults_ID_GE2026.json",
+      "checked": "2026-11-06"
+    },
+    "FL": {
+      "publisher": "Florida Division of Elections",
+      "url": "https://flelectionfiles.floridados.gov/enightfilespublic/20261103_ElecResultsFL.txt",
+      "checked": "2026-11-06"
+    },
+    "GA": {
+      "publisher": "Georgia Secretary of State",
+      "url": "https://results.sos.ga.gov/cdn/results/Georgia/export-11032026GeneralAndSpecialElection.json",
+      "checked": "2026-11-06"
+    },
+    "HI": {
+      "publisher": "Hawaii Office of Elections",
+      "url": "https://elections.hawaii.gov/wp-content/results/2026%20General/summary.txt",
+      "checked": "2026-11-06"
+    },
+    "IA": {
+      "publisher": "Iowa Secretary of State",
+      "url": "https://electionresults.iowa.gov/IA/127077/web.345435/#/summary",
+      "checked": "2026-11-06"
+    },
+    "ID": {
+      "publisher": "Idaho Secretary of State",
+      "url": "https://results.voteidaho.gov/results/public/api/elections/id/nov2026/ballot-items",
+      "checked": "2026-11-06"
+    },
+    "IL": {
+      "publisher": "Illinois State Board of Elections",
+      "url": "https://www.elections.il.gov/electionoperations/ElectionVoteTotals.aspx",
+      "checked": "2026-11-06"
+    },
+    "IN": {
+      "publisher": "Indiana Election Division",
+      "url": "https://enr.indianavoters.in.gov/site/index.html",
+      "checked": "2026-11-06"
+    },
+    "KS": {
+      "publisher": "Kansas Secretary of State",
+      "url": "https://ent.sos.ks.gov/kssos_ent.html",
+      "checked": "2026-11-06"
+    },
+    "KY": {
+      "publisher": "Kentucky State Board of Elections / Secretary of State",
+      "url": "https://vrsws.sos.ky.gov/liveresults",
+      "checked": "2026-11-06"
+    },
+    "LA": {
+      "publisher": "Louisiana Secretary of State",
+      "url": "https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data?blob=20261103/csv/ByParish_67997.csv",
+      "checked": "2026-11-06"
+    },
+    "MA": {
+      "publisher": "Massachusetts Secretary of the Commonwealth (Elections Division)",
+      "url": "https://electionstats.state.ma.us/elections/search/year_from:2026/year_to:2026",
+      "checked": "2026-11-06"
+    },
+    "MD": {
+      "publisher": "Maryland State Board of Elections",
+      "url": "https://elections.maryland.gov/elections/2026/general_results/gen_results_2026_4_1.html",
+      "checked": "2026-11-06"
+    },
+    "ME": {
+      "publisher": "Maine Secretary of State",
+      "url": "https://www.maine.gov/sos/elections-voting/election-results-data",
+      "checked": "2026-11-06"
+    },
+    "MI": {
+      "publisher": "Michigan Department of State",
+      "url": "https://mielections.us/election/results/",
+      "checked": "2026-11-06"
+    },
+    "MN": {
+      "publisher": "Minnesota Secretary of State",
+      "url": "https://electionresults.sos.mn.gov/Results/Index?ErsElectionId=201&officeInElectionIdList=38485&officeInElectionIdList=-1&scenario=USSenate&electionDate=11%2F03%2F2026%2000%3A00%3A00",
+      "checked": "2026-11-06"
+    },
+    "MO": {
+      "publisher": "Missouri Secretary of State",
+      "url": "https://enr.sos.mo.gov/",
+      "checked": "2026-11-06"
+    },
+    "MS": {
+      "publisher": "Mississippi Secretary of State",
+      "url": "https://www.sos.ms.gov/elections-voting/election-results",
+      "checked": "2026-11-06"
+    },
+    "MT": {
+      "publisher": "Montana Secretary of State",
+      "url": "https://electionresults.mt.gov/resultsSW.aspx?type=FED&map=CTY",
+      "checked": "2026-11-06"
+    },
+    "NC": {
+      "publisher": "North Carolina State Board of Elections",
+      "url": "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/2026_11_03/results_pct_20261103.zip",
+      "checked": "2026-11-06"
+    },
+    "ND": {
+      "publisher": "North Dakota Secretary of State",
+      "url": "https://resultsnd.sos.nd.gov/#election=348",
+      "checked": "2026-11-06"
+    },
+    "NE": {
+      "publisher": "Nebraska Secretary of State",
+      "url": "https://electionresults.nebraska.gov/resultsSW.aspx?type=SW&map=CTY",
+      "checked": "2026-11-06"
+    },
+    "NH": {
+      "publisher": "New Hampshire Secretary of State",
+      "url": "https://www.sos.nh.gov/sites/g/files/ehbemt561/files/media/media_document/2026-ge-us-senator-summary.xlsx",
+      "checked": "2026-11-06"
+    },
+    "NJ": {
+      "publisher": "County election officials as linked from NJ Division of Elections",
+      "url": "https://results.enr.clarityelections.com/NJ/Atlantic/127487/web.345435/#/summary | https://www.bergencountyclerk.gov/_Content/pdf/ElectionResult/UNOFFICIAL%2026GEN%20EV%20ED%20PMI%20SUMMARY%2011_5.pdf | https://results.enr.clarityelections.com/NJ/Burlington/127582/web.345435/#/summary | https://www.camdencounty.com/wp-content/elections/general2026/2026_GENERAL_UNOFFICIAL_RESULTS.pdf | https://results.enr.clarityelections.com/NJ/Cape_May/127585/web.345435/#/summary | https://results.enr.clarityelections.com/NJ/Cumberland/127562/web.345435/#/summary | https://results.enr.clarityelections.com/NJ/Essex/127486/web.345435/#/summary | https://results.enr.clarityelections.com/NJ/Gloucester/127298/web.345435/#/summary | https://results.enr.clarityelections.com/NJ/Hudson/127495/web.345435/#/summary | https://www.co.hunterdon.nj.us/DocumentCenter/View/21109 | https://results.enr.clarityelections.com/NJ/Mercer/127554/web.345435/#/summary | https://results.enr.clarityelections.com/NJ/Middlesex/127580/web.345435/#/summary | https://results.enr.clarityelections.com/NJ/Monmouth/127586/web.345435/#/summary | https://results.enr.clarityelections.com/NJ/Morris/127576/web.345435/#/summary | https://results.enr.clarityelections.com/NJ/Ocean/127556/web.345435/#/summary | https://results.enr.clarityelections.com/NJ/Passaic/127401/ | https://www.livevoterturnout.com/ENR/salemnjenr/13/en/Index_13.html | https://results.enr.clarityelections.com/NJ/Somerset/127569/web.345435/#/summary | https://www.sussex.nj.us/DocumentCenter/View/4819/11-03-2026-GE-Countywide-Summary-11-4th-PDF | https://results.enr.clarityelections.com/NJ/Union/127567/web.345435/#/summary | https://www.warrencountyvotes.com/home/showpublisheddocument/15059",
+      "checked": "2026-11-06"
+    },
+    "NM": {
+      "publisher": "New Mexico Secretary of State",
+      "url": "https://electionresults.sos.nm.gov/resultsSW.aspx?type=FED&map=CTY",
+      "checked": "2026-11-06"
+    },
+    "NV": {
+      "publisher": "Nevada Secretary of State",
+      "url": "https://silverstateelection.nv.gov/",
+      "checked": "2026-11-06"
+    },
+    "NY": {
+      "publisher": "New York State Board of Elections",
+      "url": "https://nyenr.elections.ny.gov/ (U.S. Congress, all districts)",
+      "checked": "2026-11-06"
+    },
+    "OH": {
+      "publisher": "Ohio Secretary of State",
+      "url": "https://liveresults.ohiosos.gov/Api/v1/Contest/GetContestDetailsObject?contestName=U.S.+Senator&contestObjectId=_55A742EA56A709A3E0633390EE0AE290&resultsLevel=Statewide&countyId=",
+      "checked": "2026-11-06"
+    },
+    "OK": {
+      "publisher": "Oklahoma State Election Board",
+      "url": "https://results.okelections.gov/OKER/?elecDate=20261103 (data via results.okelections.gov/OKERS/enrapi/getelec/20261103/SW/xx)",
+      "checked": "2026-11-06"
+    },
+    "OR": {
+      "publisher": "Oregon Secretary of State",
+      "url": "https://results.oregonvotes.gov/ResultsSW.aspx?type=FED&map=CTY",
+      "checked": "2026-11-06"
+    },
+    "PA": {
+      "publisher": "Pennsylvania Department of State",
+      "url": "https://www.electionreturns.pa.gov/api/ElectionReturn/GetOfficeData?officeId=11&methodName=GetOfficeDetails&electionid=117&electiontype=G&isactive=1",
+      "checked": "2026-11-06"
+    },
+    "RI": {
+      "publisher": "Rhode Island Board of Elections",
+      "url": "https://electionresults.ri.gov/results/public/api/elections/rhodeisland/2026StatewideGeneralElection/ballot-items",
+      "checked": "2026-11-06"
+    },
+    "SC": {
+      "publisher": "South Carolina State Election Commission",
+      "url": "https://www.enr-scvotes.org/SC/127300/385843/json/en/summary.json",
+      "checked": "2026-11-06"
+    },
+    "SD": {
+      "publisher": "South Dakota Secretary of State",
+      "url": "https://electionresults.sd.gov/resultsSW.aspx?type=SWR&map=CTY",
+      "checked": "2026-11-06"
+    },
+    "TN": {
+      "publisher": "Tennessee Secretary of State",
+      "url": "https://elections.tn.gov/categories/congressional/offices",
+      "checked": "2026-11-06"
+    },
+    "TX": {
+      "publisher": "Texas Secretary of State",
+      "url": "https://goelect.txelections.civixapps.com/api-ivis-system/api/s3/enr/election/53815 (page: https://goelect.txelections.civixapps.com/ivis-enr-ui/races)",
+      "checked": "2026-11-06"
+    },
+    "UT": {
+      "publisher": "Utah Lieutenant Governor Elections Office",
+      "url": "https://electionresults.utah.gov/results/public/api/elections/utah/General11032026/ballot-items",
+      "checked": "2026-11-06"
+    },
+    "VA": {
+      "publisher": "Virginia Department of Elections",
+      "url": "https://enr.elections.virginia.gov/results/public/api/elections/virginia/2026-November-General/ballot-items",
+      "checked": "2026-11-06"
+    },
+    "VT": {
+      "publisher": "Vermont Secretary of State",
+      "url": "https://electionresults.vermont.gov/",
+      "checked": "2026-11-06"
+    },
+    "WA": {
+      "publisher": "Washington Secretary of State",
+      "url": "https://results.votewa.gov/results/public/api/elections/washington/20261103/ballot-items",
+      "checked": "2026-11-06"
+    },
+    "WI": {
+      "publisher": "Wisconsin Elections Commission",
+      "url": "https://elections.wi.gov/2026",
+      "checked": "2026-11-06"
+    },
+    "WV": {
+      "publisher": "West Virginia Secretary of State",
+      "url": "https://sos.wv.gov/elections/election-data/historical-election-results-and-turnout",
+      "checked": "2026-11-06"
+    },
+    "WY": {
+      "publisher": "Wyoming Secretary of State",
+      "url": "https://sos.wyo.gov/Elections/Docs/2026/Results/General/2026_General_Statewide_Candidates_Summary.pdf",
+      "checked": "2026-11-06"
+    }
+  }
+}

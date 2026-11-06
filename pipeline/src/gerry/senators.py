@@ -28,6 +28,7 @@ SENATORS = Source(
 )
 
 _PARTIES = {"D": "Democrat", "R": "Republican", "I": "Independent"}
+_CLASSES = {"Class I": 1, "Class II": 2, "Class III": 3}
 
 
 def display_name(first: str, last: str) -> str:
@@ -44,8 +45,9 @@ def read_senators(path: Path) -> pd.DataFrame:
     """Read the Senate's list of senators.
 
     Returns:
-        state (USPS code), last (last name, for sorting), name (see display_name) and party
-        ("Democrat", "Republican" or "Independent"), in file order.
+        state (USPS code), last (last name, for sorting), name (see display_name), party
+        ("Democrat", "Republican" or "Independent") and class (1, 2 or 3: which election
+        cycle the seat is on; class 2 seats were on the 2026 ballot), in file order.
 
     Raises:
         ValueError: on a party letter other than D, R or I, rather than guessing its name.
@@ -61,8 +63,9 @@ def read_senators(path: Path) -> pd.DataFrame:
             "last": last,
             "name": display_name(m.findtext("first_name") or "", last),
             "party": _PARTIES[letter],
+            "class": _CLASSES[(m.findtext("class") or "").strip()],
         })  # fmt: skip
-    return pd.DataFrame(rows, columns=["state", "last", "name", "party"])
+    return pd.DataFrame(rows, columns=["state", "last", "name", "party", "class"])
 
 
 def senator_problems(table: pd.DataFrame) -> list[str]:

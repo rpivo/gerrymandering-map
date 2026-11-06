@@ -2,7 +2,7 @@
 UV := uv run --project pipeline
 PY_PATHS := pipeline tools
 
-.PHONY: setup lint format test check-functions check pr-size site-dev site-check boundaries audit calibrate scores data votes fairness population senators
+.PHONY: setup lint format test check-functions check pr-size site-dev site-check boundaries audit calibrate scores data votes fairness population senators elected
 
 setup:
 	uv sync --project pipeline
@@ -60,6 +60,11 @@ population:
 # Write each state's two U.S. senators for the site, from the Senate's list (about 30 KB).
 senators:
 	$(UV) python -m gerry senators
+
+# Write who won each November 2026 House and Senate race, from data/sources/members/ (run
+# make senators first: Senate races are matched to the seats that were up).
+elected:
+	$(UV) python -m gerry elected
 
 # Validate data/sources/states.csv and list states whose 2026 map differs from 2024.
 audit:
