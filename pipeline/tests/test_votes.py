@@ -13,7 +13,8 @@ from gerry.votes import (
 )
 
 HEADER = (
-    "precinct,office,party_simplified,mode,votes,county_fips,jurisdiction_fips,district,state_po\n"
+    "precinct,office,party_detailed,party_simplified,mode,votes,county_fips,jurisdiction_fips,"
+    "district,state_po\n"
 )
 
 
@@ -40,13 +41,34 @@ def test_read_precinct_returns_treats_redacted_votes_as_zero(tmp_path):
     path = tmp_path / "pres.csv"
     path.write_text(
         HEADER
-        + "P1,US PRESIDENT,DEMOCRAT,TOTAL,*,06001,06001,STATEWIDE,CA\n"
-        + "P1,US PRESIDENT,REPUBLICAN,TOTAL,12,06001,06001,STATEWIDE,CA\n"
+        + "P1,US PRESIDENT,DEMOCRAT,DEMOCRAT,TOTAL,*,06001,06001,STATEWIDE,CA\n"
+        + "P1,US PRESIDENT,REPUBLICAN,REPUBLICAN,TOTAL,12,06001,06001,STATEWIDE,CA\n"
     )
     df = read_precinct_returns(path)
     assert df["votes"].tolist() == [0.0, 12.0]
     # Codes stay strings: leading zeros in FIPS codes matter for the join.
     assert df["county_fips"].tolist() == ["06001", "06001"]
+
+
+def test_read_precinct_returns_takes_the_party_from_party_detailed_when_marked_nonpartisan(
+    tmp_path,
+):
+    # MIT's 2024 file marks every Nebraska presidential row NONPARTISAN in party_simplified,
+    # though party_detailed names each candidate's party, so Nebraska dropped out entirely.
+    path = tmp_path / "pres.csv"
+    path.write_text(
+        HEADER
+        + "P1,US PRESIDENT,DEMOCRAT,NONPARTISAN,TOTAL,40,31055,31055,STATEWIDE,NE\n"
+        + "P1,US PRESIDENT,REPUBLICAN,NONPARTISAN,TOTAL,35,31055,31055,STATEWIDE,NE\n"
+        + "P1,US PRESIDENT,LIBERTARIAN,NONPARTISAN,TOTAL,2,31055,31055,STATEWIDE,NE\n"
+        + "P1,US PRESIDENT,,NONPARTISAN,TOTAL,1,31055,31055,STATEWIDE,NE\n"
+    )
+    df = read_precinct_returns(path)
+    assert df["party_simplified"].tolist() == [
+        "DEMOCRAT", "REPUBLICAN", "NONPARTISAN", "NONPARTISAN"
+    ]  # fmt: skip
+    row = two_party_by_precinct(df).iloc[0]
+    assert (row["dem"], row["rep"]) == (40.0, 35.0)
 
 
 def test_one_count_per_precinct_prefers_total_rows():
@@ -460,6 +482,25 @@ def test_assign_matches_town_names_that_differ_only_by_a_municipal_suffix():
     assert "county" not in set(out["kind"])
     by = out.groupby("district")["dem"].sum()
     assert by.to_dict() == {1: 52.5, 2: 47.5}
+
+
+def test_a_same_named_precinct_in_another_state_doesnt_block_a_town_match():
+    # Nebraska has a precinct named like a New Jersey town's House precinct. Only a name already
+    # used in the same county means the House precinct is taken.
+    out = _assign(
+        [
+            ("NJ", "15", "Deptford Twp", "TOTAL", "DEMOCRAT", 70, ""),
+            ("NE", "31", "Deptford", "TOTAL", "DEMOCRAT", 9, ""),
+        ],
+        [
+            ("NJ", "15", "Deptford", "TOTAL", "DEMOCRAT", 3, "001"),
+            ("NJ", "15", "Deptford", "TOTAL", "DEMOCRAT", 1, "002"),
+            ("NE", "31", "Deptford", "TOTAL", "DEMOCRAT", 1, "001"),
+        ],
+    )
+    nj = out[out["state"] == "NJ"]
+    assert set(nj["kind"]) == {"split"}
+    assert nj.groupby("district")["dem"].sum().to_dict() == {1: 52.5, 2: 17.5}
 
 
 def test_assign_doesnt_guess_between_two_towns_with_the_same_short_name():

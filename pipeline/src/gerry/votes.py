@@ -21,7 +21,10 @@ Rules, each found in the data (see plans/PLAN.md section 3.3):
   ballots, say) is split the same way, but each district gets its own partisan mix, taken from
   the county's single-district precincts (Missouri, Oklahoma).
 - A precinct whose name differs from the House file's only by a municipal type ("Deptford Twp"
-  and "Deptford", Gloucester County, NJ) takes the House precinct's districts.
+  and "Deptford", Gloucester County, NJ) takes the House precinct's districts, unless the
+  President file already uses that name in the same county.
+- A row marked NONPARTISAN takes its party from party_detailed (MIT's 2024 presidential file
+  marks all of Nebraska's rows NONPARTISAN).
 - A precinct with no House votes goes to the state's unopposed district if it has exactly one
   (Oklahoma's 3rd had no race on the ballot), else each party's votes are spread the way that
   party's matched votes are spread across the county's districts.
@@ -36,7 +39,9 @@ from gerry.fetch import Source
 from gerry.states import STATES_BY_USPS
 
 KEY = ["state_po", "county_fips", "jurisdiction_fips", "precinct"]
-COLUMNS = KEY + ["mode", "party_simplified", "votes", "district"]
+COLUMNS = KEY + ["mode", "party_detailed", "party_simplified", "votes", "district"]
+# party_simplified values that party_detailed overrides for the two major parties.
+_UNLABELED = {"NONPARTISAN"}
 # A non-exact row bigger than this is a catch-all (a county's mail ballots, a whole county),
 # so splitting it gives every district the same partisan mix. The share of votes in such rows
 # says how far to trust a state's district results.
@@ -81,9 +86,17 @@ KING_COUNTY_2024 = Source(
 
 
 def read_precinct_returns(path: Path) -> pd.DataFrame:
-    """Read an MIT precinct returns CSV. Codes stay strings; redacted votes ("*") count as 0."""
+    """Read an MIT precinct returns CSV. Codes stay strings; redacted votes ("*") count as 0.
+
+    MIT's 2024 presidential file marks all of Nebraska's rows NONPARTISAN in party_simplified,
+    though party_detailed names the party, so a Democratic or Republican party_detailed wins.
+    """
     df = pd.read_csv(path, usecols=COLUMNS, dtype=str, keep_default_na=False)
     df["votes"] = pd.to_numeric(df["votes"], errors="coerce").fillna(0.0)
+    fix = df["party_simplified"].isin(_UNLABELED) & df["party_detailed"].isin(
+        ["DEMOCRAT", "REPUBLICAN"]
+    )
+    df.loc[fix, "party_simplified"] = df.loc[fix, "party_detailed"]
     return df
 
 
@@ -214,7 +227,10 @@ def _rename_by_town(two: pd.DataFrame, weights: pd.DataFrame) -> pd.DataFrame:
     unmatched = _unmatched(two, weights).drop(columns="row_votes")
     unmatched = unmatched.assign(town=unmatched["precinct"].map(_town))
     hits = unmatched.merge(unique, on=county + ["town"], suffixes=("", "_house"))
-    hits = hits[~hits["precinct_house"].isin(two["precinct"])]
+    # A House name the President file already uses in the same county is that precinct's own.
+    taken = pd.MultiIndex.from_frame(two[KEY])
+    house_keys = pd.MultiIndex.from_frame(hits[county + ["precinct_house"]].set_axis(KEY, axis=1))
+    hits = hits[~house_keys.isin(taken)]
     hit_keys = pd.MultiIndex.from_frame(hits[KEY])
     rename = dict(zip(hit_keys, hits["precinct_house"], strict=True))
     keys = pd.MultiIndex.from_frame(two[KEY])
