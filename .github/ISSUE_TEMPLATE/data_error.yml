@@ -1,0 +1,28 @@
+name: Data error
+description: Something on the site looks wrong, such as a district's shape, a city's place or an election result.
+title: "[Data] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for helping keep the site accurate. A link to an official source helps most.
+  - type: input
+    id: page
+    attributes:
+      label: Which page?
+      description: The district or state, such as TX-35, or the page's address.
+      placeholder: https://gerrymandermap.us/tx/35
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What looks wrong?
+      description: What the site shows, and what you expected instead.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      description: A link to an official source that shows the right information, if you have one.

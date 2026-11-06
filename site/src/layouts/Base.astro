@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { FEEDBACK_EMAIL, ISSUES_URL } from "../lib/feedback";
 import { ogImagePath, SITE_URL } from "../lib/og";
 import { applySavedTheme, setupThemeToggle } from "../lib/theme";
 
@@ -67,6 +68,10 @@ const themeToggle = `(${setupThemeToggle.toString()})(document.documentElement, 
             <path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM16 10.5h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5v2.5M12 3.5v2.5" />
           </svg>Buy me a coffee!</a
         >
+      </p>
+      <p>
+        Feedback or ideas? Email <a href={`mailto:${FEEDBACK_EMAIL}`}>{FEEDBACK_EMAIL}</a>, or{" "}
+        <a href={ISSUES_URL}>suggest a feature on GitHub</a>.
       </p>
     </footer>
     <script is:inline set:html={themeToggle} />
