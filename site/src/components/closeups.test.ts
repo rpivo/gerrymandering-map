@@ -50,14 +50,16 @@ describe("MapCloseups", () => {
     expect(html).not.toContain("state-tier");
   });
 
-  it("draws the close-ups that enlarge least across the whole width", async () => {
+  it("draws every close-up the same size, each map fitted inside a square frame", async () => {
     const html = await container.renderToString(MapCloseups, { props: { state: "CA", stateName: "California" } });
-    expect(figures(html).map((f) => /class="[^"]*\bwide\b/.test(f.slice(0, f.indexOf(">"))))).toEqual([
-      true,
-      true,
-      true,
-      false,
-    ]);
+    const panels = figures(html);
+    expect(panels).toHaveLength(4); // anchor: CA has tall, square and wide close-ups
+    for (const panel of panels) {
+      expect(panel.slice(0, panel.indexOf(">"))).toMatch(/class="closeup"/);
+      expect(panel).toMatch(/<div class="closeup-fit"/);
+      // Fitted: no wider than the frame, and no taller than it is wide.
+      expect(panel).toMatch(/width: min\(100%, calc\(100cqw \* [\d.]+\)\)/);
+    }
   });
 
   it("outlines the area of a close-up of a close-up on its parent", async () => {

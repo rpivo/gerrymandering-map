@@ -12,12 +12,7 @@ export interface Closeup extends StateCloseup {
   mapBox: Box;
   /** How many times larger than the state map it draws, for the same drawn size. */
   zoom: number;
-  /** Drawn across the whole width, since it enlarges what it's beside least and needs the room most. */
-  wide: boolean;
 }
-
-/** Close-ups that enlarge what they're drawn beside (the map, or their parent) less than this are drawn wide. */
-export const WIDE_BELOW_ZOOM = 6;
 
 const cityData = citiesFile as { states: Record<string, { cities: { name: string; x: number; y: number }[] }> };
 
@@ -59,7 +54,7 @@ export function closeups(state: string): Closeup[] {
     const city = cities.find((p) => inside(mapBox, p.x, p.y))?.name;
     if (!city) throw new Error(`No city in a ${state} close-up to name it by`);
     const name = parent && c.parent !== undefined && cityOf[c.parent] === city ? `${parent.name}, closer in` : `${city} area`;
-    found.push({ ...c, name, mapBox, zoom: step(mapBox), wide: step(c.box) < WIDE_BELOW_ZOOM });
+    found.push({ ...c, name, mapBox, zoom: step(mapBox) });
     cityOf.push(city);
   }
   return found;
