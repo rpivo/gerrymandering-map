@@ -27,12 +27,11 @@ const cards = sortCards(
     <h1>Gerrymander Map</h1>
     <p class="lede">
       Every US congressional district in the 2026 election, what it looks like, and how irregular
-      its shape is compared with the other {rankedCount - 1} districts with lines.{" "}
-      <a href="/methodology">How scores work</a>
+      its shape is compared with the other {rankedCount - 1} districts with lines.
     </p>
     <p class="note">
       A score describes shape, not intent. Coastlines, rivers and the Voting Rights Act can all
-      make a district irregular for good reasons.
+      make a district irregular for good reasons. <a href="/methodology">How scores work</a>
     </p>
 
     <UsMap />
@@ -155,9 +154,11 @@ const cards = sortCards(
     line-height: 1.1;
   }
 
+  /* Grows with the screen: 1.25rem on phones, up to 1.5rem on wide screens. */
   .lede {
     max-width: 44rem;
-    font-size: 1.15rem;
+    font-size: clamp(1.25rem, 1rem + 1vw, 1.5rem);
+    line-height: 1.45;
     color: var(--text-muted);
   }
 
