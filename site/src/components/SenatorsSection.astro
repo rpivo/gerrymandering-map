@@ -1,4 +1,5 @@
 ---
+import { getSenateOutcome, seatOnBallot, senateBallotLine } from "../lib/elected";
 import { asOfDate, getSenators, senatorsAsOf } from "../lib/senators";
 
 interface Props {
@@ -7,17 +8,27 @@ interface Props {
 }
 
 const { usps, stateName } = Astro.props;
-const senators = getSenators(usps);
+const senators = getSenators(usps).map((s) => {
+  const outcome = getSenateOutcome(usps, seatOnBallot(s.class));
+  return { ...s, ballot: outcome && senateBallotLine(s.last, outcome) };
+});
 ---
 
 <section class="senators" aria-labelledby="senators-heading">
   <h2 id="senators-heading">{stateName}'s senators</h2>
   <ul>
-    {senators.map((s) => <li>{s.name}, {s.party}</li>)}
+    {
+      senators.map((s) => (
+        <li>
+          {s.name}, {s.party}
+          {s.ballot && <span class="ballot">{s.ballot}</span>}
+        </li>
+      ))
+    }
   </ul>
   <p class="note">
-    Senators are elected by the whole state, so district lines don't change who they are.
-    As of {asOfDate(senatorsAsOf)}. Senators elected in November 2026 take office January 3, 2027.{" "}
+    Senators are elected by the whole state, so district lines don't change who they are. Senators serving as of
+    {" "}{asOfDate(senatorsAsOf)}. Senators elected in November 2026 take office January 3, 2027.{" "}
     <a href="/methodology#senators">Where this comes from</a>
   </p>
 </section>
@@ -30,6 +41,16 @@ const senators = getSenators(usps);
   ul {
     padding-left: 1.25rem;
     font-size: 1.1rem;
+  }
+
+  li + li {
+    margin-top: 0.5rem;
+  }
+
+  .ballot {
+    display: block;
+    font-size: 0.95rem;
+    color: var(--text-muted);
   }
 
   .note {

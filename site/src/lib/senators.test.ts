@@ -50,7 +50,7 @@ describe("a district page's senators", () => {
   it("says senators represent the whole state, when the list is from, and that it changes in January", async () => {
     const text = section(await render("TX-35"));
     expect(text).toContain("Senators are elected by the whole state, so district lines don't change who they are.");
-    expect(text).toContain("As of November 6, 2026");
+    expect(text).toContain("Senators serving as of November 6, 2026");
     expect(text).toContain("take office January 3, 2027");
     expect(section(await render("TX-35"))).toBe(text); // stable across renders
   });
