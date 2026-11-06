@@ -7,11 +7,15 @@ const [, , mapWidth = 0, mapHeight = 0] = map.viewBox.split(" ").map(Number);
 const boxes = callouts(map);
 const viewBox = `0 0 ${mapWidth + 90} ${mapHeight}`;
 const statePath = (usps: string) => `/${usps.toLowerCase()}`;
+// On a phone the boxes beside the map are too small to tap, so they're cut off and the small
+// states get buttons below instead. Widening the drawing by this much pushes the boxes out of view.
+const cropWidth = `${((mapWidth + 90) / mapWidth) * 100}%`;
 ---
 
 <nav class="us-map" aria-label="States">
   <h2>Go to a state</h2>
-  <svg viewBox={viewBox}>
+  <div class="frame">
+  <svg viewBox={viewBox} style={`--crop-width: ${cropWidth}`}>
     {
       states.map((s) => {
         const [x, y] = map.labels[s.state] ?? [0, 0];
@@ -40,6 +44,18 @@ const statePath = (usps: string) => `/${usps.toLowerCase()}`;
       ))
     }
   </svg>
+  </div>
+  <ul class="small-states" aria-hidden="true">
+    {
+      boxes.map((b) => (
+        <li>
+          <a href={statePath(b.state)} tabindex="-1">
+            {b.state}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
 </nav>
 
 <style>
@@ -72,13 +88,55 @@ const statePath = (usps: string) => `/${usps.toLowerCase()}`;
     font-weight: 600;
     text-anchor: middle;
     dominant-baseline: central;
-    pointer-events: none;
+  }
+
+  .small-states {
+    display: none;
   }
 
   /* The map shrinks to a third of its size on a phone, so labels need bigger map units there. */
   @media (max-width: 40rem) {
     text {
       font-size: 22px;
+    }
+
+    .frame {
+      overflow: hidden;
+    }
+
+    svg {
+      width: var(--crop-width);
+      max-width: none;
+    }
+
+    .callout {
+      display: none;
+    }
+
+    /* 44 pixels square at least: the size a fingertip needs. */
+    .small-states {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+      margin: 0.75rem 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .small-states a {
+      display: grid;
+      place-items: center;
+      min-height: 2.75rem;
+      border-radius: 6px;
+      background: var(--shape-muted);
+      color: var(--text);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .small-states a:hover {
+      background: var(--accent);
+      color: var(--bg);
     }
   }
 

@@ -42,6 +42,22 @@ describe("the home page's US map", () => {
     }
   });
 
+  it("also lists the small states as buttons big enough to tap, north to south, outside the tab order", () => {
+    const list = nav().match(/<ul\b[^>]*class="small-states"[\s\S]*?<\/ul>/)?.[0] ?? "";
+    const links = list.match(/<a\b[^>]*>/g) ?? [];
+    const hrefs = links.map((a) => a.match(/href="\/([a-z]{2})"/)?.[1]);
+    expect(hrefs).toEqual(["vt", "nh", "ma", "ri", "ct", "nj", "md", "de"]);
+    expect(links.every((a) => a.includes('tabindex="-1"'))).toBe(true);
+  });
+
+  it("lets a state's label be tapped too, not only its shape", () => {
+    const source = Object.values(
+      import.meta.glob<string>("../components/UsMap.astro", { query: "?raw", import: "default", eager: true }),
+    )[0];
+    expect(source).toMatch(/<style>[\s\S]*text \{/); // anchor: the label styles were read
+    expect(source).not.toMatch(/pointer-events:\s*none/);
+  });
+
   it("comes before the district search, so it's near the top", () => {
     expect(nav()).not.toBe(""); // anchor: the nav rendered
     expect(html.indexOf('aria-label="States"')).toBeLessThan(html.indexOf('aria-label="Find districts"'));
