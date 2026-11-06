@@ -11,9 +11,12 @@ Commands:
     population  Add up 2020 voting-age population by race, and people by city or town, per
                 district; write data/build/.
     senators    Write each state's two U.S. senators for the site, from the Senate's list.
+    elected     Write who won each November 2026 House and Senate race, from the states'
+                unofficial results and the list of races not yet called.
 """
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -24,10 +27,20 @@ from shapely.geometry.base import BaseGeometry
 from gerry.blocks import assemble_districts, read_block_assignment, read_blocks
 from gerry.boundaries import load_districts, load_state_outlines
 from gerry.calibrate import calibrate
+from gerry.elected import (
+    house_outcomes,
+    read_results,
+    read_uncalled,
+    result_problems,
+    senate_outcomes,
+    senate_problems,
+    state_sources,
+)
 from gerry.export import (
     write_cities_json,
     write_district_cities_json,
     write_districts_json,
+    write_elected_json,
     write_fairness_json,
     write_places_json,
     write_population_json,
@@ -92,6 +105,8 @@ from gerry.votes import (
 
 # pipeline/src/gerry/__main__.py -> repo root
 REPO_ROOT = Path(__file__).resolve().parents[3]
+# States with a special Senate election in 2026, for a seat out of its usual cycle.
+SENATE_SPECIALS_2026 = {"FL", "OH"}
 # Replacement districts may leave at most this share of a state's land uncovered.
 MAX_COVERAGE_GAP = 0.005
 
@@ -382,6 +397,48 @@ def senators(repo_root: Path) -> int:
     return 0
 
 
+def _seats_up(senators_json: Path) -> set[tuple[str, str]]:
+    """Return the Senate seats on the 2026 ballot: every class 2 seat, plus special elections.
+
+    A special election fills a seat out of its cycle; in 2026 those are class 3 seats held by
+    appointed senators (Ohio and Florida).
+    """
+    seats = set()
+    for state, senators in json.loads(senators_json.read_text())["states"].items():
+        for s in senators:
+            if s["class"] == 2:
+                seats.add((state, "regular"))
+            elif s["class"] == 3 and state in SENATE_SPECIALS_2026:
+                seats.add((state, "special"))
+    return seats
+
+
+def elected(repo_root: Path) -> int:
+    """Write site/src/data/elected-2026.json from data/sources/members/."""
+    members = repo_root / "data" / "sources" / "members"
+    results = read_results(members / "results-2026.csv")
+    uncalled = read_uncalled(members / "uncalled-2026.csv")
+    site = repo_root / "site" / "src" / "data"
+    ids = [
+        f"{s.usps}-{'AL' if s.seats == 1 else f'{n:02d}'}"
+        for s in STATES
+        for n in range(1, s.seats + 1)
+    ]
+    problems = result_problems(results, uncalled, ids)
+    problems += senate_problems(results, _seats_up(site / "senators.json"))
+    if problems:
+        _print_problems(problems, " in the 2026 results")
+        print("Site data not written.")
+        return 1
+    house, senate = house_outcomes(results, uncalled), senate_outcomes(results, uncalled)
+    as_of = max(uncalled["as_of"], default="")
+    write_elected_json(house, senate, as_of, state_sources(results), site / "elected-2026.json")
+    decided = sum(o["status"] == "elected" for o in house.values())
+    print(f"Wrote {(site / 'elected-2026.json').relative_to(repo_root)}: {decided} of "
+          f"{len(house)} House races decided, {len(senate)} Senate races.")  # fmt: skip
+    return 0
+
+
 COMMANDS = {
     "boundaries": (boundaries, "Build and validate the 2026 district map."),
     "audit": (audit, "Validate the state map audit and list changed states."),
@@ -391,6 +448,7 @@ COMMANDS = {
     "fairness": (fairness, "Score each state's map for partisan fairness."),
     "population": (population, "Add up 2020 population by race and by place per district."),
     "senators": (senators, "Write each state's two U.S. senators for the site."),
+    "elected": (elected, "Write who won each November 2026 House and Senate race."),
 }
 
 

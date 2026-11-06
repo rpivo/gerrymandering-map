@@ -43,10 +43,36 @@ def test_reads_each_senator_with_a_readable_name_and_party(tmp_path):
     )
     table = read_senators(path)
     assert table.to_dict("records") == [
-        {"state": "ME", "last": "King", "name": "Angus S. King Jr.", "party": "Independent"},
-        {"state": "ME", "last": "Collins", "name": "Susan M. Collins", "party": "Republican"},
-        {"state": "MD", "last": "Alsobrooks", "name": "Angela D. Alsobrooks", "party": "Democrat"},
+        {
+            "state": "ME",
+            "last": "King",
+            "name": "Angus S. King Jr.",
+            "party": "Independent",
+            "class": 1,
+        },
+        {
+            "state": "ME",
+            "last": "Collins",
+            "name": "Susan M. Collins",
+            "party": "Republican",
+            "class": 1,
+        },
+        {
+            "state": "MD",
+            "last": "Alsobrooks",
+            "name": "Angela D. Alsobrooks",
+            "party": "Democrat",
+            "class": 1,
+        },
     ]
+
+
+def test_reads_the_senate_class_as_a_number(tmp_path):
+    from gerry.senators import read_senators
+
+    path = tmp_path / "senators.xml"
+    path.write_text(senate_xml(member("Doe", "Jo", "D", "WY").replace("Class I<", "Class III<")))
+    assert read_senators(path)["class"].tolist() == [3]
 
 
 def test_an_unknown_party_letter_fails_rather_than_guessing(tmp_path):
@@ -101,8 +127,8 @@ def test_senators_json_lists_each_state_alphabetically_by_last_name(tmp_path):
     assert data["as_of"] == "2026-11-06"
     assert data["states"] == {
         "ME": [
-            {"name": "Susan M. Collins", "party": "Republican"},
-            {"name": "Angus S. King Jr.", "party": "Independent"},
+            {"name": "Susan M. Collins", "last": "Collins", "party": "Republican", "class": 1},
+            {"name": "Angus S. King Jr.", "last": "King", "party": "Independent", "class": 1},
         ]
     }
 
@@ -143,8 +169,8 @@ def test_the_senators_command_writes_the_site_data(tmp_path):
     assert data["as_of"] == "2026-11-06"
     assert len(data["states"]) == 50
     assert data["states"]["OH"] == [
-        {"name": "Pat OH1", "party": "Democrat"},
-        {"name": "Pat OH2", "party": "Republican"},
+        {"name": "Pat OH1", "last": "OH1", "party": "Democrat", "class": 1},
+        {"name": "Pat OH2", "last": "OH2", "party": "Republican", "class": 1},
     ]
     roles = [s["role"] for s in json.loads((site / "sources.json").read_text())["sources"]]
     assert roles == ["members"]

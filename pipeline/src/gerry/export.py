@@ -502,6 +502,33 @@ def write_places_json(table: pd.DataFrame, districts: pd.DataFrame, path: Path) 
     _write_json(data, path)
 
 
+def write_elected_json(
+    house: dict[str, dict], senate: dict[tuple, dict], called_as_of: str, sources: dict, path: Path
+) -> None:
+    """Write site/src/data/elected-2026.json: who won each November 2026 House and Senate race.
+
+    Args:
+        house: From gerry.elected.house_outcomes, keyed by district ID.
+        senate: From gerry.elected.senate_outcomes, keyed by (state, "regular" or "special").
+        called_as_of: When the list of uncalled races was last checked.
+        sources: From gerry.elected.state_sources: each state's results page.
+        path: Where to write.
+    """
+    by_state: dict[str, dict] = {}
+    for (state, seat), outcome in sorted(senate.items()):
+        by_state.setdefault(state, {})[seat] = outcome
+    _write_json(
+        {
+            "description": "Who won each November 2026 U.S. House and Senate race (unofficial).",
+            "called_as_of": called_as_of,
+            "house": dict(sorted(house.items())),
+            "senate": by_state,
+            "sources": sources,
+        },
+        path,
+    )
+
+
 def write_senators_json(table: pd.DataFrame, as_of: str, path: Path) -> None:
     """Write site/src/data/senators.json: each state's senators, by last name.
 
@@ -512,7 +539,10 @@ def write_senators_json(table: pd.DataFrame, as_of: str, path: Path) -> None:
     """
     ordered = table.sort_values(["state", "last", "name"], kind="stable")
     states = {
-        state: [{"name": r.name, "party": r.party} for r in rows.itertuples()]
+        state: [
+            {"name": r["name"], "last": r["last"], "party": r["party"], "class": int(r["class"])}
+            for r in rows.to_dict("records")
+        ]
         for state, rows in ordered.groupby("state", sort=True)
     }
     _write_json(
