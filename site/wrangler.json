@@ -2,6 +2,7 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "gerrymandering-map",
   "compatibility_date": "2026-10-20",
+  "workers_dev": true,
   "routes": [
     { "pattern": "gerrymandermap.us", "custom_domain": true },
     { "pattern": "www.gerrymandermap.us", "custom_domain": true }
