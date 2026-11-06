@@ -6,7 +6,7 @@ import { districtCardSvg, siteCardSvg, stateCardSvg } from "../../lib/og";
 import { assertFontsLoad, renderPng } from "../../lib/og-render";
 
 const SITE_CARDS: Record<string, [string, string]> = {
-  index: ["Gerrymandering Map", "How irregular is the shape of every US congressional district?"],
+  index: ["Gerrymander Map", "How irregular is the shape of every US congressional district?"],
   methodology: ["How scores work", "Three compactness measures, and what they can't tell you."],
 };
 

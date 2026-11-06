@@ -15,7 +15,7 @@ Copyright (c) 2026 Ryan Pivovar
 
 ## How to credit it
 
-> Gerrymandering Map (Ryan Pivovar), https://gerrymandermap.us, CC BY 4.0
+> Gerrymander Map (Ryan Pivovar), https://gerrymandermap.us, CC BY 4.0
 
 ## What it doesn't cover
 
