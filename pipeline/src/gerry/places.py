@@ -164,8 +164,41 @@ def piece_points(placed: pd.DataFrame) -> pd.DataFrame:
         lies in its district, unlike the center itself, which can fall outside a curved part.
         Parts with no residents are left out.
     """
-    blocks = placed[placed["place"].notna() & (placed["pop"] > 0)].copy()
     keys = ["district_id", "state", "place"]
+    return _nearest_blocks(placed, keys).astype({"pop": int}).reset_index(drop=True)
+
+
+def populated_points(places: pd.DataFrame, placed: pd.DataFrame) -> pd.DataFrame:
+    """Return places with each point moved to where its people live.
+
+    The Census's internal point can sit far from any resident: San Francisco's is in the
+    Pacific, since most of the city's area is water. So a place with residents moves to the
+    block nearest its population center, across all its districts.
+
+    Args:
+        places: From read_pl_places, plus a state column.
+        placed: Blocks with state, place, lon, lat and pop.
+
+    Returns:
+        A copy of places, in the same order, with lon and lat (degrees) replaced for every
+        place with residents. A place nobody lives in keeps its internal point.
+    """
+    nearest = _nearest_blocks(placed, ["state", "place"]).set_index(["state", "place"])
+    keys = pd.MultiIndex.from_frame(places[["state", "place"]])
+    out = places.copy()
+    for col in ("lon", "lat"):
+        moved = nearest[col].reindex(keys).to_numpy()
+        out[col] = np.where(np.isnan(moved), places[col].to_numpy(), moved)
+    return out
+
+
+def _nearest_blocks(placed: pd.DataFrame, keys: list[str]) -> pd.DataFrame:
+    """Return, per group of keys, its residents (pop) and the block nearest its population center.
+
+    A block always lies inside the place and where people live, unlike the center itself,
+    which can fall outside a curved place. Returns keys, pop, and lon and lat in degrees.
+    """
+    blocks = placed[placed["place"].notna() & (placed["pop"] > 0)].copy()
     blocks["wlon"], blocks["wlat"] = blocks["lon"] * blocks["pop"], blocks["lat"] * blocks["pop"]
     sums = blocks.groupby(keys, sort=True)[["pop", "wlon", "wlat"]].sum()
     centers = (sums[["wlon", "wlat"]].div(sums["pop"], axis=0)).rename(
@@ -178,4 +211,4 @@ def piece_points(placed: pd.DataFrame) -> pd.DataFrame:
     blocks["dist"] = dx**2 + dy**2
     nearest = blocks.sort_values("dist", kind="stable").groupby(keys, sort=True).head(1)
     out = nearest.set_index(keys)[["lon", "lat"]].join(sums["pop"]).reset_index()
-    return out[[*keys, "pop", "lon", "lat"]].astype({"pop": int}).reset_index(drop=True)
+    return out[[*keys, "pop", "lon", "lat"]]

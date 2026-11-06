@@ -141,9 +141,10 @@ const redrawn = states.filter((s) => s.changed_since_2024).map((s) => s.name);
       areas or small settlements the Census doesn't name.
     </p>
     <p>
-      State maps mark the largest places in the state with a dot, as landmarks. Each dot is at the
-      Census Bureau's "internal point" for the place, a spot it picks inside the place's borders,
-      which is usually near its middle but not always at its downtown. Each map marks up to 10,
+      State maps mark the largest places in the state with a dot, as landmarks. Each dot is
+      at the census block nearest where the place's residents live on average, so it always falls
+      where people live, though not always at the downtown. (The Census's own point for a place
+      can be in open water: most of San Francisco's area is ocean and bay.) Each map marks up to 10,
       biggest first. A place is skipped when it sits right next to one already marked, such as
       a suburb beside its city, so the marks spread across the state, and when its label would
       cover another one. So a map can skip a big suburb for a smaller city elsewhere, and a

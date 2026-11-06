@@ -251,3 +251,26 @@ class TestPiecePoints:
         )
         (point,) = piece_points(placed)[["lon", "lat"]].itertuples(index=False)
         assert tuple(point) in {(-90.0, 30.0), (-88.0, 30.0)}
+
+
+class TestPopulatedPoints:
+    def test_moves_a_place_to_the_block_nearest_where_all_its_people_live(self):
+        from gerry.places import populated_points
+
+        # San Francisco's internal point is in the ocean; its people live on land, in 2 districts.
+        places = pd.DataFrame({
+            "state": ["CA", "CA"], "place": ["67000", "00500"], "name": ["San Francisco", "Empty"],
+            "kind": ["city", "city"], "pop": [9, 0], "lat": [37.73, 38.0], "lon": [-123.03, -121.0],
+        })  # fmt: skip
+        placed = piece_blocks(
+            ("CA-11", "CA", "67000", -122.50, 37.75, 1),
+            ("CA-11", "CA", "67000", -122.42, 37.77, 4),
+            ("CA-15", "CA", "67000", -122.40, 37.72, 4),
+            ("CA-15", "CA", "00500", -121.00, 38.50, 0),  # a place with nobody in it
+        )
+        moved = populated_points(places, placed)
+        assert moved[["place", "lon", "lat"]].to_dict("records") == [
+            {"place": "67000", "lon": -122.42, "lat": 37.77},
+            {"place": "00500", "lon": -121.0, "lat": 38.0},  # keeps its internal point
+        ]
+        assert moved[["name", "kind", "pop"]].equals(places[["name", "kind", "pop"]])
