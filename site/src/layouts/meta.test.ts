@@ -33,6 +33,15 @@ describe("link preview tags", () => {
     expect(metaTags(html)["og:image:alt"]).toBeTruthy();
   });
 
+  it("uses gerrymandermap.us as the canonical address", async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Base, {
+      props: { title: "TX-35", description: "About TX-35.", path: "/tx/35" },
+    });
+    expect(html).toContain('<link rel="canonical" href="https://gerrymandermap.us/tx/35">');
+    expect(metaTags(html)["og:image"]).toBe("https://gerrymandermap.us/og/tx/35.png");
+  });
+
   it("uses the site-wide image for pages without their own, such as the 404 page", async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(Base, { props: { title: "Not found", description: "Missing." } });
