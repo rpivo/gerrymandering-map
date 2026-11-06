@@ -9,6 +9,7 @@ import PlacesSection from "../../components/PlacesSection.astro";
 import PopulationNote from "../../components/PopulationNote.astro";
 import PresidentSection from "../../components/PresidentSection.astro";
 import SenatorsSection from "../../components/SenatorsSection.astro";
+import ZipsSection from "../../components/ZipsSection.astro";
 import StateEdgeNote from "../../components/StateEdgeNote.astro";
 import MapCloseups from "../../components/MapCloseups.astro";
 import StateMapSvg from "../../components/StateMapSvg.astro";
@@ -107,6 +108,8 @@ const ranked = district.rank_national !== null;
     }
 
     <PlacesSection id={district.id} />
+
+    <ZipsSection id={district.id} />
 
     <PresidentSection id={district.id} stateName={state.name} />
 

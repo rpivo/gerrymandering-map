@@ -302,6 +302,8 @@ def _source_role(source_id: str) -> str:
         return "population"
     if source_id.startswith("senate-"):
         return "members"
+    if source_id.startswith("census-zcta"):
+        return "zips"
     votes = source_id.startswith("medsl-") or source_id.endswith("-votes")
     return "votes" if votes else "boundaries"
 
@@ -312,7 +314,8 @@ def write_sources_json(entries: dict[str, dict[str, str]], path: Path) -> None:
     Census TIGER files are used only by `python -m gerry calibrate`, so their role is
     "calibration"; MIT election files (`medsl-`) and other results (`-votes`) supply "votes";
     the 2020 redistricting files (`census-pl94171-`) supply "population";
-    the Senate's list (`senate-`) supplies "members";
+    the Senate's list (`senate-`) supplies "members"; the ZIP code area file (`census-zcta`)
+    supplies "zips";
     every other source supplies boundaries.
     """
     sources = [
@@ -547,4 +550,42 @@ def write_senators_json(table: pd.DataFrame, as_of: str, path: Path) -> None:
     }
     _write_json(
         {"description": "Each state's two U.S. senators.", "as_of": as_of, "states": states}, path
+    )
+
+
+def _share(share: float) -> float | int:
+    """Round a ZIP code's share to two places, keeping a split ZIP code between 0 and 1.
+
+    A whole ZIP code is 1. A split one stays between 0.01 and 0.99 even when nearly all or
+    almost none of its residents are in the district, so it still reads as split.
+    """
+    if share >= 1:
+        return 1
+    return min(max(round(share, 2), 0.01), 0.99)
+
+
+def write_zips_json(table: pd.DataFrame, path: Path) -> None:
+    """Write site/src/data/zips.json: each district's ZIP codes, in order, with shares.
+
+    Args:
+        table: From gerry.zips.zcta_shares: district_id, zcta, pop and share.
+        path: Where to write.
+
+    Each district maps to [ZIP code, share] pairs, where share is the 0 to 1 part of that
+    ZIP code's 2020 residents who live in the district (1 when all of them do).
+    """
+    ordered = table.sort_values(["district_id", "zcta"], kind="stable")
+    districts = {
+        district: [[f"{int(r.zcta):05d}", _share(r.share)] for r in rows.itertuples()]
+        for district, rows in ordered.groupby("district_id", sort=True)
+    }
+    _write_json(
+        {
+            "description": (
+                "ZIP codes in each district (Census ZIP Code Tabulation Areas), with the share "
+                "of each one's 2020 residents who live in the district."
+            ),
+            "districts": districts,
+        },
+        path,
     )
