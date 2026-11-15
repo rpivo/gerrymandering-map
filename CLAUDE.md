@@ -79,7 +79,7 @@ The site is a neutral reference tool. Scores describe shape, not intent.
 - Keep the pipeline and the site separate. The site reads only exported JSON, never raw data, and never runs Python.
 - Use TypeScript strict mode in `site/`, and type hints in `pipeline/`.
 - Pages must work at phone width, in light and dark mode, and by keyboard. Light is the default whatever the device prefers; the header's sun and moon switch changes and remembers it (`site/src/lib/theme.ts`).
-- Prefer build-time work over browser JavaScript. Only search, sort and filter, and the light/dark toggle, need client-side code. The toggle's two small scripts are inline (one in the head, so a saved dark choice applies before the page draws) and the site works without them.
+- Prefer build-time work over browser JavaScript. Only search, sort and filter, the light/dark toggle, and the visit beacon need client-side code. The toggle's two small scripts are inline (one in the head, so a saved dark choice applies before the page draws), the visit beacon is one inline script in the head of `site/src/layouts/Base.astro`, and the site works without any of them.
 
 ## Commands
 

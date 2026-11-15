@@ -108,6 +108,10 @@ Preview builds are off because Cloudflare's preview setup (in open beta in Novem
 
 The site opens in light mode for everyone, whatever their device prefers. A sun and moon switch in the header (announced to screen readers as a "Dark mode" switch) changes it and remembers the choice in that browser (`localStorage`). The colors for both modes are in `site/src/styles/global.css` (dark ones under `:root[data-theme="dark"]`), and `site/src/lib/theme.ts` holds the two small inline scripts: one in the page head applies a saved dark choice before the page draws, so it never flashes light, and one runs the switch. Without JavaScript the switch stays hidden and the site is light. Link preview images are always light.
 
+### Visit alerts
+
+Every page sends one `navigator.sendBeacon` on load to `visit-notifier`, a separate Cloudflare Worker (in the `visit-notifier` folder next to this repo, not in it) that pushes a phone notification at most once per visitor per site per hour. The beacon is an inline script in the head of `site/src/layouts/Base.astro` and sends only the page path and the referrer. To skip it in your own browser, run `localStorage.setItem('no-visit-ping', '1')` in the console on gerrymandermap.us. Traffic numbers come from Cloudflare Web Analytics, not from this beacon.
+
 ### ZIP code search
 
 Typing a five-digit ZIP code in the home page search shows its district, or every district it's split between with the share of its residents in each. The build writes one small file per group of ZIP codes sharing their first three digits (`/zip/782.json`, about 885 files of up to 3 KB, from `site/src/pages/zip/[prefix].json.ts`), and the page fetches only the group it needs. A ZIP code search shows its districts whatever the state and at-large filters say.
