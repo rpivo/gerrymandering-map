@@ -37,6 +37,20 @@ const themeToggle = `(${setupThemeToggle.toString()})(document.documentElement, 
     <meta property="og:image:alt" content={description} />
     <meta name="twitter:card" content="summary_large_image" />
     <script is:inline set:html={savedTheme} />
+    <script is:inline>
+      // Visit alert beacon (visit-notifier Worker). Skipped in browsers where
+      // localStorage has "no-visit-ping" set. A text/plain body avoids a CORS preflight.
+      try {
+        if (!localStorage.getItem('no-visit-ping') && navigator.sendBeacon) {
+          navigator.sendBeacon(
+            'https://visit-notifier.ryanpivovar.workers.dev/',
+            JSON.stringify({ path: location.pathname, ref: document.referrer }),
+          );
+        }
+      } catch {
+        // Storage is blocked (some private modes): skip the ping.
+      }
+    </script>
   </head>
   <body>
     <header class="site-header">
